@@ -1,6 +1,10 @@
 import { QueryClient, dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { getIdeaList } from "@/services/idea.services"
 import HomeFeatured from "@/components/modules/Home/HomeFeatured"
+import { HeroSection } from "@/components/modules/Home/HeroSection"
+import { ServicesSection } from "@/components/modules/Home/ServicesSection"
+import { ImpactSection } from "@/components/modules/Home/ImpactSection"
+import { NewsletterForm } from "@/components/modules/Home/NewsletterForm"
 
 export default async function Home() {
   const queryClient = new QueryClient()
@@ -12,18 +16,25 @@ export default async function Home() {
 
   return (
     <main className="container mx-auto px-4 py-10">
-      <section className="mx-auto max-w-3xl text-center">
-        <h1 className="text-3xl font-semibold">EcoSpark Hub</h1>
-        <p className="mt-2 text-muted-foreground">
-          Share sustainability ideas, get feedback, and unlock paid insights.
-        </p>
+      <HeroSection />
+
+      <section className="mt-10">
+        <ServicesSection />
       </section>
 
-      <section className="mt-8">
+      <section className="mt-10">
         <h2 className="mb-3 text-xl font-semibold">Latest Ideas</h2>
         <HydrationBoundary state={dehydrate(queryClient)}>
           <HomeFeatured initialParams={params} />
         </HydrationBoundary>
+      </section>
+
+      <section className="mt-10">
+        <ImpactSection />
+      </section>
+
+      <section className="mt-10">
+        <NewsletterForm />
       </section>
     </main>
   )
