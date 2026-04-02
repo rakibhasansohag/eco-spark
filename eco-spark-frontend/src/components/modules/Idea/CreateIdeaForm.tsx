@@ -7,6 +7,10 @@ import { AppField } from "@/components/shared/form/AppField"
 import { AppSubmitButton } from "@/components/shared/form/AppSubmitButton"
 import { createIdeaZodSchema } from "@/zod/idea.validation"
 import { createIdeaAction } from "@/app/(dashboardLayout)/member/dashboard/create-idea/_action"
+import { useQuery } from "@tanstack/react-query"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ApiResponse } from "@/types/api.types"
+import { ICategory } from "@/types/category.types"
 
 const normalizeErrors = (errors: unknown[]): string[] =>
   errors.map((error) => {
@@ -49,6 +53,7 @@ export function CreateIdeaForm() {
         form.handleSubmit()
       }}
     >
+      <CategoryField />
       <form.Field name="title" validators={{ onChange: createIdeaZodSchema.shape.title }}>
         {(field) => (
           <AppField
@@ -122,18 +127,7 @@ export function CreateIdeaForm() {
         name="categoryId"
         validators={{ onChange: createIdeaZodSchema.shape.categoryId }}
       >
-        {(field) => (
-          <AppField
-            id={field.name}
-            label="Category ID"
-            value={field.state.value}
-            onChange={field.handleChange}
-            onBlur={field.handleBlur}
-            touched={field.state.meta.isTouched}
-            errors={normalizeErrors(field.state.meta.errors)}
-            placeholder="Category ID"
-          />
-        )}
+        {(field) => <CategorySelect field={field} />}
       </form.Field>
 
       <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
@@ -147,5 +141,63 @@ export function CreateIdeaForm() {
         )}
       </form.Subscribe>
     </form>
+  )
+}
+
+function CategoryField() {
+  return (
+    <div>
+      <p className="text-sm text-muted-foreground">
+        Choose a category to help people find your idea.
+      </p>
+    </div>
+  )
+}
+
+function CategorySelect({
+  field,
+}: {
+  field: {
+    name: string
+    state: { value: string; meta: { isTouched: boolean; errors: unknown[] } }
+    handleChange: (value: string) => void
+    handleBlur: () => void
+  }
+}) {
+  const API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api/v1"
+
+  const { data } = useQuery({
+    queryKey: ["categories", { limit: "100" }],
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE_URL}/categories?limit=100`, {
+        credentials: "include",
+      })
+      return (await response.json()) as ApiResponse<ICategory[]>
+    },
+  })
+
+  const errors = normalizeErrors(field.state.meta.errors)
+  const hasError = field.state.meta.isTouched && errors.length > 0
+
+  return (
+    <div className="space-y-2">
+      <label htmlFor={field.name} className="text-sm font-medium">
+        Category
+      </label>
+      <Select value={field.state.value} onValueChange={field.handleChange} required>
+        <SelectTrigger className="w-full" aria-invalid={hasError}>
+          <SelectValue placeholder="Select a category" />
+        </SelectTrigger>
+        <SelectContent>
+          {data?.data?.map((cat) => (
+            <SelectItem key={cat.id} value={cat.id}>
+              {cat.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {hasError ? <p className="text-sm text-destructive">{errors[0]}</p> : null}
+    </div>
   )
 }
