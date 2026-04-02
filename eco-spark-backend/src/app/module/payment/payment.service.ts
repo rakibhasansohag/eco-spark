@@ -43,7 +43,7 @@ export const PaymentService = {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: undefined,
-      success_url: `${envVars.FRONTEND_URL}/member/dashboard/my-payments?transactionId=${payment.id}`,
+      success_url: `${envVars.FRONTEND_URL}/member/dashboard/my-payments?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${envVars.FRONTEND_URL}/ideas/${idea.id}`,
       line_items: [
         {
@@ -127,6 +127,34 @@ export const PaymentService = {
     if (!payment || payment.userId !== userId) {
       throw new AppError(StatusCodes.NOT_FOUND, "Payment not found");
     }
+
+    if (payment.status === PaymentStatus.SUCCESS) {
+      return payment;
+    }
+
+    const session = await stripe.checkout.sessions.retrieve(transactionId);
+    const isPaid = session.payment_status === "paid" || session.status === "complete";
+
+    if (isPaid) {
+      const updated = await prisma.$transaction(async (tx) => {
+        const updatedPayment = await tx.payment.update({
+          where: { id: payment.id },
+          data: { status: PaymentStatus.SUCCESS },
+          include: { idea: true },
+        });
+
+        await tx.ideaAccess.upsert({
+          where: { userId_ideaId: { userId: payment.userId, ideaId: payment.ideaId } },
+          update: { paymentId: payment.id },
+          create: { userId: payment.userId, ideaId: payment.ideaId, paymentId: payment.id },
+        });
+
+        return updatedPayment;
+      });
+
+      return updated;
+    }
+
     return payment;
   },
 };

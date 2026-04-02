@@ -8,6 +8,7 @@ import { DataTable } from "@/components/shared/table/DataTable"
 import { useServerManagedDataTable } from "@/hooks/useServerManagedDataTable"
 import { DateCell } from "@/components/shared/cell/DateCell"
 import { StatusBadgeCell } from "@/components/shared/cell/StatusBadgeCell"
+import { Badge } from "@/components/ui/badge"
 
 const columns: ColumnDef<IPayment>[] = [
   { header: "Idea ID", accessorKey: "ideaId" },
@@ -26,8 +27,10 @@ const columns: ColumnDef<IPayment>[] = [
 
 export default function MyPaymentsManagement({
   searchParams,
+  paymentNotice,
 }: {
   searchParams: Record<string, string>
+  paymentNotice?: string | null
 }) {
   const { data } = useQuery({
     queryKey: ["member-payments", searchParams],
@@ -41,5 +44,14 @@ export default function MyPaymentsManagement({
     searchParams,
   })
 
-  return <DataTable table={table} pagination={pagination} />
+  return (
+    <>
+      {paymentNotice ? (
+        <div className="mb-3">
+          <Badge variant="secondary">{paymentNotice}</Badge>
+        </div>
+      ) : null}
+      <DataTable table={table} pagination={pagination} />
+    </>
+  )
 }

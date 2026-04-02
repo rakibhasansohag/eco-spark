@@ -1,5 +1,5 @@
 import { QueryClient, dehydrate, HydrationBoundary } from "@tanstack/react-query"
-import { getMyPayments } from "@/services/payment.services"
+import { getMyPayments, verifyPayment } from "@/services/payment.services"
 import MyPaymentsManagement from "@/components/modules/Member/Payments/MyPaymentsManagement"
 
 export default async function MyPaymentsPage({
@@ -8,15 +8,34 @@ export default async function MyPaymentsPage({
   searchParams: Promise<Record<string, string>>
 }) {
   const params = await searchParams
+  const { session_id, ...listParams } = params
   const queryClient = new QueryClient()
+  let paymentNotice: string | null = null
+
+  if (session_id) {
+    try {
+      const verification = await verifyPayment(session_id)
+      if (verification.data.status === "SUCCESS") {
+        paymentNotice = "Payment verified successfully. Idea access has been unlocked."
+      } else {
+        paymentNotice = `Payment status: ${verification.data.status}`
+      }
+    } catch {
+      paymentNotice = "Unable to verify payment yet. Please refresh in a few moments."
+    }
+  }
+
   await queryClient.prefetchQuery({
-    queryKey: ["member-payments", params],
-    queryFn: () => getMyPayments(params),
+    queryKey: ["member-payments", listParams],
+    queryFn: () => getMyPayments(listParams),
   })
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <MyPaymentsManagement searchParams={params} />
-    </HydrationBoundary>
+    <section className="space-y-4">
+      <h1 className="text-2xl font-semibold">My Payments</h1>
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <MyPaymentsManagement searchParams={listParams} paymentNotice={paymentNotice} />
+      </HydrationBoundary>
+    </section>
   )
 }
