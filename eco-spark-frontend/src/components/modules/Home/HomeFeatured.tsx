@@ -32,7 +32,7 @@ export default function HomeFeatured({
         <Link
           key={idea.id}
           href={`/ideas/${idea.id}`}
-          className="rounded-lg border bg-background p-4 transition hover:border-primary/30 hover:shadow-sm"
+          className="group cursor-pointer rounded-lg border bg-background p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
         >
           <div className="mb-2 flex items-center justify-between gap-2">
             <Badge variant="secondary">{idea.status}</Badge>
@@ -40,7 +40,9 @@ export default function HomeFeatured({
               {new Date(idea.createdAt).toLocaleDateString()}
             </span>
           </div>
-          <h3 className="line-clamp-2 font-medium">{idea.title}</h3>
+          <h3 className="line-clamp-2 font-medium transition-colors group-hover:text-foreground">
+            {idea.title}
+          </h3>
           <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
             {idea.description ?? "Content preview locked"}
           </p>

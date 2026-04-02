@@ -18,10 +18,10 @@ export function HeroSection() {
           through paid idea access.
         </p>
         <div className="mt-7 flex flex-wrap items-center gap-3">
-          <Button asChild>
+          <Button asChild className="transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
             <Link href="/ideas">Explore Ideas</Link>
           </Button>
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild className="transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
             <Link href="/member/dashboard/create-idea">Submit an Idea</Link>
           </Button>
         </div>

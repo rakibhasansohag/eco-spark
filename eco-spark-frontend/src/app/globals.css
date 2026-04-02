@@ -128,3 +128,12 @@
     @apply font-sans;
   }
 }
+
+@layer utilities {
+  a,
+  button,
+  [role="button"],
+  .cursor-pointer {
+    cursor: pointer;
+  }
+}

@@ -1,11 +1,14 @@
 import { Response } from "express";
 import { envVars } from "../config/env.js";
 
-const cookieBase = {
-  httpOnly: true,
-  secure: envVars.NODE_ENV === "production",
-  sameSite: "none" as const,
-};
+const cookieBase = (() => {
+  const isProd = envVars.NODE_ENV === "production";
+  return {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: (isProd ? "none" : "lax") as "lax" | "none",
+  };
+})();
 
 export const setAuthCookies = (
   res: Response,
