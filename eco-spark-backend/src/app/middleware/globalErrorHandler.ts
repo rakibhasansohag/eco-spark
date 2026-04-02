@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod/v4";
-import { Prisma } from "@prisma/client";
-import { StatusCodes } from "http-status";
+import { Prisma } from "../../generated/prisma/index.js";
+import { StatusCodes } from "http-status-codes";
 import AppError from "../errorHelpers/AppError.js";
 import handleZodError from "../errorHelpers/handleZodError.js";
 import handlePrismaErrors from "../errorHelpers/handlePrismaErrors.js";

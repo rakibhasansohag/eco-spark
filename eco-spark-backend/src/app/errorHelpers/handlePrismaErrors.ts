@@ -1,5 +1,5 @@
-import { Prisma } from "@prisma/client";
-import { StatusCodes } from "http-status";
+import { Prisma } from "../../generated/prisma/index.js";
+import { StatusCodes } from "http-status-codes";
 import { IErrorSource } from "../interfaces/error.interface.js";
 
 const handlePrismaErrors = (

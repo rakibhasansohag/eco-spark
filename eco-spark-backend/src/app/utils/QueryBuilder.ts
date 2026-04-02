@@ -32,7 +32,7 @@ class QueryBuilder {
   }
 
   search(): this {
-    const { searchTerm } = this.query;
+    const searchTerm = this.query.searchTerm as string | undefined;
     const { searchableFields = [] } = this.options;
 
     if (searchTerm && searchableFields.length > 0) {
@@ -63,8 +63,9 @@ class QueryBuilder {
     const { filterableFields = [] } = this.options;
 
     const filters: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(rest)) {
-      if (filterableFields.includes(key) && value !== undefined) {
+    for (const [key, rawValue] of Object.entries(rest)) {
+      if (filterableFields.includes(key) && rawValue !== undefined) {
+        const value = typeof rawValue === "string" ? rawValue : String(rawValue);
         if (value === "true") filters[key] = true;
         else if (value === "false") filters[key] = false;
         else filters[key] = value;
@@ -76,21 +77,22 @@ class QueryBuilder {
   }
 
   paginate(): this {
-    const page = Math.max(1, parseInt(this.query.page ?? "1", 10));
-    const limit = Math.min(100, parseInt(this.query.limit ?? "10", 10));
+    const page = Math.max(1, parseInt((this.query.page as string | undefined) ?? "1", 10));
+    const limit = Math.min(100, parseInt((this.query.limit as string | undefined) ?? "10", 10));
     this.skip = (page - 1) * limit;
     this.take = limit;
     return this;
   }
 
   sort(): this {
-    const { sortBy = "createdAt", sortOrder = "desc" } = this.query;
+    const sortBy = (this.query.sortBy as string | undefined) ?? "createdAt";
+    const sortOrder = (this.query.sortOrder as string | undefined) ?? "desc";
     this.orderBy = [{ [sortBy]: sortOrder }];
     return this;
   }
 
   include(): this {
-    const { include } = this.query;
+    const include = this.query.include as string | undefined;
     if (include) {
       for (const key of include.split(",")) {
         this.includeClause[key.trim()] = true;
@@ -100,8 +102,8 @@ class QueryBuilder {
   }
 
   async execute(): Promise<{ data: unknown[]; meta: { page: number; limit: number } }> {
-    const page = Math.max(1, parseInt(this.query.page ?? "1", 10));
-    const limit = Math.min(100, parseInt(this.query.limit ?? "10", 10));
+    const page = Math.max(1, parseInt((this.query.page as string | undefined) ?? "1", 10));
+    const limit = Math.min(100, parseInt((this.query.limit as string | undefined) ?? "10", 10));
 
     const data = await this.model.findMany({
       where: this.whereClause,

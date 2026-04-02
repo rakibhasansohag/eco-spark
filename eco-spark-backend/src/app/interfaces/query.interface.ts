@@ -6,5 +6,5 @@ export interface IQueryParams {
   sortOrder?: string;
   fields?: string;
   include?: string;
-  [key: string]: string | undefined;
+  [key: string]: unknown;
 }
