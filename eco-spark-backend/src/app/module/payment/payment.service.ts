@@ -43,7 +43,7 @@ export const PaymentService = {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: undefined,
-      success_url: `${envVars.FRONTEND_URL}/member/dashboard/my-payments?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${envVars.FRONTEND_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${envVars.FRONTEND_URL}/ideas/${idea.id}`,
       line_items: [
         {

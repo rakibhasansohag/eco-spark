@@ -27,11 +27,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Link href="/register" className="text-muted-foreground hover:text-foreground">
                 Register
               </Link>
+              <Link href="/member/dashboard" className="text-muted-foreground hover:text-foreground">
+                Dashboard
+              </Link>
             </nav>
           </div>
         </header>
       ) : null}
       <div className="flex-1">{children}</div>
+      {!inDashboard ? (
+        <footer className="border-t bg-background/95">
+          <div className="container mx-auto flex flex-col gap-2 px-4 py-6 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
+            <p>© {new Date().getFullYear()} EcoSpark Hub. Build greener outcomes together.</p>
+            <div className="flex items-center gap-3">
+              <Link href="/ideas" className="hover:text-foreground">
+                Explore
+              </Link>
+              <Link href="/login" className="hover:text-foreground">
+                Sign In
+              </Link>
+            </div>
+          </div>
+        </footer>
+      ) : null}
     </>
   )
 }
