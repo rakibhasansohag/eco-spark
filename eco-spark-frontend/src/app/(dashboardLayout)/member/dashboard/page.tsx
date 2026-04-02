@@ -1,4 +1,6 @@
 import { getMemberDashboardStats } from "@/services/dashboard.services"
+import { StatsCard } from "@/components/shared/StatsCard"
+import { IdeaStatusBarChart } from "@/components/shared/charts/IdeaStatusBarChart"
 
 export default async function MemberDashboardPage() {
   const result = await getMemberDashboardStats()
@@ -8,19 +10,17 @@ export default async function MemberDashboardPage() {
     <section className="space-y-4">
       <h1 className="text-2xl font-semibold">Member Dashboard</h1>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <div className="rounded-lg border bg-background p-4">
-          <p className="text-sm text-muted-foreground">My Total Ideas</p>
-          <p className="mt-2 text-2xl font-bold">{stats.totalIdeas}</p>
-        </div>
-        <div className="rounded-lg border bg-background p-4">
-          <p className="text-sm text-muted-foreground">Votes Received</p>
-          <p className="mt-2 text-2xl font-bold">{stats.totalVotesReceived}</p>
-        </div>
-        <div className="rounded-lg border bg-background p-4">
-          <p className="text-sm text-muted-foreground">Comments Received</p>
-          <p className="mt-2 text-2xl font-bold">{stats.totalCommentsReceived}</p>
-        </div>
+        <StatsCard title="My Total Ideas" value={stats.totalIdeas} />
+        <StatsCard title="Votes Received" value={stats.totalVotesReceived} />
+        <StatsCard title="Comments Received" value={stats.totalCommentsReceived} />
       </div>
+      <IdeaStatusBarChart
+        data={[
+          { status: "Approved", value: stats.ideasByStatus.approved },
+          { status: "Pending", value: stats.ideasByStatus.pending },
+          { status: "Rejected", value: stats.ideasByStatus.rejected },
+        ]}
+      />
     </section>
   )
 }
