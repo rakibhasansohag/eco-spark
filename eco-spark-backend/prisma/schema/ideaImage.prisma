@@ -1,0 +1,10 @@
+model IdeaImage {
+  id        String   @id @default(cuid())
+  url       String
+  ideaId    String
+  createdAt DateTime @default(now())
+
+  idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+
+  @@map("idea_images")
+}

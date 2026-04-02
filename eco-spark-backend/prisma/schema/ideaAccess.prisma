@@ -1,0 +1,14 @@
+model IdeaAccess {
+  id        String   @id @default(cuid())
+  userId    String
+  ideaId    String
+  paymentId String   @unique
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  idea      Idea     @relation(fields: [ideaId], references: [id])
+  payment   Payment  @relation(fields: [paymentId], references: [id])
+
+  @@unique([userId, ideaId])
+  @@map("idea_accesses")
+}
