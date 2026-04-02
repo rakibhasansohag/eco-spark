@@ -1,5 +1,3 @@
-"use server";
-
 import axios, { AxiosHeaders, AxiosRequestConfig, AxiosResponse } from "axios";
 import { getAuthCookiesForHeader } from "../cookieUtils";
 import { getAccessToken, getRefreshToken, shouldRefreshAccessToken } from "../tokenUtils";
