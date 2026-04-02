@@ -15,8 +15,11 @@ export default async function MyIdeasPage({
   })
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <MyIdeasManagement searchParams={params} />
-    </HydrationBoundary>
+    <section className="space-y-4">
+      <h1 className="text-2xl font-semibold">My Ideas</h1>
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <MyIdeasManagement searchParams={params} />
+      </HydrationBoundary>
+    </section>
   )
 }

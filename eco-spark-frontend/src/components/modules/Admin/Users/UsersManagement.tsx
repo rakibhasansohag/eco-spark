@@ -8,6 +8,7 @@ import { DataTable } from "@/components/shared/table/DataTable"
 import { useServerManagedDataTable } from "@/hooks/useServerManagedDataTable"
 import { UserInfoCell } from "@/components/shared/cell/UserInfoCell"
 import { StatusBadgeCell } from "@/components/shared/cell/StatusBadgeCell"
+import { SearchBar } from "@/components/shared/form/SearchBar"
 
 const columns: ColumnDef<IUser>[] = [
   {
@@ -50,5 +51,10 @@ export default function AdminUsersManagement({
     searchParams,
   })
 
-  return <DataTable table={table} pagination={pagination} />
+  return (
+    <>
+      <SearchBar searchParams={searchParams} />
+      <DataTable table={table} pagination={pagination} />
+    </>
+  )
 }

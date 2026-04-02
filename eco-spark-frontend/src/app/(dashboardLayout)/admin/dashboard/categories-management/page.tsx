@@ -15,8 +15,11 @@ export default async function CategoriesManagementPage({
   })
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <AdminCategoriesManagement searchParams={params} />
-    </HydrationBoundary>
+    <section className="space-y-4">
+      <h1 className="text-2xl font-semibold">Categories Management</h1>
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <AdminCategoriesManagement searchParams={params} />
+      </HydrationBoundary>
+    </section>
   )
 }

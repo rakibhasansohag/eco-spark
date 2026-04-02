@@ -8,6 +8,7 @@ import { DataTable } from "@/components/shared/table/DataTable"
 import { useServerManagedDataTable } from "@/hooks/useServerManagedDataTable"
 import { DateCell } from "@/components/shared/cell/DateCell"
 import { StatusBadgeCell } from "@/components/shared/cell/StatusBadgeCell"
+import { SearchBar } from "@/components/shared/form/SearchBar"
 
 const columns: ColumnDef<IComment>[] = [
   {
@@ -48,5 +49,10 @@ export default function AdminCommentsManagement({
     searchParams,
   })
 
-  return <DataTable table={table} pagination={pagination} />
+  return (
+    <>
+      <SearchBar searchParams={searchParams} />
+      <DataTable table={table} pagination={pagination} />
+    </>
+  )
 }

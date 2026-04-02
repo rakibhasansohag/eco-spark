@@ -7,6 +7,7 @@ import { ICategory } from "@/types/category.types"
 import { DataTable } from "@/components/shared/table/DataTable"
 import { useServerManagedDataTable } from "@/hooks/useServerManagedDataTable"
 import { DateCell } from "@/components/shared/cell/DateCell"
+import { SearchBar } from "@/components/shared/form/SearchBar"
 
 const columns: ColumnDef<ICategory>[] = [
   { header: "Name", accessorKey: "name" },
@@ -35,5 +36,10 @@ export default function AdminCategoriesManagement({
     searchParams,
   })
 
-  return <DataTable table={table} pagination={pagination} />
+  return (
+    <>
+      <SearchBar searchParams={searchParams} />
+      <DataTable table={table} pagination={pagination} />
+    </>
+  )
 }
