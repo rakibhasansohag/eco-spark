@@ -1,10 +1,9 @@
 "use client"
 
-import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { getIdeaList } from "@/services/idea.services"
 import { IIdea } from "@/types/idea.types"
-import { Badge } from "@/components/ui/badge"
+import { IdeaCard } from "@/components/shared/card/IdeaCard"
 
 export default function HomeFeatured({
   initialParams,
@@ -20,8 +19,8 @@ export default function HomeFeatured({
 
   if (ideas.length === 0) {
     return (
-      <div className="rounded-lg border bg-background p-6 text-sm text-muted-foreground">
-        No approved ideas yet.
+      <div className="rounded-lg border bg-muted/40 px-6 py-10 text-center">
+        <p className="text-sm text-muted-foreground">No approved ideas yet.</p>
       </div>
     )
   }
@@ -29,24 +28,7 @@ export default function HomeFeatured({
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {ideas.map((idea: IIdea) => (
-        <Link
-          key={idea.id}
-          href={`/ideas/${idea.id}`}
-          className="group cursor-pointer rounded-lg border bg-background p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
-        >
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <Badge variant="secondary">{idea.status}</Badge>
-            <span className="text-xs text-muted-foreground">
-              {new Date(idea.createdAt).toLocaleDateString()}
-            </span>
-          </div>
-          <h3 className="line-clamp-2 font-medium transition-colors group-hover:text-foreground">
-            {idea.title}
-          </h3>
-          <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
-            {idea.description ?? "Content preview locked"}
-          </p>
-        </Link>
+        <IdeaCard key={idea.id} idea={idea} href={`/ideas/${idea.id}`} />
       ))}
     </div>
   )

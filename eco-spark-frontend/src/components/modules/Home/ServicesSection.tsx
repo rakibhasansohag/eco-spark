@@ -1,6 +1,5 @@
-"use client"
-
 import { Leaf, Recycle, Lightbulb, Droplets } from "lucide-react"
+import { SectionHeader } from "@/components/shared/SectionHeader"
 
 const items = [
   {
@@ -28,12 +27,12 @@ const items = [
 export function ServicesSection() {
   return (
     <section>
-      <h2 className="mb-4 text-xl font-semibold">What You Can Do</h2>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <SectionHeader title="What You Can Do" />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {items.map((item) => (
-          <div key={item.title} className="rounded-lg border bg-background p-5">
-            <item.icon className="mb-3 text-primary" />
-            <h3 className="font-medium">{item.title}</h3>
+          <div key={item.title} className="rounded-lg border bg-card p-5">
+            <item.icon className="mb-3 size-5 text-primary" />
+            <h3 className="text-base font-semibold">{item.title}</h3>
             <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
           </div>
         ))}

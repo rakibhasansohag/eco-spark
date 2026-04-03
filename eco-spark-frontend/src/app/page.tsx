@@ -16,31 +16,23 @@ export default async function Home() {
   })
 
   return (
-    <main className="container mx-auto space-y-10 px-4 py-10">
+    <main className="container mx-auto space-y-12 px-4 py-10 md:px-6">
       <HeroSection />
 
-      <section>
-        <ServicesSection />
-      </section>
+      <ServicesSection />
+
+      <HowItWorksSection />
 
       <section>
-        <HowItWorksSection />
-      </section>
-
-      <section>
-        <h2 className="mb-3 text-xl font-semibold">Latest Ideas</h2>
+        <h2 className="mb-4 text-xl font-semibold">Latest Ideas</h2>
         <HydrationBoundary state={dehydrate(queryClient)}>
           <HomeFeatured initialParams={params} />
         </HydrationBoundary>
       </section>
 
-      <section>
-        <ImpactSection />
-      </section>
+      <ImpactSection />
 
-      <section>
-        <NewsletterForm />
-      </section>
+      <NewsletterForm />
     </main>
   )
 }

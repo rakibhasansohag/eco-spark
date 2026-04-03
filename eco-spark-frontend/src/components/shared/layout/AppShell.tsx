@@ -1,49 +1,138 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { Menu, Leaf } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
-const dashboardPrefixes = ["/admin/dashboard", "/member/dashboard", "/my-profile", "/change-password"]
+const DASHBOARD_PREFIXES = [
+  "/admin/dashboard",
+  "/member/dashboard",
+  "/my-profile",
+  "/change-password",
+]
+
+const NAV_LINKS = [
+  { href: "/ideas", label: "Ideas" },
+  { href: "/login", label: "Sign In" },
+  { href: "/member/dashboard", label: "Dashboard" },
+]
+
+function isActivePath(pathname: string, href: string): boolean {
+  if (href === "/") return pathname === "/"
+  return pathname === href || pathname.startsWith(`${href}/`)
+}
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const inDashboard = dashboardPrefixes.some((prefix) => pathname.startsWith(prefix))
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const inDashboard = DASHBOARD_PREFIXES.some((prefix) => pathname.startsWith(prefix))
 
   return (
     <>
       {!inDashboard ? (
-        <header className="border-b bg-background/95 backdrop-blur">
-          <div className="container mx-auto flex h-14 items-center justify-between px-4">
-            <Link href="/" className="font-semibold">
-              EcoSpark Hub
+          <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+          <div className="container mx-auto flex h-14 items-center justify-between px-4 md:px-6">
+            {/* Logo */}
+            <Link
+              href="/"
+              className="flex items-center gap-2 font-semibold transition-opacity hover:opacity-80"
+            >
+              <Leaf className="size-5 text-primary" />
+              <span>EcoSpark Hub</span>
             </Link>
-            <nav className="flex items-center gap-4 text-sm">
-              <Link href="/ideas" className="text-muted-foreground hover:text-foreground">
-                Ideas
-              </Link>
-              <Link href="/login" className="text-muted-foreground hover:text-foreground">
-                Login
-              </Link>
-              <Link href="/register" className="text-muted-foreground hover:text-foreground">
-                Register
-              </Link>
-              <Link href="/member/dashboard" className="text-muted-foreground hover:text-foreground">
-                Dashboard
-              </Link>
+
+            {/* Desktop nav */}
+            <nav className="hidden items-center gap-1 md:flex">
+              {NAV_LINKS.map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:text-foreground",
+                    isActivePath(pathname, href)
+                      ? "text-foreground"
+                      : "text-muted-foreground",
+                  )}
+                >
+                  {label}
+                </Link>
+              ))}
+              <Button asChild size="sm" className="ml-2">
+                <Link href="/register">Get Started</Link>
+              </Button>
             </nav>
+
+            {/* Mobile nav trigger */}
+            <div className="md:hidden">
+              <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label="Open navigation menu">
+                    <Menu className="size-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-64 p-0">
+                  <SheetHeader className="border-b px-4 py-4">
+                    <SheetTitle className="flex items-center gap-2 text-base">
+                      <Leaf className="size-4 text-primary" />
+                      EcoSpark Hub
+                    </SheetTitle>
+                  </SheetHeader>
+                  <nav className="flex flex-col gap-1 p-3">
+                    {NAV_LINKS.map(({ href, label }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={() => setMobileOpen(false)}
+                        className={cn(
+                          "rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                          isActivePath(pathname, href)
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                        )}
+                      >
+                        {label}
+                      </Link>
+                    ))}
+                    <Button
+                      asChild
+                      size="sm"
+                      className="mt-2 w-full"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <Link href="/register">Get Started</Link>
+                    </Button>
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </header>
       ) : null}
+
       <div className="flex-1">{children}</div>
+
       {!inDashboard ? (
         <footer className="border-t bg-background/95">
-          <div className="container mx-auto flex flex-col gap-2 px-4 py-6 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
-            <p>© {new Date().getFullYear()} EcoSpark Hub. Build greener outcomes together.</p>
-            <div className="flex items-center gap-3">
-              <Link href="/ideas" className="hover:text-foreground">
+          <div className="container mx-auto flex flex-col gap-3 px-4 py-6 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between md:px-6">
+            <div className="flex items-center gap-2">
+              <Leaf className="size-4 text-primary" />
+              <p>© {new Date().getFullYear()} EcoSpark Hub. Build greener outcomes together.</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <Link href="/ideas" className="transition-colors hover:text-foreground">
                 Explore
               </Link>
-              <Link href="/login" className="hover:text-foreground">
+              <Link href="/login" className="transition-colors hover:text-foreground">
                 Sign In
               </Link>
             </div>
