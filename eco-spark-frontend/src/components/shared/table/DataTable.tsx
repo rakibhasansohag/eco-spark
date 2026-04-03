@@ -27,8 +27,8 @@ interface DataTableProps<TData> {
 
 export function DataTable<TData>({ table, pagination }: DataTableProps<TData>) {
   return (
-    <div className="space-y-4">
-      <div className="rounded-lg border bg-background">
+    <div className="space-y-5">
+      <div className="overflow-hidden rounded-xl border bg-card shadow-[0_8px_30px_-18px_rgba(15,23,42,0.35)]">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

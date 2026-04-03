@@ -18,5 +18,5 @@ export default async function MemberDashboardLayout({
     redirect("/admin/dashboard")
   }
 
-  return <div className="space-y-4">{children}</div>
+  return <div className="space-y-6">{children}</div>
 }

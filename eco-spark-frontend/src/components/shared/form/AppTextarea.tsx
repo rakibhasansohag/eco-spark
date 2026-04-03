@@ -41,7 +41,7 @@ export function AppTextarea({
         aria-invalid={hasError}
         className="resize-none"
       />
-      {hasError ? <p className="text-sm text-destructive">{errors[0]}</p> : null}
+      {hasError ? <p className="text-xs text-destructive">{errors[0]}</p> : null}
     </div>
   )
 }

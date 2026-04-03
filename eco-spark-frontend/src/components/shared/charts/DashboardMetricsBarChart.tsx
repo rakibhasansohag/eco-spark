@@ -20,8 +20,15 @@ export function DashboardMetricsBarChart({ title, data }: DashboardMetricsBarCha
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis type="number" allowDecimals={false} />
             <YAxis type="category" dataKey="label" width={90} tick={{ fontSize: 12 }} />
-            <Tooltip />
-            <Bar dataKey="value" fill="var(--color-primary)" radius={[0, 6, 6, 0]} />
+            <Tooltip
+              contentStyle={{
+                borderRadius: 12,
+                border: "1px solid var(--color-border)",
+                background: "var(--color-card)",
+                color: "var(--color-card-foreground)",
+              }}
+            />
+            <Bar dataKey="value" fill="var(--color-chart-2)" radius={[0, 6, 6, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

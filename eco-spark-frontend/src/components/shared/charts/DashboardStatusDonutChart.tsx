@@ -40,7 +40,14 @@ export function DashboardStatusDonutChart({ title, data }: DashboardStatusDonutC
                 <Cell key={entry.label} fill={palette[index % palette.length]} />
               ))}
             </Pie>
-            <Tooltip />
+            <Tooltip
+              contentStyle={{
+                borderRadius: 12,
+                border: "1px solid var(--color-border)",
+                background: "var(--color-card)",
+                color: "var(--color-card-foreground)",
+              }}
+            />
           </PieChart>
         </ResponsiveContainer>
       </div>
