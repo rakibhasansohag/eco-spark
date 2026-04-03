@@ -46,7 +46,7 @@ export function UserMenu({ name, role }: UserMenuProps) {
           <Avatar className="h-7 w-7">
             <AvatarFallback className="text-xs">{getInitials(name)}</AvatarFallback>
           </Avatar>
-          <span className="hidden max-w-[120px] truncate text-sm font-medium sm:block">
+          <span className="hidden max-w-30 truncate text-sm font-medium sm:block">
             {name}
           </span>
           <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
