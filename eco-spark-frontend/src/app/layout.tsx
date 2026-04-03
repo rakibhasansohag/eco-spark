@@ -32,6 +32,8 @@ export default async function RootLayout({
   const accessToken = await getAccessToken()
   const decoded = decodeAccessToken(accessToken)
   const isLoggedIn = !!decoded
+  const userName = decoded?.name ?? "EcoSpark User"
+  const userRole = decoded?.role === "ADMIN" ? "ADMIN" : "MEMBER"
 
   return (
     <html
@@ -43,7 +45,13 @@ export default async function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <QueryProvider>
             <TooltipProvider>
-              <AppShell isLoggedIn={isLoggedIn}>{children}</AppShell>
+              <AppShell
+                isLoggedIn={isLoggedIn}
+                userName={isLoggedIn ? userName : undefined}
+                userRole={isLoggedIn ? userRole : undefined}
+              >
+                {children}
+              </AppShell>
               <Toaster richColors />
             </TooltipProvider>
           </QueryProvider>

@@ -14,6 +14,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { ThemeToggle } from "@/components/shared/ThemeToggle"
+import { UserMenu } from "@/components/modules/Dashboard/UserMenu"
 
 const DASHBOARD_PREFIXES = [
   "/dashboard",
@@ -33,9 +34,11 @@ function isActivePath(pathname: string, href: string): boolean {
 interface AppShellProps {
   children: React.ReactNode
   isLoggedIn: boolean
+  userName?: string
+  userRole?: "ADMIN" | "MEMBER"
 }
 
-export function AppShell({ children, isLoggedIn }: AppShellProps) {
+export function AppShell({ children, isLoggedIn, userName, userRole }: AppShellProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const inDashboard = DASHBOARD_PREFIXES.some((prefix) => pathname.startsWith(prefix))
@@ -99,11 +102,17 @@ export function AppShell({ children, isLoggedIn }: AppShellProps) {
               )}
 
               <ThemeToggle />
+              {isLoggedIn && userName && userRole ? (
+                <UserMenu name={userName} role={userRole} />
+              ) : null}
             </nav>
 
             {/* Mobile nav trigger */}
             <div className="flex items-center gap-1 md:hidden">
               <ThemeToggle />
+              {isLoggedIn && userName && userRole ? (
+                <UserMenu name={userName} role={userRole} />
+              ) : null}
               <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" aria-label="Open navigation menu">
