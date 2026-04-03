@@ -6,6 +6,7 @@ import {
   MessageSquare,
   Plus,
   CreditCard,
+  
   UserCircle,
   Lock,
   type LucideIcon,
@@ -35,6 +36,7 @@ const roleNavItems: Record<AppRole, INavItem[]> = {
     { label: "My Ideas", href: "/member/dashboard/my-ideas", icon: Lightbulb },
     { label: "Create Idea", href: "/member/dashboard/create-idea", icon: Plus },
     { label: "My Payments", href: "/member/dashboard/my-payments", icon: CreditCard },
+    { label: "Idea Buyers", href: "/member/dashboard/my-idea-buyers", icon: Users },
   ],
 }
 

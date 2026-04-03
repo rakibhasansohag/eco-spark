@@ -119,6 +119,43 @@ export const PaymentService = {
     return { data, meta: { ...meta, total, totalPages: Math.ceil(total / meta.limit) } };
   },
 
+  getMyIdeaSales: async (authorId: string, query: IQueryParams) => {
+    const page = Math.max(1, Number(query.page ?? 1));
+    const limit = Math.max(1, Number(query.limit ?? 10));
+    const skip = (page - 1) * limit;
+    const sortOrder = query.sortOrder === "asc" ? "asc" : "desc";
+    const sortBy = query.sortBy === "amount" ? "amount" : "createdAt";
+
+    const where = {
+      status: PaymentStatus.SUCCESS,
+      idea: { authorId },
+    } as const;
+
+    const [data, total] = await Promise.all([
+      prisma.payment.findMany({
+        where,
+        include: {
+          user: { select: { id: true, name: true, email: true } },
+          idea: { select: { id: true, title: true } },
+        },
+        orderBy: { [sortBy]: sortOrder },
+        skip,
+        take: limit,
+      }),
+      prisma.payment.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  },
+
   verify: async (transactionId: string, userId: string) => {
     const payment = await prisma.payment.findUnique({
       where: { transactionId },

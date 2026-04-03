@@ -15,3 +15,20 @@ export interface IPayment {
 export interface IInitiatePaymentPayload {
   ideaId: string;
 }
+
+export interface IMyIdeaSale {
+  id: string;
+  amount: string;
+  status: PaymentStatus;
+  transactionId: string | null;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  idea: {
+    id: string;
+    title: string;
+  };
+}

@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useForm } from "@tanstack/react-form"
 import { useMutation, useQuery } from "@tanstack/react-query"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -70,6 +71,7 @@ function CategorySelect({
 }
 
 export function CreateIdeaForm() {
+  const router = useRouter()
   const [isPaid, setIsPaid] = useState(false)
   const [images, setImages] = useState<File[]>([])
   const [serverErrors, setServerErrors] = useState<Record<string, string[]>>({})
@@ -115,6 +117,8 @@ export function CreateIdeaForm() {
         form.reset()
         setImages([])
         setIsPaid(false)
+        router.push("/member/dashboard/my-ideas")
+        router.refresh()
       } else {
         setServerErrors(result.errors ?? {})
         setFormError(result.message)

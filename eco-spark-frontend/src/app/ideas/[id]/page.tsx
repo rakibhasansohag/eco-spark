@@ -24,6 +24,7 @@ export default async function IdeaDetailsPage({
   const decoded = decodeAccessToken(accessToken)
   const isLoggedIn = !!decoded
   const currentUserId = decoded?.userId
+  const userRole = decoded?.role
 
   // Fetch vote counts and comments (server-side for SSR)
   const [voteResult, commentsResult] = await Promise.allSettled([
@@ -75,7 +76,12 @@ export default async function IdeaDetailsPage({
           </div>
 
           {contentLocked ? (
-            <IdeaBuyButton ideaId={id} price={idea.price} isLoggedIn={isLoggedIn} />
+            <IdeaBuyButton
+              ideaId={id}
+              price={idea.price}
+              isLoggedIn={isLoggedIn}
+              userRole={userRole}
+            />
           ) : (
             <>
               {idea.proposedSolution ? (

@@ -10,6 +10,7 @@ const router = Router();
 router.post("/webhook", PaymentController.webhook);
 router.post("/initiate", checkAuth(Role.MEMBER), validateRequest(initiatePaymentZodSchema), PaymentController.initiate);
 router.get("/my-payments", checkAuth(Role.MEMBER), PaymentController.getMyPayments);
+router.get("/my-idea-sales", checkAuth(Role.MEMBER), PaymentController.getMyIdeaSales);
 router.get("/verify/:transactionId", checkAuth(Role.MEMBER), PaymentController.verify);
 
 export const PaymentRoutes = router;

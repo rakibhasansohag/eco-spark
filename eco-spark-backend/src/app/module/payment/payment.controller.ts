@@ -49,6 +49,20 @@ export const PaymentController = {
     });
   }),
 
+  getMyIdeaSales: catchAsync(async (req: Request, res: Response) => {
+    const result = await PaymentService.getMyIdeaSales(
+      req.user!.userId,
+      req.query as Record<string, string>
+    );
+    sendResponse(res, {
+      httpStatusCode: StatusCodes.OK,
+      success: true,
+      message: "Idea buyers fetched successfully",
+      data: result.data,
+      meta: result.meta,
+    });
+  }),
+
   verify: catchAsync(async (req: Request, res: Response) => {
     const result = await PaymentService.verify(req.params["transactionId"] as string, req.user!.userId);
     sendResponse(res, {
