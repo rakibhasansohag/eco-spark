@@ -25,6 +25,14 @@ export const logout = async (): Promise<ApiResponse<null>> => {
   return res.data;
 };
 
+export const changePassword = async (data: {
+  currentPassword: string;
+  newPassword: string;
+}): Promise<ApiResponse<null>> => {
+  const res = await httpClient.patch<ApiResponse<null>>("/auth/change-password", data);
+  return res.data;
+};
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api/v1";
 
 export interface IAuthServerActionResponse {

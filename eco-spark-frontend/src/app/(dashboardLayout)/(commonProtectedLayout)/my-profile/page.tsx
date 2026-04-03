@@ -1,16 +1,16 @@
+import { getMyProfile } from "@/services/user.services"
+import { MyProfileForm } from "@/components/modules/Profile/MyProfileForm"
 import { PageHeader } from "@/components/shared/PageHeader"
 
-export default function MyProfilePage() {
+export default async function MyProfilePage() {
+  const result = await getMyProfile()
+  const user = result.data
+
   return (
     <section className="space-y-6">
-      <PageHeader
-        title="My Profile"
-        description="Manage your account details and preferences."
-      />
+      <PageHeader title="My Profile" description="Update your name and profile image." />
       <div className="mx-auto max-w-2xl rounded-lg border bg-card p-6">
-        <p className="text-sm text-muted-foreground">
-          Profile management will be available in an upcoming update.
-        </p>
+        <MyProfileForm initialName={user.name} initialImage={user.image ?? ""} />
       </div>
     </section>
   )

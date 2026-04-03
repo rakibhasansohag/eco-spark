@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { auth } from "../../lib/auth.js";
+import { hashPassword, verifyPassword } from "better-auth/dist/crypto/password.mjs";
 import prisma from "../../lib/prisma.js";
 import AppError from "../../errorHelpers/AppError.js";
 import { generateTokenPair } from "../../utils/token.js";
@@ -64,6 +65,27 @@ export const AuthService = {
       user: { id: user.id, name: user.name, email: user.email, role: user.role },
       ...tokens,
     };
+  },
+
+  changePassword: async (
+    userId: string,
+    payload: { currentPassword: string; newPassword: string },
+  ) => {
+    const account = await prisma.account.findFirst({
+      where: { userId, providerId: "credential" },
+    });
+
+    if (!account?.password) {
+      throw new AppError(StatusCodes.BAD_REQUEST, "No password set for this account");
+    }
+
+    const isValid = await verifyPassword({ hash: account.password, password: payload.currentPassword });
+    if (!isValid) {
+      throw new AppError(StatusCodes.UNAUTHORIZED, "Current password is incorrect");
+    }
+
+    const newHash = await hashPassword(payload.newPassword);
+    await prisma.account.update({ where: { id: account.id }, data: { password: newHash } });
   },
 
   refreshToken: async (refreshToken: string) => {

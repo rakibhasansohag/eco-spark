@@ -4,6 +4,7 @@ import catchAsync from "../../shared/catchAsync.js";
 import sendResponse from "../../shared/sendResponse.js";
 import { AuthService } from "./auth.service.js";
 import { setAuthCookies, clearAuthCookies } from "../../utils/cookie.js";
+import { IRequestUser } from "../../interfaces/requestUser.interface.js";
 
 export const AuthController = {
   register: catchAsync(async (req: Request, res: Response) => {
@@ -54,6 +55,17 @@ export const AuthController = {
       httpStatusCode: StatusCodes.OK,
       success: true,
       message: "Logged out successfully",
+      data: null,
+    });
+  }),
+
+  changePassword: catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IRequestUser;
+    await AuthService.changePassword(user.userId, req.body);
+    sendResponse(res, {
+      httpStatusCode: StatusCodes.OK,
+      success: true,
+      message: "Password changed successfully",
       data: null,
     });
   }),

@@ -1,30 +1,26 @@
 "use server"
 
+import { revalidatePath } from "next/cache"
 import { AxiosError } from "axios"
 import { updateUserByAdmin } from "@/services/user.services"
-import { updateUserByAdminZodSchema } from "@/zod/user.validation"
 
-interface IActionResult {
+interface ActionResult {
   success: boolean
   message: string
 }
 
-export const updateUserByAdminAction = async (
-  userId: string,
-  values: unknown
-): Promise<IActionResult> => {
-  const parsed = updateUserByAdminZodSchema.safeParse(values)
-  if (!parsed.success) {
-    return { success: false, message: "Validation failed" }
-  }
-
+export async function updateUserByAdminAction(
+  id: string,
+  data: { role?: "ADMIN" | "MEMBER"; status?: "ACTIVE" | "INACTIVE" },
+): Promise<ActionResult> {
   try {
-    const result = await updateUserByAdmin(userId, parsed.data)
-    return { success: result.success, message: result.message }
+    await updateUserByAdmin(id, data)
+    revalidatePath("/admin/dashboard/users-management")
+    return { success: true, message: "User updated successfully" }
   } catch (error) {
     if (error instanceof AxiosError && error.response?.data?.message) {
       return { success: false, message: String(error.response.data.message) }
     }
-    return { success: false, message: "User update failed" }
+    return { success: false, message: "Failed to update user" }
   }
 }

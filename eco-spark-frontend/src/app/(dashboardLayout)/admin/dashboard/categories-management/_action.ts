@@ -1,70 +1,68 @@
 "use server"
 
+import { revalidatePath } from "next/cache"
 import { AxiosError } from "axios"
 import {
   createCategory,
-  deleteCategory,
   updateCategory,
+  deleteCategory,
 } from "@/services/category.services"
 import {
   createCategoryZodSchema,
   updateCategoryZodSchema,
 } from "@/zod/category.validation"
 
-interface IActionResult {
+interface ActionResult {
   success: boolean
   message: string
 }
 
-export const createCategoryAction = async (
-  values: unknown
-): Promise<IActionResult> => {
+export async function createCategoryAction(values: unknown): Promise<ActionResult> {
   const parsed = createCategoryZodSchema.safeParse(values)
   if (!parsed.success) {
-    return { success: false, message: "Validation failed" }
+    return { success: false, message: "Category name is required (min 2 chars)" }
   }
-
   try {
     const result = await createCategory(parsed.data)
+    revalidatePath("/admin/dashboard/categories-management")
     return { success: result.success, message: result.message }
   } catch (error) {
     if (error instanceof AxiosError && error.response?.data?.message) {
       return { success: false, message: String(error.response.data.message) }
     }
-    return { success: false, message: "Category creation failed" }
+    return { success: false, message: "Failed to create category" }
   }
 }
 
-export const updateCategoryAction = async (
-  categoryId: string,
-  values: unknown
-): Promise<IActionResult> => {
+export async function updateCategoryAction(
+  id: string,
+  values: unknown,
+): Promise<ActionResult> {
   const parsed = updateCategoryZodSchema.safeParse(values)
   if (!parsed.success) {
     return { success: false, message: "Validation failed" }
   }
-
   try {
-    const result = await updateCategory(categoryId, parsed.data)
+    const result = await updateCategory(id, parsed.data)
+    revalidatePath("/admin/dashboard/categories-management")
     return { success: result.success, message: result.message }
   } catch (error) {
     if (error instanceof AxiosError && error.response?.data?.message) {
       return { success: false, message: String(error.response.data.message) }
     }
-    return { success: false, message: "Category update failed" }
+    return { success: false, message: "Failed to update category" }
   }
 }
 
-export const deleteCategoryAction = async (
-  categoryId: string
-): Promise<IActionResult> => {
+export async function deleteCategoryAction(id: string): Promise<ActionResult> {
   try {
-    const result = await deleteCategory(categoryId)
+    const result = await deleteCategory(id)
+    revalidatePath("/admin/dashboard/categories-management")
     return { success: result.success, message: result.message }
   } catch (error) {
     if (error instanceof AxiosError && error.response?.data?.message) {
       return { success: false, message: String(error.response.data.message) }
     }
-    return { success: false, message: "Category deletion failed" }
+    return { success: false, message: "Failed to delete category" }
   }
 }
