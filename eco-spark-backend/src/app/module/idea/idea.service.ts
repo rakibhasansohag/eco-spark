@@ -203,11 +203,13 @@ export const IdeaService = {
     });
   },
 
-  remove: async (id: string, authorId: string) => {
+  remove: async (id: string, actorId: string, actorRole?: string) => {
     const idea = await prisma.idea.findUnique({ where: { id } });
     if (!idea) throw new AppError(StatusCodes.NOT_FOUND, "Idea not found");
-    if (idea.authorId !== authorId) throw new AppError(StatusCodes.FORBIDDEN, "Not authorized");
-    assertIdeaIsEditable(idea.status);
+    if (actorRole !== "ADMIN") {
+      if (idea.authorId !== actorId) throw new AppError(StatusCodes.FORBIDDEN, "Not authorized");
+      assertIdeaIsEditable(idea.status);
+    }
     return prisma.idea.delete({ where: { id } });
   },
 

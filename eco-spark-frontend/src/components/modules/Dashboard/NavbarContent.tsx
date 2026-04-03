@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sheet"
 import { UserMenu } from "./UserMenu"
 import { SidebarContent } from "./SidebarContent"
+import { ThemeToggle } from "@/components/shared/ThemeToggle"
 
 interface NavbarContentProps {
   name: string
@@ -51,8 +52,9 @@ export function NavbarContent({ name, role }: NavbarContentProps) {
         </Sheet>
       </div>
 
-      {/* UserMenu — always visible, pushed to right */}
-      <div className="ml-auto">
+      {/* Right slot: theme toggle + user menu */}
+      <div className="ml-auto flex items-center gap-1">
+        <ThemeToggle />
         <UserMenu name={name} role={role} />
       </div>
     </>

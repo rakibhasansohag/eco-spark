@@ -5,10 +5,17 @@ import { useForm } from "@tanstack/react-form"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { AppField } from "@/components/shared/form/AppField"
 import { AppTextarea } from "@/components/shared/form/AppTextarea"
+import { AppFileInput } from "@/components/shared/form/AppFileInput"
 import { AppSubmitButton } from "@/components/shared/form/AppSubmitButton"
 import { normalizeErrors } from "@/lib/formUtils"
 import { createIdeaZodSchema } from "@/zod/idea.validation"
@@ -64,6 +71,7 @@ function CategorySelect({
 
 export function CreateIdeaForm() {
   const [isPaid, setIsPaid] = useState(false)
+  const [images, setImages] = useState<File[]>([])
   const mutation = useMutation({ mutationFn: createIdeaAction })
 
   const form = useForm({
@@ -73,14 +81,26 @@ export function CreateIdeaForm() {
       proposedSolution: "",
       description: "",
       categoryId: "",
-      isPaid: false as boolean | undefined,
       price: undefined as number | undefined,
     },
     onSubmit: async ({ value }) => {
-      const result = await mutation.mutateAsync({ ...value, isPaid })
+      const formData = new FormData()
+      formData.append("title", value.title)
+      formData.append("problemStatement", value.problemStatement)
+      formData.append("proposedSolution", value.proposedSolution)
+      formData.append("description", value.description)
+      formData.append("categoryId", value.categoryId)
+      formData.append("isPaid", String(isPaid))
+      if (isPaid && value.price !== undefined) {
+        formData.append("price", String(value.price))
+      }
+      images.forEach((img) => formData.append("images", img))
+
+      const result = await mutation.mutateAsync(formData)
       if (result.success) {
         toast.success(result.message)
         form.reset()
+        setImages([])
         setIsPaid(false)
       } else {
         toast.error(result.message)
@@ -128,7 +148,7 @@ export function CreateIdeaForm() {
             onBlur={field.handleBlur}
             touched={field.state.meta.isTouched}
             errors={normalizeErrors(field.state.meta.errors)}
-            placeholder="Describe the environmental or sustainability problem you're addressing."
+            placeholder="Describe the sustainability problem you're addressing."
             rows={3}
           />
         )}
@@ -166,13 +186,21 @@ export function CreateIdeaForm() {
             onBlur={field.handleBlur}
             touched={field.state.meta.isTouched}
             errors={normalizeErrors(field.state.meta.errors)}
-            placeholder="Provide detailed information, implementation steps, expected impact…"
+            placeholder="Detailed information, implementation steps, expected impact…"
             rows={5}
           />
         )}
       </form.Field>
 
-      {/* Monetisation toggle */}
+      <AppFileInput
+        id="idea-images"
+        label="Images (optional)"
+        onChange={setImages}
+        maxFiles={5}
+        maxSizeMb={5}
+      />
+
+      {/* Monetisation */}
       <div className="space-y-3 rounded-lg border bg-muted/40 p-4">
         <div className="flex items-center gap-3">
           <input
@@ -182,7 +210,6 @@ export function CreateIdeaForm() {
             checked={isPaid}
             onChange={(e) => {
               setIsPaid(e.target.checked)
-              form.setFieldValue("isPaid", e.target.checked)
               if (!e.target.checked) form.setFieldValue("price", undefined)
             }}
           />
@@ -192,10 +219,7 @@ export function CreateIdeaForm() {
         </div>
 
         {isPaid ? (
-          <form.Field
-            name="price"
-            validators={{ onChange: createIdeaZodSchema.shape.price }}
-          >
+          <form.Field name="price" validators={{ onChange: createIdeaZodSchema.shape.price }}>
             {(field) => (
               <div className="space-y-2">
                 <Label htmlFor={field.name}>Price (USD)</Label>

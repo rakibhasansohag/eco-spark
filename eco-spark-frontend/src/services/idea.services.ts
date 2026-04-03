@@ -24,7 +24,9 @@ export const getIdeasForAdmin = async (params?: Record<string, string>): Promise
   return res.data;
 };
 
-export const createIdea = async (data: ICreateIdeaPayload): Promise<ApiResponse<IIdea>> => {
+export const createIdea = async (
+  data: ICreateIdeaPayload | FormData,
+): Promise<ApiResponse<IIdea>> => {
   const res = await httpClient.post<ApiResponse<IIdea>>("/ideas", data);
   return res.data;
 };

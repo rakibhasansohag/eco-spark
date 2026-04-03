@@ -13,6 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { ThemeToggle } from "@/components/shared/ThemeToggle"
 
 const DASHBOARD_PREFIXES = [
   "/admin/dashboard",
@@ -21,18 +22,19 @@ const DASHBOARD_PREFIXES = [
   "/change-password",
 ]
 
-const NAV_LINKS = [
-  { href: "/ideas", label: "Ideas" },
-  { href: "/login", label: "Sign In" },
-  { href: "/member/dashboard", label: "Dashboard" },
-]
+const PUBLIC_NAV_LINKS = [{ href: "/ideas", label: "Ideas" }]
 
 function isActivePath(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/"
   return pathname === href || pathname.startsWith(`${href}/`)
 }
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+interface AppShellProps {
+  children: React.ReactNode
+  isLoggedIn: boolean
+}
+
+export function AppShell({ children, isLoggedIn }: AppShellProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const inDashboard = DASHBOARD_PREFIXES.some((prefix) => pathname.startsWith(prefix))
@@ -40,7 +42,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       {!inDashboard ? (
-          <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
           <div className="container mx-auto flex h-14 items-center justify-between px-4 md:px-6">
             {/* Logo */}
             <Link
@@ -53,27 +55,54 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
             {/* Desktop nav */}
             <nav className="hidden items-center gap-1 md:flex">
-              {NAV_LINKS.map(({ href, label }) => (
+              {PUBLIC_NAV_LINKS.map(({ href, label }) => (
                 <Link
                   key={href}
                   href={href}
                   className={cn(
                     "rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:text-foreground",
-                    isActivePath(pathname, href)
-                      ? "text-foreground"
-                      : "text-muted-foreground",
+                    isActivePath(pathname, href) ? "text-foreground" : "text-muted-foreground",
                   )}
                 >
                   {label}
                 </Link>
               ))}
-              <Button asChild size="sm" className="ml-2">
-                <Link href="/register">Get Started</Link>
-              </Button>
+
+              {isLoggedIn ? (
+                <Link
+                  href="/member/dashboard"
+                  className={cn(
+                    "rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:text-foreground",
+                    isActivePath(pathname, "/member/dashboard") || isActivePath(pathname, "/admin/dashboard")
+                      ? "text-foreground"
+                      : "text-muted-foreground",
+                  )}
+                >
+                  Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className={cn(
+                      "rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:text-foreground",
+                      isActivePath(pathname, "/login") ? "text-foreground" : "text-muted-foreground",
+                    )}
+                  >
+                    Sign In
+                  </Link>
+                  <Button asChild size="sm" className="ml-1">
+                    <Link href="/register">Get Started</Link>
+                  </Button>
+                </>
+              )}
+
+              <ThemeToggle />
             </nav>
 
             {/* Mobile nav trigger */}
-            <div className="md:hidden">
+            <div className="flex items-center gap-1 md:hidden">
+              <ThemeToggle />
               <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" aria-label="Open navigation menu">
@@ -88,7 +117,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     </SheetTitle>
                   </SheetHeader>
                   <nav className="flex flex-col gap-1 p-3">
-                    {NAV_LINKS.map(({ href, label }) => (
+                    {PUBLIC_NAV_LINKS.map(({ href, label }) => (
                       <Link
                         key={href}
                         href={href}
@@ -103,14 +132,45 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         {label}
                       </Link>
                     ))}
-                    <Button
-                      asChild
-                      size="sm"
-                      className="mt-2 w-full"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      <Link href="/register">Get Started</Link>
-                    </Button>
+
+                    {isLoggedIn ? (
+                      <Link
+                        href="/member/dashboard"
+                        onClick={() => setMobileOpen(false)}
+                        className={cn(
+                          "rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                          isActivePath(pathname, "/member/dashboard") ||
+                            isActivePath(pathname, "/admin/dashboard")
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                        )}
+                      >
+                        Dashboard
+                      </Link>
+                    ) : (
+                      <>
+                        <Link
+                          href="/login"
+                          onClick={() => setMobileOpen(false)}
+                          className={cn(
+                            "rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                            isActivePath(pathname, "/login")
+                              ? "bg-primary text-primary-foreground"
+                              : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                          )}
+                        >
+                          Sign In
+                        </Link>
+                        <Button
+                          asChild
+                          size="sm"
+                          className="mt-2 w-full"
+                          onClick={() => setMobileOpen(false)}
+                        >
+                          <Link href="/register">Get Started</Link>
+                        </Button>
+                      </>
+                    )}
                   </nav>
                 </SheetContent>
               </Sheet>
@@ -132,9 +192,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Link href="/ideas" className="transition-colors hover:text-foreground">
                 Explore
               </Link>
-              <Link href="/login" className="transition-colors hover:text-foreground">
-                Sign In
-              </Link>
+              {isLoggedIn ? (
+                <Link href="/member/dashboard" className="transition-colors hover:text-foreground">
+                  Dashboard
+                </Link>
+              ) : (
+                <Link href="/login" className="transition-colors hover:text-foreground">
+                  Sign In
+                </Link>
+              )}
             </div>
           </div>
         </footer>

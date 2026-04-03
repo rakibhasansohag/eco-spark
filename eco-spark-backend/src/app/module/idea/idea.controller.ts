@@ -38,7 +38,7 @@ export const IdeaController = {
   }),
 
   remove: catchAsync(async (req: Request, res: Response) => {
-    const result = await IdeaService.remove(req.params["id"] as string, req.user!.userId);
+    const result = await IdeaService.remove(req.params["id"] as string, req.user!.userId, req.user!.role);
     sendResponse(res, { httpStatusCode: StatusCodes.OK, success: true, message: "Idea deleted successfully", data: result });
   }),
 

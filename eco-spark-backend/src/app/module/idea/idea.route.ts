@@ -31,7 +31,7 @@ router.patch(
   validateRequest(updateIdeaZodSchema),
   IdeaController.update
 );
-router.delete("/:id", checkAuth(Role.MEMBER), IdeaController.remove);
+router.delete("/:id", checkAuth(Role.ADMIN, Role.MEMBER), IdeaController.remove);
 router.patch("/:id/submit", checkAuth(Role.MEMBER), IdeaController.submit);
 
 // Admin actions
