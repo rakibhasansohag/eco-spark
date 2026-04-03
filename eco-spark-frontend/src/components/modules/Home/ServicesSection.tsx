@@ -26,14 +26,22 @@ const items = [
 
 export function ServicesSection() {
   return (
-    <section>
-      <SectionHeader title="What You Can Do" />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <section className="space-y-5">
+      <SectionHeader
+        title="What You Can Do"
+        description="Practical workflows designed for sustainability-focused collaboration and execution."
+      />
+      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
         {items.map((item) => (
-          <div key={item.title} className="rounded-lg border bg-card p-5">
-            <item.icon className="mb-3 size-5 text-primary" />
-            <h3 className="text-base font-semibold">{item.title}</h3>
-            <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
+          <div
+            key={item.title}
+            className="rounded-xl border bg-card p-6 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.35)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30"
+          >
+            <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-2.5">
+              <item.icon className="size-5 text-primary" />
+            </div>
+            <h3 className="text-lg font-semibold tracking-tight">{item.title}</h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>
           </div>
         ))}
       </div>

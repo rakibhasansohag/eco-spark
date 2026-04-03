@@ -16,15 +16,20 @@ export default async function Home() {
   })
 
   return (
-    <main className="container mx-auto space-y-12 px-4 py-10 md:px-6">
+    <main className="container mx-auto max-w-7xl space-y-14 px-4 py-12 md:px-6">
       <HeroSection />
 
       <ServicesSection />
 
       <HowItWorksSection />
 
-      <section>
-        <h2 className="mb-4 text-xl font-semibold">Latest Ideas</h2>
+      <section className="space-y-5">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Latest Ideas</h2>
+          <p className="mt-2 text-base leading-7 text-muted-foreground">
+            Recently approved ideas from the EcoSpark community.
+          </p>
+        </div>
         <HydrationBoundary state={dehydrate(queryClient)}>
           <HomeFeatured initialParams={params} />
         </HydrationBoundary>

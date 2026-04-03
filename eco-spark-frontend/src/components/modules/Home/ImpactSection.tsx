@@ -5,9 +5,12 @@ import { StatsCard } from "@/components/shared/StatsCard"
 
 export function ImpactSection() {
   return (
-    <section>
-      <SectionHeader title="Why EcoSpark" />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <section className="space-y-5">
+      <SectionHeader
+        title="Why EcoSpark"
+        description="A focused product environment for measurable sustainability collaboration."
+      />
+      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Community Members"
           value="2K+"

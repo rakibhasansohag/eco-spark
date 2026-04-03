@@ -15,8 +15,8 @@ export function IdeaCard({ idea, href, className }: IdeaCardProps) {
     <Link
       href={href}
       className={cn(
-        "group flex flex-col rounded-lg border bg-card p-4",
-        "transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md",
+        "group flex flex-col rounded-xl border bg-card p-6 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.35)]",
+        "transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_14px_34px_-18px_rgba(15,23,42,0.45)]",
         className,
       )}
     >
@@ -32,11 +32,11 @@ export function IdeaCard({ idea, href, className }: IdeaCardProps) {
         </div>
       </div>
 
-      <h3 className="mt-2 line-clamp-2 text-base font-semibold transition-colors group-hover:text-primary">
+      <h3 className="mt-3 line-clamp-2 text-lg font-semibold tracking-tight transition-colors group-hover:text-primary">
         {idea.title}
       </h3>
 
-      <p className="mt-1 line-clamp-3 text-sm text-muted-foreground">
+      <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
         {idea.description ?? "Content preview locked — purchase access to view."}
       </p>
     </Link>
