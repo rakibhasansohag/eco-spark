@@ -37,9 +37,9 @@ export default function AdminCategoriesManagement({
   })
 
   return (
-    <>
+    <div className="space-y-3">
       <SearchBar searchParams={searchParams} />
       <DataTable table={table} pagination={pagination} />
-    </>
+    </div>
   )
 }

@@ -7,12 +7,10 @@ export function SearchBar({ searchParams }: { searchParams: Record<string, strin
   const { searchTerm, setSearchTerm } = useServerManagedDataTableSearch({ searchParams })
 
   return (
-    <div className="mb-3">
-      <Input
-        placeholder="Search..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-    </div>
+    <Input
+      placeholder="Search..."
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+    />
   )
 }
