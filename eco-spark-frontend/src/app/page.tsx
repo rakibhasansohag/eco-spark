@@ -6,6 +6,7 @@ import { ServicesSection } from "@/components/modules/Home/ServicesSection"
 import { ImpactSection } from "@/components/modules/Home/ImpactSection"
 import { NewsletterForm } from "@/components/modules/Home/NewsletterForm"
 import { HowItWorksSection } from "@/components/modules/Home/HowItWorksSection"
+import { FadeInSection } from "@/components/shared/motion/FadeInSection"
 
 export default async function Home() {
   const queryClient = new QueryClient()
@@ -17,12 +18,19 @@ export default async function Home() {
 
   return (
     <main className="container mx-auto max-w-7xl space-y-14 px-4 py-12 md:px-6">
-      <HeroSection />
+      <FadeInSection>
+        <HeroSection />
+      </FadeInSection>
 
-      <ServicesSection />
+      <FadeInSection delay={0.04}>
+        <ServicesSection />
+      </FadeInSection>
 
-      <HowItWorksSection />
+      <FadeInSection delay={0.08}>
+        <HowItWorksSection />
+      </FadeInSection>
 
+      <FadeInSection delay={0.12}>
       <section className="space-y-5">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Latest Ideas</h2>
@@ -34,10 +42,15 @@ export default async function Home() {
           <HomeFeatured initialParams={params} />
         </HydrationBoundary>
       </section>
+      </FadeInSection>
 
-      <ImpactSection />
+      <FadeInSection delay={0.16}>
+        <ImpactSection />
+      </FadeInSection>
 
-      <NewsletterForm />
+      <FadeInSection delay={0.2}>
+        <NewsletterForm />
+      </FadeInSection>
     </main>
   )
 }
