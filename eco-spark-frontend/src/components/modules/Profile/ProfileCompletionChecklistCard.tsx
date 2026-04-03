@@ -30,7 +30,11 @@ export function ProfileCompletionChecklistCard({
 
       <div className="space-y-2">
         {items.map((item) => (
-          <div key={item.key} className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2">
+          <Link
+            key={item.key}
+            href={`/my-profile#profile-${item.key}`}
+            className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2 transition-colors hover:bg-muted/60"
+          >
             {item.done ? (
               <CheckCircle2 className="size-4 text-primary" />
             ) : (
@@ -39,7 +43,7 @@ export function ProfileCompletionChecklistCard({
             <span className={item.done ? "text-sm text-foreground" : "text-sm text-muted-foreground"}>
               {item.label}
             </span>
-          </div>
+          </Link>
         ))}
       </div>
 

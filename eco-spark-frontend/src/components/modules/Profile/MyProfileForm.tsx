@@ -78,7 +78,7 @@ export function MyProfileForm({
     >
       <form.Field name="avatar">
         {(field) => (
-          <div className="space-y-3 rounded-xl border bg-background p-4">
+          <div id="profile-image" className="scroll-mt-24 space-y-3 rounded-xl border bg-background p-4">
             <div className="flex items-center gap-4">
               <Avatar className="size-16">
                 <AvatarImage
@@ -114,16 +114,18 @@ export function MyProfileForm({
 
       <form.Field name="name">
         {(field) => (
-          <AppField
-            id={field.name}
-            label="Name"
-            value={field.state.value}
-            onChange={field.handleChange}
-            onBlur={field.handleBlur}
-            touched={field.state.meta.isTouched}
-            errors={normalizeErrors(field.state.meta.errors)}
-            placeholder="Your full name"
-          />
+          <div id="profile-name" className="scroll-mt-24">
+            <AppField
+              id={field.name}
+              label="Name"
+              value={field.state.value}
+              onChange={field.handleChange}
+              onBlur={field.handleBlur}
+              touched={field.state.meta.isTouched}
+              errors={normalizeErrors(field.state.meta.errors)}
+              placeholder="Your full name"
+            />
+          </div>
         )}
       </form.Field>
 
@@ -145,31 +147,35 @@ export function MyProfileForm({
       <div className="grid gap-4 md:grid-cols-2">
         <form.Field name="jobTitle">
           {(field) => (
-            <AppField
-              id={field.name}
-              label="Job Title"
-              value={field.state.value}
-              onChange={field.handleChange}
-              onBlur={field.handleBlur}
-              touched={field.state.meta.isTouched}
-              errors={normalizeErrors(field.state.meta.errors)}
-              placeholder="e.g. Sustainability Analyst"
-            />
+            <div id="profile-jobTitle" className="scroll-mt-24">
+              <AppField
+                id={field.name}
+                label="Job Title"
+                value={field.state.value}
+                onChange={field.handleChange}
+                onBlur={field.handleBlur}
+                touched={field.state.meta.isTouched}
+                errors={normalizeErrors(field.state.meta.errors)}
+                placeholder="e.g. Sustainability Analyst"
+              />
+            </div>
           )}
         </form.Field>
 
         <form.Field name="organization">
           {(field) => (
-            <AppField
-              id={field.name}
-              label="Organization"
-              value={field.state.value}
-              onChange={field.handleChange}
-              onBlur={field.handleBlur}
-              touched={field.state.meta.isTouched}
-              errors={normalizeErrors(field.state.meta.errors)}
-              placeholder="Your company or initiative"
-            />
+            <div id="profile-organization" className="scroll-mt-24">
+              <AppField
+                id={field.name}
+                label="Organization"
+                value={field.state.value}
+                onChange={field.handleChange}
+                onBlur={field.handleBlur}
+                touched={field.state.meta.isTouched}
+                errors={normalizeErrors(field.state.meta.errors)}
+                placeholder="Your company or initiative"
+              />
+            </div>
           )}
         </form.Field>
       </div>
@@ -177,63 +183,71 @@ export function MyProfileForm({
       <div className="grid gap-4 md:grid-cols-2">
         <form.Field name="location">
           {(field) => (
-            <AppField
-              id={field.name}
-              label="Location"
-              value={field.state.value}
-              onChange={field.handleChange}
-              onBlur={field.handleBlur}
-              touched={field.state.meta.isTouched}
-              errors={normalizeErrors(field.state.meta.errors)}
-              placeholder="City, Country"
-            />
+            <div id="profile-location" className="scroll-mt-24">
+              <AppField
+                id={field.name}
+                label="Location"
+                value={field.state.value}
+                onChange={field.handleChange}
+                onBlur={field.handleBlur}
+                touched={field.state.meta.isTouched}
+                errors={normalizeErrors(field.state.meta.errors)}
+                placeholder="City, Country"
+              />
+            </div>
           )}
         </form.Field>
 
         <form.Field name="phone">
           {(field) => (
-            <AppField
-              id={field.name}
-              label="Phone"
-              value={field.state.value}
-              onChange={field.handleChange}
-              onBlur={field.handleBlur}
-              touched={field.state.meta.isTouched}
-              errors={normalizeErrors(field.state.meta.errors)}
-              placeholder="+1 234 567 890"
-            />
+            <div id="profile-phone" className="scroll-mt-24">
+              <AppField
+                id={field.name}
+                label="Phone"
+                value={field.state.value}
+                onChange={field.handleChange}
+                onBlur={field.handleBlur}
+                touched={field.state.meta.isTouched}
+                errors={normalizeErrors(field.state.meta.errors)}
+                placeholder="+1 234 567 890"
+              />
+            </div>
           )}
         </form.Field>
       </div>
 
       <form.Field name="website">
         {(field) => (
-          <AppField
-            id={field.name}
-            label="Website"
-            value={field.state.value}
-            onChange={field.handleChange}
-            onBlur={field.handleBlur}
-            touched={field.state.meta.isTouched}
-            errors={normalizeErrors(field.state.meta.errors)}
-            placeholder="https://yourwebsite.com"
-          />
+          <div id="profile-website" className="scroll-mt-24">
+            <AppField
+              id={field.name}
+              label="Website"
+              value={field.state.value}
+              onChange={field.handleChange}
+              onBlur={field.handleBlur}
+              touched={field.state.meta.isTouched}
+              errors={normalizeErrors(field.state.meta.errors)}
+              placeholder="https://yourwebsite.com"
+            />
+          </div>
         )}
       </form.Field>
 
       <form.Field name="bio">
         {(field) => (
-          <AppTextarea
-            id={field.name}
-            label="Bio"
-            value={field.state.value}
-            onChange={field.handleChange}
-            onBlur={field.handleBlur}
-            touched={field.state.meta.isTouched}
-            errors={normalizeErrors(field.state.meta.errors)}
-            placeholder="Tell people about your sustainability focus and what you are building."
-            rows={4}
-          />
+          <div id="profile-bio" className="scroll-mt-24">
+            <AppTextarea
+              id={field.name}
+              label="Bio"
+              value={field.state.value}
+              onChange={field.handleChange}
+              onBlur={field.handleBlur}
+              touched={field.state.meta.isTouched}
+              errors={normalizeErrors(field.state.meta.errors)}
+              placeholder="Tell people about your sustainability focus and what you are building."
+              rows={4}
+            />
+          </div>
         )}
       </form.Field>
 
