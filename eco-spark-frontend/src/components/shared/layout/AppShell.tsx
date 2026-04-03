@@ -16,6 +16,7 @@ import {
 import { ThemeToggle } from "@/components/shared/ThemeToggle"
 
 const DASHBOARD_PREFIXES = [
+  "/dashboard",
   "/admin/dashboard",
   "/member/dashboard",
   "/my-profile",
@@ -70,7 +71,7 @@ export function AppShell({ children, isLoggedIn }: AppShellProps) {
 
               {isLoggedIn ? (
                 <Link
-                  href="/member/dashboard"
+                  href="/dashboard"
                   className={cn(
                     "rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:text-foreground",
                     isActivePath(pathname, "/member/dashboard") || isActivePath(pathname, "/admin/dashboard")
@@ -135,7 +136,7 @@ export function AppShell({ children, isLoggedIn }: AppShellProps) {
 
                     {isLoggedIn ? (
                       <Link
-                        href="/member/dashboard"
+                        href="/dashboard"
                         onClick={() => setMobileOpen(false)}
                         className={cn(
                           "rounded-md px-3 py-2 text-sm font-medium transition-colors",
@@ -193,7 +194,7 @@ export function AppShell({ children, isLoggedIn }: AppShellProps) {
                 Explore
               </Link>
               {isLoggedIn ? (
-                <Link href="/member/dashboard" className="transition-colors hover:text-foreground">
+                <Link href="/dashboard" className="transition-colors hover:text-foreground">
                   Dashboard
                 </Link>
               ) : (

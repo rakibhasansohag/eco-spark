@@ -36,6 +36,13 @@ async function seed() {
       console.info("Admin user created: admin@ecosparkHub.com / Admin@1234");
     }
   } else {
+    if (existingAdmin.role !== Role.ADMIN) {
+      await prisma.user.update({
+        where: { id: existingAdmin.id },
+        data: { role: Role.ADMIN },
+      });
+      console.info("Admin role corrected for existing admin user");
+    }
     console.info("Admin user already exists");
   }
 

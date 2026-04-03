@@ -5,7 +5,7 @@ import prisma from "../../lib/prisma.js";
 import AppError from "../../errorHelpers/AppError.js";
 import { generateTokenPair } from "../../utils/token.js";
 import { verifyRefreshToken } from "../../utils/jwt.js";
-import { UserStatus } from "../../../generated/prisma/index.js";
+import { Role, UserStatus } from "../../../generated/prisma/index.js";
 
 export const AuthService = {
   register: async (payload: { name: string; email: string; password: string }) => {
@@ -47,8 +47,18 @@ export const AuthService = {
       throw new AppError(StatusCodes.UNAUTHORIZED, "Invalid email or password");
     }
 
-    const user = await prisma.user.findUnique({ where: { id: result.user.id } });
+    let user = await prisma.user.findUnique({ where: { id: result.user.id } });
     if (!user) throw new AppError(StatusCodes.UNAUTHORIZED, "User not found");
+
+    if (
+      user.email.toLowerCase() === "admin@ecosparkhub.com" &&
+      user.role !== Role.ADMIN
+    ) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { role: Role.ADMIN },
+      });
+    }
 
     if (user.status !== UserStatus.ACTIVE) {
       throw new AppError(StatusCodes.FORBIDDEN, "Account is deactivated");

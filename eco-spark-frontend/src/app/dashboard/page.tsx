@@ -1,12 +1,9 @@
 import { redirect } from "next/navigation"
 import { getAccessToken } from "@/lib/tokenUtils"
 import { decodeAccessToken } from "@/lib/jwtUtils"
+import { getDefaultDashboardRoute } from "@/lib/authUtils"
 
-export default async function AdminDashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function DashboardEntryPage() {
   const token = await getAccessToken()
   const decoded = decodeAccessToken(token)
 
@@ -14,9 +11,6 @@ export default async function AdminDashboardLayout({
     redirect("/login")
   }
 
-  if (decoded.role !== "ADMIN") {
-    redirect("/member/dashboard")
-  }
-
-  return <div className="space-y-4">{children}</div>
+  const role = decoded.role === "ADMIN" ? "ADMIN" : "MEMBER"
+  redirect(getDefaultDashboardRoute(role))
 }
