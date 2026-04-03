@@ -15,6 +15,12 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
     console.error(error)
   }, [error])
 
+  const rawMessage = typeof error?.message === "string" ? error.message.trim() : ""
+  const readableMessage =
+    rawMessage && rawMessage !== "An error occurred in the Server Components render but no message was provided"
+      ? rawMessage
+      : "We could not complete this request. Please verify your input or try again."
+
   return (
     <main className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center justify-center px-4 py-12 text-center">
       <div className="max-w-md">
@@ -24,8 +30,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
 
         <h1 className="mt-5 text-2xl font-bold tracking-tight">Something went wrong</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          An unexpected error occurred on this page. You can try again — if the problem
-          persists, go back or return to the home page.
+          {readableMessage}
         </p>
 
         {error.digest ? (

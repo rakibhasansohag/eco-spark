@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useMutation } from "@tanstack/react-query"
 import { useForm } from "@tanstack/react-form"
 import { toast } from "sonner"
@@ -25,6 +26,17 @@ const normalizeErrors = (errors: unknown[]): string[] =>
 export function RegisterForm() {
   const router = useRouter()
   const mutation = useMutation({ mutationFn: registerAction })
+  const [serverErrors, setServerErrors] = useState<Record<string, string[]>>({})
+  const [formError, setFormError] = useState<string | null>(null)
+
+  const clearFieldError = (field: string) => {
+    setServerErrors((prev) => {
+      if (!prev[field]) return prev
+      const next = { ...prev }
+      delete next[field]
+      return next
+    })
+  }
 
   const form = useForm({
     defaultValues: {
@@ -36,10 +48,14 @@ export function RegisterForm() {
       const result = await mutation.mutateAsync(value)
 
       if (!result.success || !result.data) {
+        setServerErrors(result.errors ?? {})
+        setFormError(result.message)
         toast.error(result.message)
         return
       }
 
+      setServerErrors({})
+      setFormError(null)
       toast.success(result.message)
       const redirectPath = getDefaultDashboardRoute(result.data.role)
       router.push(redirectPath)
@@ -61,21 +77,39 @@ export function RegisterForm() {
             form.handleSubmit()
           }}
         >
+          {formError ? (
+            <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+              {formError}
+            </p>
+          ) : null}
+
           <form.Field
             name="name"
             validators={{ onChange: registerZodSchema.shape.name }}
           >
             {(field) => (
+              (() => {
+                const mergedErrors = [
+                  ...normalizeErrors(field.state.meta.errors),
+                  ...(serverErrors.name ?? []),
+                ]
+                return (
               <AppField
                 id={field.name}
                 label="Full name"
                 value={field.state.value}
-                onChange={field.handleChange}
+                onChange={(value) => {
+                  clearFieldError("name")
+                  setFormError(null)
+                  field.handleChange(value)
+                }}
                 onBlur={field.handleBlur}
-                touched={field.state.meta.isTouched}
-                errors={normalizeErrors(field.state.meta.errors)}
+                touched={field.state.meta.isTouched || (serverErrors.name?.length ?? 0) > 0}
+                errors={mergedErrors}
                 placeholder="Your full name"
               />
+                )
+              })()
             )}
           </form.Field>
 
@@ -84,17 +118,29 @@ export function RegisterForm() {
             validators={{ onChange: registerZodSchema.shape.email }}
           >
             {(field) => (
+              (() => {
+                const mergedErrors = [
+                  ...normalizeErrors(field.state.meta.errors),
+                  ...(serverErrors.email ?? []),
+                ]
+                return (
               <AppField
                 id={field.name}
                 label="Email"
                 type="email"
                 value={field.state.value}
-                onChange={field.handleChange}
+                onChange={(value) => {
+                  clearFieldError("email")
+                  setFormError(null)
+                  field.handleChange(value)
+                }}
                 onBlur={field.handleBlur}
-                touched={field.state.meta.isTouched}
-                errors={normalizeErrors(field.state.meta.errors)}
+                touched={field.state.meta.isTouched || (serverErrors.email?.length ?? 0) > 0}
+                errors={mergedErrors}
                 placeholder="you@example.com"
               />
+                )
+              })()
             )}
           </form.Field>
 
@@ -103,17 +149,29 @@ export function RegisterForm() {
             validators={{ onChange: registerZodSchema.shape.password }}
           >
             {(field) => (
+              (() => {
+                const mergedErrors = [
+                  ...normalizeErrors(field.state.meta.errors),
+                  ...(serverErrors.password ?? []),
+                ]
+                return (
               <AppField
                 id={field.name}
                 label="Password"
                 type="password"
                 value={field.state.value}
-                onChange={field.handleChange}
+                onChange={(value) => {
+                  clearFieldError("password")
+                  setFormError(null)
+                  field.handleChange(value)
+                }}
                 onBlur={field.handleBlur}
-                touched={field.state.meta.isTouched}
-                errors={normalizeErrors(field.state.meta.errors)}
+                touched={field.state.meta.isTouched || (serverErrors.password?.length ?? 0) > 0}
+                errors={mergedErrors}
                 placeholder="At least 6 characters"
               />
+                )
+              })()
             )}
           </form.Field>
 

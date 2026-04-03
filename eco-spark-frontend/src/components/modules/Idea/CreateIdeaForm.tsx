@@ -72,7 +72,18 @@ function CategorySelect({
 export function CreateIdeaForm() {
   const [isPaid, setIsPaid] = useState(false)
   const [images, setImages] = useState<File[]>([])
+  const [serverErrors, setServerErrors] = useState<Record<string, string[]>>({})
+  const [formError, setFormError] = useState<string | null>(null)
   const mutation = useMutation({ mutationFn: createIdeaAction })
+
+  const clearFieldError = (field: string) => {
+    setServerErrors((prev) => {
+      if (!prev[field]) return prev
+      const next = { ...prev }
+      delete next[field]
+      return next
+    })
+  }
 
   const form = useForm({
     defaultValues: {
@@ -98,11 +109,15 @@ export function CreateIdeaForm() {
 
       const result = await mutation.mutateAsync(formData)
       if (result.success) {
+        setServerErrors({})
+        setFormError(null)
         toast.success(result.message)
         form.reset()
         setImages([])
         setIsPaid(false)
       } else {
+        setServerErrors(result.errors ?? {})
+        setFormError(result.message)
         toast.error(result.message)
       }
     },
@@ -116,23 +131,64 @@ export function CreateIdeaForm() {
         form.handleSubmit()
       }}
     >
+      {formError ? (
+        <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+          {formError}
+        </p>
+      ) : null}
+
       <form.Field name="title" validators={{ onChange: createIdeaZodSchema.shape.title }}>
         {(field) => (
+          (() => {
+            const mergedErrors = [
+              ...normalizeErrors(field.state.meta.errors),
+              ...(serverErrors.title ?? []),
+            ]
+            return (
           <AppField
             id={field.name}
             label="Title"
             value={field.state.value}
-            onChange={field.handleChange}
+            onChange={(value) => {
+              clearFieldError("title")
+              setFormError(null)
+              field.handleChange(value)
+            }}
             onBlur={field.handleBlur}
-            touched={field.state.meta.isTouched}
-            errors={normalizeErrors(field.state.meta.errors)}
+            touched={field.state.meta.isTouched || (serverErrors.title?.length ?? 0) > 0}
+            errors={mergedErrors}
             placeholder="A concise, descriptive title"
           />
+            )
+          })()
         )}
       </form.Field>
 
       <form.Field name="categoryId" validators={{ onChange: createIdeaZodSchema.shape.categoryId }}>
-        {(field) => <CategorySelect field={field} />}
+        {(field) => (
+          <CategorySelect
+            field={{
+              ...field,
+              handleChange: (value) => {
+                clearFieldError("categoryId")
+                setFormError(null)
+                field.handleChange(value)
+              },
+              state: {
+                ...field.state,
+                meta: {
+                  ...field.state.meta,
+                  errors: [
+                    ...field.state.meta.errors,
+                    ...(serverErrors.categoryId ?? []),
+                  ],
+                  isTouched:
+                    field.state.meta.isTouched || (serverErrors.categoryId?.length ?? 0) > 0,
+                },
+              },
+            }}
+          />
+        )}
       </form.Field>
 
       <form.Field
@@ -140,17 +196,31 @@ export function CreateIdeaForm() {
         validators={{ onChange: createIdeaZodSchema.shape.problemStatement }}
       >
         {(field) => (
+          (() => {
+            const mergedErrors = [
+              ...normalizeErrors(field.state.meta.errors),
+              ...(serverErrors.problemStatement ?? []),
+            ]
+            return (
           <AppTextarea
             id={field.name}
             label="Problem Statement"
             value={field.state.value}
-            onChange={field.handleChange}
+            onChange={(value) => {
+              clearFieldError("problemStatement")
+              setFormError(null)
+              field.handleChange(value)
+            }}
             onBlur={field.handleBlur}
-            touched={field.state.meta.isTouched}
-            errors={normalizeErrors(field.state.meta.errors)}
+            touched={
+              field.state.meta.isTouched || (serverErrors.problemStatement?.length ?? 0) > 0
+            }
+            errors={mergedErrors}
             placeholder="Describe the sustainability problem you're addressing."
             rows={3}
           />
+            )
+          })()
         )}
       </form.Field>
 
@@ -159,17 +229,31 @@ export function CreateIdeaForm() {
         validators={{ onChange: createIdeaZodSchema.shape.proposedSolution }}
       >
         {(field) => (
+          (() => {
+            const mergedErrors = [
+              ...normalizeErrors(field.state.meta.errors),
+              ...(serverErrors.proposedSolution ?? []),
+            ]
+            return (
           <AppTextarea
             id={field.name}
             label="Proposed Solution"
             value={field.state.value}
-            onChange={field.handleChange}
+            onChange={(value) => {
+              clearFieldError("proposedSolution")
+              setFormError(null)
+              field.handleChange(value)
+            }}
             onBlur={field.handleBlur}
-            touched={field.state.meta.isTouched}
-            errors={normalizeErrors(field.state.meta.errors)}
+            touched={
+              field.state.meta.isTouched || (serverErrors.proposedSolution?.length ?? 0) > 0
+            }
+            errors={mergedErrors}
             placeholder="Explain your approach to solving the problem."
             rows={3}
           />
+            )
+          })()
         )}
       </form.Field>
 
@@ -178,17 +262,29 @@ export function CreateIdeaForm() {
         validators={{ onChange: createIdeaZodSchema.shape.description }}
       >
         {(field) => (
+          (() => {
+            const mergedErrors = [
+              ...normalizeErrors(field.state.meta.errors),
+              ...(serverErrors.description ?? []),
+            ]
+            return (
           <AppTextarea
             id={field.name}
             label="Full Description"
             value={field.state.value}
-            onChange={field.handleChange}
+            onChange={(value) => {
+              clearFieldError("description")
+              setFormError(null)
+              field.handleChange(value)
+            }}
             onBlur={field.handleBlur}
-            touched={field.state.meta.isTouched}
-            errors={normalizeErrors(field.state.meta.errors)}
+            touched={field.state.meta.isTouched || (serverErrors.description?.length ?? 0) > 0}
+            errors={mergedErrors}
             placeholder="Detailed information, implementation steps, expected impact…"
             rows={5}
           />
+            )
+          })()
         )}
       </form.Field>
 
@@ -231,13 +327,20 @@ export function CreateIdeaForm() {
                   placeholder="e.g. 9.99"
                   value={field.state.value ?? ""}
                   onChange={(e) =>
-                    field.handleChange(e.target.value ? Number(e.target.value) : undefined)
+                    {
+                      clearFieldError("price")
+                      setFormError(null)
+                      field.handleChange(e.target.value ? Number(e.target.value) : undefined)
+                    }
                   }
                   onBlur={field.handleBlur}
                 />
-                {field.state.meta.isTouched && field.state.meta.errors.length > 0 ? (
+                {field.state.meta.isTouched || (serverErrors.price?.length ?? 0) > 0 ? (
                   <p className="text-sm text-destructive">
-                    {normalizeErrors(field.state.meta.errors)[0]}
+                    {[
+                      ...normalizeErrors(field.state.meta.errors),
+                      ...(serverErrors.price ?? []),
+                    ][0]}
                   </p>
                 ) : null}
               </div>

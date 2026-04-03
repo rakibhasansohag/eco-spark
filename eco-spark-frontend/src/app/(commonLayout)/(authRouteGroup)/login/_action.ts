@@ -1,10 +1,10 @@
 "use server"
 
-import { AxiosError } from "axios"
 import { cookies } from "next/headers"
 import { loginForServerAction } from "@/services/auth.services"
 import { IAuthUser } from "@/types/auth.types"
 import { loginZodSchema } from "@/zod/auth.validation"
+import { extractActionError, firstFieldErrorMessage } from "@/lib/actionErrorUtils"
 
 export interface ILoginActionResult {
   success: boolean
@@ -22,11 +22,12 @@ export const loginAction = async (values: unknown): Promise<ILoginActionResult> 
   const parsed = loginZodSchema.safeParse(values)
 
   if (!parsed.success) {
+    const errors = parsed.error.flatten().fieldErrors
     return {
       success: false,
-      message: "Validation failed",
+      message: firstFieldErrorMessage(errors, "Please check your credentials"),
       data: null,
-      errors: parsed.error.flatten().fieldErrors,
+      errors,
     }
   }
 
@@ -68,18 +69,12 @@ export const loginAction = async (values: unknown): Promise<ILoginActionResult> 
       data: result.data,
     }
   } catch (error) {
-    if (error instanceof AxiosError && error.response?.data?.message) {
-      return {
-        success: false,
-        message: String(error.response.data.message),
-        data: null,
-      }
-    }
-
+    const parsedError = extractActionError(error, "Login failed")
     return {
       success: false,
-      message: "Login failed",
+      message: parsedError.message,
       data: null,
+      errors: parsedError.errors,
     }
   }
 }

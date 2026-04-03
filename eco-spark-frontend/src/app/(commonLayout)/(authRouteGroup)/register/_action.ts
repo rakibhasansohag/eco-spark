@@ -1,10 +1,10 @@
 "use server"
 
-import { AxiosError } from "axios"
 import { cookies } from "next/headers"
 import { registerForServerAction } from "@/services/auth.services"
 import { IAuthUser } from "@/types/auth.types"
 import { registerZodSchema } from "@/zod/auth.validation"
+import { extractActionError, firstFieldErrorMessage } from "@/lib/actionErrorUtils"
 
 export interface IRegisterActionResult {
   success: boolean
@@ -22,11 +22,12 @@ export const registerAction = async (values: unknown): Promise<IRegisterActionRe
   const parsed = registerZodSchema.safeParse(values)
 
   if (!parsed.success) {
+    const errors = parsed.error.flatten().fieldErrors
     return {
       success: false,
-      message: "Validation failed",
+      message: firstFieldErrorMessage(errors, "Please check your registration data"),
       data: null,
-      errors: parsed.error.flatten().fieldErrors,
+      errors,
     }
   }
 
@@ -68,18 +69,12 @@ export const registerAction = async (values: unknown): Promise<IRegisterActionRe
       data: result.data,
     }
   } catch (error) {
-    if (error instanceof AxiosError && error.response?.data?.message) {
-      return {
-        success: false,
-        message: String(error.response.data.message),
-        data: null,
-      }
-    }
-
+    const parsedError = extractActionError(error, "Registration failed")
     return {
       success: false,
-      message: "Registration failed",
+      message: parsedError.message,
       data: null,
+      errors: parsedError.errors,
     }
   }
 }
