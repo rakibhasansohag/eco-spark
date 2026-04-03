@@ -19,7 +19,9 @@ export const getMyProfile = async (): Promise<ApiResponse<IUser>> => {
   return res.data;
 };
 
-export const updateMyProfile = async (data: IUpdateProfilePayload): Promise<ApiResponse<IUser>> => {
+export const updateMyProfile = async (
+  data: IUpdateProfilePayload | FormData
+): Promise<ApiResponse<IUser>> => {
   const res = await httpClient.patch<ApiResponse<IUser>>("/users/my-profile", data);
   return res.data;
 };

@@ -1,9 +1,9 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { AxiosError } from "axios"
 import { updateMyProfile } from "@/services/user.services"
 import { updateProfileZodSchema } from "@/zod/user.validation"
+import { extractActionError, firstFieldErrorMessage } from "@/lib/actionErrorUtils"
 
 interface ActionResult {
   success: boolean
@@ -11,18 +11,45 @@ interface ActionResult {
 }
 
 export async function updateProfileAction(values: unknown): Promise<ActionResult> {
-  const parsed = updateProfileZodSchema.safeParse(values)
+  const raw = (values ?? {}) as Record<string, unknown>
+  const parsed = updateProfileZodSchema.safeParse({
+    name: raw.name,
+    image: raw.image,
+    bio: raw.bio,
+    organization: raw.organization,
+    jobTitle: raw.jobTitle,
+    location: raw.location,
+    website: raw.website,
+    phone: raw.phone,
+  })
   if (!parsed.success) {
-    return { success: false, message: "Validation failed" }
+    return {
+      success: false,
+      message: firstFieldErrorMessage(parsed.error.flatten().fieldErrors, "Validation failed"),
+    }
   }
+
+  const payload = new FormData()
+  const entries = Object.entries(parsed.data)
+  for (const [key, value] of entries) {
+    if (typeof value === "string" && value.trim().length > 0) {
+      payload.append(key, value.trim())
+    }
+  }
+  const avatar = raw.avatar
+  if (avatar instanceof File && avatar.size > 0) {
+    payload.append("avatar", avatar, avatar.name)
+  }
+
   try {
-    await updateMyProfile(parsed.data)
+    await updateMyProfile(payload)
     revalidatePath("/my-profile")
+    revalidatePath("/dashboard")
+    revalidatePath("/member/dashboard")
+    revalidatePath("/admin/dashboard")
     return { success: true, message: "Profile updated successfully" }
   } catch (error) {
-    if (error instanceof AxiosError && error.response?.data?.message) {
-      return { success: false, message: String(error.response.data.message) }
-    }
-    return { success: false, message: "Failed to update profile" }
+    const parsedError = extractActionError(error, "Failed to update profile")
+    return { success: false, message: parsedError.message }
   }
 }

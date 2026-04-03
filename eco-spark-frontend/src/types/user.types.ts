@@ -3,6 +3,12 @@ export interface IUser {
   name: string;
   email: string;
   image: string | null;
+  bio?: string | null;
+  organization?: string | null;
+  jobTitle?: string | null;
+  location?: string | null;
+  website?: string | null;
+  phone?: string | null;
   role: "ADMIN" | "MEMBER";
   status: "ACTIVE" | "INACTIVE";
   createdAt: string;
@@ -12,6 +18,13 @@ export interface IUser {
 export interface IUpdateProfilePayload {
   name?: string;
   image?: string;
+  bio?: string;
+  organization?: string;
+  jobTitle?: string;
+  location?: string;
+  website?: string;
+  phone?: string;
+  avatar?: File;
 }
 
 export interface IUpdateUserByAdminPayload {

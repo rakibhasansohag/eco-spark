@@ -27,7 +27,10 @@ export default async function MemberDashboardPage() {
 
   return (
     <section className="space-y-6">
-      <PageHeader title="My Dashboard" />
+      <PageHeader
+        title="My Dashboard"
+        description="Track idea progress, engagement, and visibility from your member workspace."
+      />
       {hasLoadError ? (
         <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
           Unable to load dashboard stats right now. Please refresh.

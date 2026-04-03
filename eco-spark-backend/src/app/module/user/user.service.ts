@@ -6,12 +6,19 @@ import { userSearchableFields, userFilterableFields } from "./user.constant.js";
 import { IUpdateUserProfile } from "./user.interface.js";
 import { Role, UserStatus } from "../../../generated/prisma/index.js";
 import { IQueryParams } from "../../interfaces/query.interface.js";
+import { uploadAvatarToCloudinary } from "./user.utils.js";
 
 const publicUserSelect = {
   id: true,
   name: true,
   email: true,
   image: true,
+  bio: true,
+  organization: true,
+  jobTitle: true,
+  location: true,
+  website: true,
+  phone: true,
   role: true,
   status: true,
   createdAt: true,
@@ -41,8 +48,17 @@ export const UserService = {
     return user;
   },
 
-  updateMyProfile: async (userId: string, payload: IUpdateUserProfile) => {
-    return prisma.user.update({ where: { id: userId }, data: payload, select: publicUserSelect });
+  updateMyProfile: async (userId: string, payload: IUpdateUserProfile, file?: Express.Multer.File) => {
+    const avatarUrl = file ? await uploadAvatarToCloudinary(file.buffer) : undefined;
+    const data = {
+      ...payload,
+      ...(avatarUrl ? { image: avatarUrl } : {}),
+    };
+    return prisma.user.update({
+      where: { id: userId },
+      data: data as any,
+      select: publicUserSelect as any,
+    });
   },
 
   updateByAdmin: async (id: string, payload: { role?: string; status?: string }) => {

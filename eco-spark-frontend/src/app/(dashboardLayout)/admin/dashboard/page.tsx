@@ -27,7 +27,10 @@ export default async function AdminDashboardPage() {
 
   return (
     <section className="space-y-6">
-      <PageHeader title="Admin Dashboard" />
+      <PageHeader
+        title="Admin Dashboard"
+        description="Monitor platform health, content pipeline status, and member activity in one place."
+      />
       {hasLoadError ? (
         <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
           Unable to load dashboard stats right now. Please refresh.

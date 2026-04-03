@@ -8,9 +8,21 @@ export default async function MyProfilePage() {
 
   return (
     <section className="space-y-6">
-      <PageHeader title="My Profile" description="Update your name and profile image." />
-      <div className="mx-auto max-w-2xl rounded-lg border bg-card p-6">
-        <MyProfileForm initialName={user.name} initialImage={user.image ?? ""} />
+      <PageHeader
+        title="My Profile"
+        description="Manage your avatar, personal details, and public professional profile."
+      />
+      <div className="mx-auto w-full max-w-3xl rounded-xl border bg-card p-6 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.35)]">
+        <MyProfileForm
+          initialName={user.name}
+          initialImage={user.image ?? ""}
+          initialBio={user.bio ?? ""}
+          initialOrganization={user.organization ?? ""}
+          initialJobTitle={user.jobTitle ?? ""}
+          initialLocation={user.location ?? ""}
+          initialWebsite={user.website ?? ""}
+          initialPhone={user.phone ?? ""}
+        />
       </div>
     </section>
   )

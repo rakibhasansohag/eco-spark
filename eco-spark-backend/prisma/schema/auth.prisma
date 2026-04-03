@@ -6,6 +6,12 @@ model User {
   email         String     @unique
   emailVerified Boolean    @default(false)
   image         String?
+  bio           String?
+  organization  String?
+  jobTitle      String?
+  location      String?
+  website       String?
+  phone         String?
   role          Role       @default(MEMBER)
   status        UserStatus @default(ACTIVE)
   createdAt     DateTime   @default(now())

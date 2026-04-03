@@ -21,7 +21,7 @@ export const UserController = {
   }),
 
   updateMyProfile: catchAsync(async (req: Request, res: Response) => {
-    const result = await UserService.updateMyProfile(req.user!.userId, req.body);
+    const result = await UserService.updateMyProfile(req.user!.userId, req.body, req.file);
     sendResponse(res, { httpStatusCode: StatusCodes.OK, success: true, message: "Profile updated successfully", data: result });
   }),
 
