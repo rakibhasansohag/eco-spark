@@ -1,8 +1,9 @@
 import { getMemberDashboardStats } from "@/services/dashboard.services"
 import { StatsCard } from "@/components/shared/StatsCard"
-import { IdeaStatusBarChart } from "@/components/shared/charts/IdeaStatusBarChart"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { IMemberDashboardStats } from "@/types/dashboard.types"
+import { DashboardStatusDonutChart } from "@/components/shared/charts/DashboardStatusDonutChart"
+import { DashboardMetricsBarChart } from "@/components/shared/charts/DashboardMetricsBarChart"
 
 export default async function MemberDashboardPage() {
   let stats: IMemberDashboardStats = {
@@ -37,13 +38,24 @@ export default async function MemberDashboardPage() {
         <StatsCard title="Votes Received" value={stats.totalVotesReceived} />
         <StatsCard title="Comments Received" value={stats.totalCommentsReceived} />
       </div>
-      <IdeaStatusBarChart
-        data={[
-          { status: "Approved", value: stats.ideasByStatus.approved },
-          { status: "Pending", value: stats.ideasByStatus.pending },
-          { status: "Rejected", value: stats.ideasByStatus.rejected },
-        ]}
-      />
+      <div className="grid gap-4 xl:grid-cols-2">
+        <DashboardStatusDonutChart
+          title="My Idea Status"
+          data={[
+            { label: "Approved", value: stats.ideasByStatus.approved },
+            { label: "Pending", value: stats.ideasByStatus.pending },
+            { label: "Rejected", value: stats.ideasByStatus.rejected },
+          ]}
+        />
+        <DashboardMetricsBarChart
+          title="My Engagement Metrics"
+          data={[
+            { label: "My Ideas", value: stats.totalIdeas },
+            { label: "Votes", value: stats.totalVotesReceived },
+            { label: "Comments", value: stats.totalCommentsReceived },
+          ]}
+        />
+      </div>
     </section>
   )
 }

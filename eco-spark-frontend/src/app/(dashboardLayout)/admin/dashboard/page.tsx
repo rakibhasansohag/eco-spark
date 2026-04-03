@@ -1,8 +1,9 @@
 import { getAdminDashboardStats } from "@/services/dashboard.services"
 import { StatsCard } from "@/components/shared/StatsCard"
-import { IdeaStatusBarChart } from "@/components/shared/charts/IdeaStatusBarChart"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { IAdminDashboardStats } from "@/types/dashboard.types"
+import { DashboardStatusDonutChart } from "@/components/shared/charts/DashboardStatusDonutChart"
+import { DashboardMetricsBarChart } from "@/components/shared/charts/DashboardMetricsBarChart"
 
 export default async function AdminDashboardPage() {
   let stats: IAdminDashboardStats = {
@@ -37,14 +38,26 @@ export default async function AdminDashboardPage() {
         <StatsCard title="Total Ideas" value={stats.totalIdeas} />
         <StatsCard title="Approved Ideas" value={stats.ideasByStatus.approved} />
       </div>
-      <IdeaStatusBarChart
-        data={[
-          { status: "Approved", value: stats.ideasByStatus.approved },
-          { status: "Pending", value: stats.ideasByStatus.pending },
-          { status: "Under Review", value: stats.ideasByStatus.underReview },
-          { status: "Rejected", value: stats.ideasByStatus.rejected },
-        ]}
-      />
+      <div className="grid gap-4 xl:grid-cols-2">
+        <DashboardStatusDonutChart
+          title="Idea Status Distribution"
+          data={[
+            { label: "Approved", value: stats.ideasByStatus.approved },
+            { label: "Pending", value: stats.ideasByStatus.pending },
+            { label: "Under Review", value: stats.ideasByStatus.underReview },
+            { label: "Rejected", value: stats.ideasByStatus.rejected },
+          ]}
+        />
+        <DashboardMetricsBarChart
+          title="Platform Overview"
+          data={[
+            { label: "Members", value: stats.totalMembers },
+            { label: "Ideas", value: stats.totalIdeas },
+            { label: "Approved", value: stats.ideasByStatus.approved },
+            { label: "Pending", value: stats.ideasByStatus.pending },
+          ]}
+        />
+      </div>
     </section>
   )
 }
