@@ -1,11 +1,10 @@
 import { StatusCodes } from "http-status-codes";
-import { Decimal } from "@prisma/client/runtime/library";
 import prisma from "../../lib/prisma.js";
 import AppError from "../../errorHelpers/AppError.js";
 import QueryBuilder from "../../utils/QueryBuilder.js";
 import { ideaSearchableFields, ideaFilterableFields } from "./idea.constant.js";
 import { ICreateIdea, IUpdateIdea, IRejectIdea } from "./idea.interface.js";
-import { IdeaStatus, Role } from "../../../generated/prisma/index.js";
+import { IdeaStatus, Prisma, Role } from "../../../generated/prisma/index.js";
 import { canViewFullContent, assertIdeaIsEditable, uploadManyImages } from "./idea.utils.js";
 import { IQueryParams } from "../../interfaces/query.interface.js";
 
@@ -33,7 +32,7 @@ export const IdeaService = {
           description: payload.description,
           categoryId: payload.categoryId,
           isPaid: payload.isPaid ?? false,
-          price: payload.price != null ? new Decimal(payload.price) : null,
+          price: payload.price != null ? new Prisma.Decimal(payload.price) : null,
           authorId,
           status: IdeaStatus.DRAFT,
         },
@@ -188,7 +187,7 @@ export const IdeaService = {
         where: { id },
         data: {
           ...payload,
-          price: payload.price != null ? new Decimal(payload.price) : undefined,
+          price: payload.price != null ? new Prisma.Decimal(payload.price) : undefined,
         },
         include: ideaInclude,
       });
