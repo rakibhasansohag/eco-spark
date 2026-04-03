@@ -13,7 +13,7 @@ export default function NotFoundPage() {
         <p className="mt-5 text-7xl font-extrabold tracking-tight text-primary/20">404</p>
         <h1 className="mt-2 text-2xl font-bold tracking-tight">Page not found</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you are looking for doesn't exist or may have been moved.
+          The page you are looking for doesn&apos;t exist or may have been moved.
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">

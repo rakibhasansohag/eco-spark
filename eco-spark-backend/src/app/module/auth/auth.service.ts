@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { auth } from "../../lib/auth.js";
-import { hashPassword, verifyPassword } from "better-auth/dist/crypto/password.mjs";
+import { hashPassword, verifyPassword } from "better-auth/crypto";
 import prisma from "../../lib/prisma.js";
 import AppError from "../../errorHelpers/AppError.js";
 import { generateTokenPair } from "../../utils/token.js";

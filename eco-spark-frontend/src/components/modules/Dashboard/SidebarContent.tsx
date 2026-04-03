@@ -15,9 +15,16 @@ export function SidebarContent({ role, onNavigate }: SidebarContentProps) {
   const pathname = usePathname()
   const roleItems = getRoleNavItems(role)
   const commonItems = getCommonProtectedNavItems()
+  const allItems = [...roleItems, ...commonItems]
+
+  const activeHref =
+    allItems
+      .map((item) => item.href)
+      .filter((href) => pathname === href || pathname.startsWith(`${href}/`))
+      .sort((a, b) => b.length - a.length)[0] ?? null
 
   const linkClass = (href: string) => {
-    const active = pathname === href || pathname.startsWith(`${href}/`)
+    const active = href === activeHref
     return cn(
       "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
       active
