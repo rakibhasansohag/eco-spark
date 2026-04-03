@@ -10,8 +10,8 @@ export async function Navbar() {
   const name = decoded?.name ?? "EcoSpark User"
 
   return (
-    <header className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur">
-      <div className="flex h-14 items-center justify-end px-4">
+    <header className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <div className="flex h-14 items-center gap-2 px-4">
         <NavbarContent role={role} name={name} />
       </div>
     </header>

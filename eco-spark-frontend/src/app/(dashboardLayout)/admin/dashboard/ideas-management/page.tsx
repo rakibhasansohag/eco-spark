@@ -1,6 +1,7 @@
 import { QueryClient, dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { getIdeasForAdmin } from "@/services/idea.services"
 import AdminIdeasManagement from "@/components/modules/Admin/Ideas/IdeasManagement"
+import { PageHeader } from "@/components/shared/PageHeader"
 
 export default async function IdeasManagementPage({
   searchParams,
@@ -15,8 +16,8 @@ export default async function IdeasManagementPage({
   })
 
   return (
-    <section className="space-y-4">
-      <h1 className="text-2xl font-semibold">Ideas Management</h1>
+    <section className="space-y-6">
+      <PageHeader title="Ideas Management" />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <AdminIdeasManagement searchParams={params} />
       </HydrationBoundary>

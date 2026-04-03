@@ -1,6 +1,7 @@
 import { QueryClient, dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { getMyPayments, verifyPayment } from "@/services/payment.services"
 import MyPaymentsManagement from "@/components/modules/Member/Payments/MyPaymentsManagement"
+import { PageHeader } from "@/components/shared/PageHeader"
 
 export default async function MyPaymentsPage({
   searchParams,
@@ -31,8 +32,8 @@ export default async function MyPaymentsPage({
   })
 
   return (
-    <section className="space-y-4">
-      <h1 className="text-2xl font-semibold">My Payments</h1>
+    <section className="space-y-6">
+      <PageHeader title="My Payments" />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <MyPaymentsManagement searchParams={listParams} paymentNotice={paymentNotice} />
       </HydrationBoundary>

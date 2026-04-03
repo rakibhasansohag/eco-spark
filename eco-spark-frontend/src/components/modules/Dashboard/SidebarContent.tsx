@@ -13,27 +13,36 @@ interface SidebarContentProps {
 
 export function SidebarContent({ role, onNavigate }: SidebarContentProps) {
   const pathname = usePathname()
-  const navItems = [...getRoleNavItems(role), ...getCommonProtectedNavItems()]
+  const roleItems = getRoleNavItems(role)
+  const commonItems = getCommonProtectedNavItems()
+
+  const linkClass = (href: string) => {
+    const active = pathname === href || pathname.startsWith(`${href}/`)
+    return cn(
+      "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+      active
+        ? "bg-primary text-primary-foreground"
+        : "text-muted-foreground hover:bg-accent hover:text-foreground",
+    )
+  }
 
   return (
     <nav className="flex flex-col gap-1 p-3">
-      {navItems.map((item) => {
-        const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
+      {roleItems.map((item) => (
+        <Link key={item.href} href={item.href} onClick={onNavigate} className={linkClass(item.href)}>
+          <item.icon className="size-4 shrink-0" />
+          {item.label}
+        </Link>
+      ))}
 
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={onNavigate}
-            className={cn(
-              "rounded-md px-3 py-2 text-sm font-medium transition-colors",
-              active ? "bg-primary text-primary-foreground" : "hover:bg-muted"
-            )}
-          >
-            {item.label}
-          </Link>
-        )
-      })}
+      <div className="my-2 h-px bg-border" />
+
+      {commonItems.map((item) => (
+        <Link key={item.href} href={item.href} onClick={onNavigate} className={linkClass(item.href)}>
+          <item.icon className="size-4 shrink-0" />
+          {item.label}
+        </Link>
+      ))}
     </nav>
   )
 }

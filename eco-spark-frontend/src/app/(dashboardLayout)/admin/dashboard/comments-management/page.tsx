@@ -1,6 +1,7 @@
 import { QueryClient, dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { getCommentList } from "@/services/comment.services"
 import AdminCommentsManagement from "@/components/modules/Admin/Comments/CommentsManagement"
+import { PageHeader } from "@/components/shared/PageHeader"
 
 export default async function CommentsManagementPage({
   searchParams,
@@ -15,8 +16,8 @@ export default async function CommentsManagementPage({
   })
 
   return (
-    <section className="space-y-4">
-      <h1 className="text-2xl font-semibold">Comments Management</h1>
+    <section className="space-y-6">
+      <PageHeader title="Comments Management" />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <AdminCommentsManagement searchParams={params} />
       </HydrationBoundary>

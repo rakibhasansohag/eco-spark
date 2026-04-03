@@ -1,6 +1,7 @@
 import { QueryClient, dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { getUserList } from "@/services/user.services"
 import AdminUsersManagement from "@/components/modules/Admin/Users/UsersManagement"
+import { PageHeader } from "@/components/shared/PageHeader"
 
 export default async function UsersManagementPage({
   searchParams,
@@ -15,8 +16,8 @@ export default async function UsersManagementPage({
   })
 
   return (
-    <section className="space-y-4">
-      <h1 className="text-2xl font-semibold">Users Management</h1>
+    <section className="space-y-6">
+      <PageHeader title="Users Management" />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <AdminUsersManagement searchParams={params} />
       </HydrationBoundary>

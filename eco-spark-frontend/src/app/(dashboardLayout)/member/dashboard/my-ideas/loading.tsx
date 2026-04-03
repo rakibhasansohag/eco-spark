@@ -1,3 +1,5 @@
+import { TableSkeleton } from "@/components/shared/skeleton/TableSkeleton"
+
 export default function MyIdeasLoading() {
-  return <div className="h-24 animate-pulse rounded-lg bg-muted" />
+  return <TableSkeleton />
 }

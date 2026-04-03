@@ -1,3 +1,5 @@
+import { DashboardSkeleton } from "@/components/shared/skeleton/DashboardSkeleton"
+
 export default function AdminDashboardLoading() {
-  return <div className="h-24 animate-pulse rounded-lg bg-muted" />
+  return <DashboardSkeleton />
 }

@@ -1,3 +1,5 @@
+import { FormSkeleton } from "@/components/shared/skeleton/FormSkeleton"
+
 export default function ChangePasswordLoading() {
-  return <div className="h-24 animate-pulse rounded-lg bg-muted" />
+  return <FormSkeleton fields={3} />
 }

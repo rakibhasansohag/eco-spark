@@ -1,10 +1,17 @@
+import { PageHeader } from "@/components/shared/PageHeader"
+
 export default function MyProfilePage() {
   return (
-    <section className="rounded-lg border bg-background p-6">
-      <h1 className="text-xl font-semibold">My Profile</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Profile management UI will be implemented in upcoming steps.
-      </p>
+    <section className="space-y-6">
+      <PageHeader
+        title="My Profile"
+        description="Manage your account details and preferences."
+      />
+      <div className="mx-auto max-w-2xl rounded-lg border bg-card p-6">
+        <p className="text-sm text-muted-foreground">
+          Profile management will be available in an upcoming update.
+        </p>
+      </div>
     </section>
   )
 }

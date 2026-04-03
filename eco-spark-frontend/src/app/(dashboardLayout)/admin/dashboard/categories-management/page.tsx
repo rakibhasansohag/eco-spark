@@ -1,6 +1,7 @@
 import { QueryClient, dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { getCategoryList } from "@/services/category.services"
 import AdminCategoriesManagement from "@/components/modules/Admin/Categories/CategoriesManagement"
+import { PageHeader } from "@/components/shared/PageHeader"
 
 export default async function CategoriesManagementPage({
   searchParams,
@@ -15,8 +16,8 @@ export default async function CategoriesManagementPage({
   })
 
   return (
-    <section className="space-y-4">
-      <h1 className="text-2xl font-semibold">Categories Management</h1>
+    <section className="space-y-6">
+      <PageHeader title="Categories Management" />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <AdminCategoriesManagement searchParams={params} />
       </HydrationBoundary>
