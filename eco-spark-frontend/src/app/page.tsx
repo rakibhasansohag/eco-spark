@@ -10,6 +10,7 @@ import { FadeInSection } from "@/components/shared/motion/FadeInSection"
 import { UseCasesSection } from "@/components/modules/Home/UseCasesSection"
 import { HomeFaqSection } from "@/components/modules/Home/HomeFaqSection"
 import { ActionCtaSection } from "@/components/modules/Home/ActionCtaSection"
+import { TrustedBySection } from "@/components/modules/Home/TrustedBySection"
 
 export default async function Home() {
   const queryClient = new QueryClient()
@@ -26,18 +27,22 @@ export default async function Home() {
       </FadeInSection>
 
       <FadeInSection delay={0.04}>
-        <ServicesSection />
+        <TrustedBySection />
       </FadeInSection>
 
       <FadeInSection delay={0.08}>
-        <HowItWorksSection />
+        <ServicesSection />
       </FadeInSection>
 
       <FadeInSection delay={0.12}>
-        <UseCasesSection />
+        <HowItWorksSection />
       </FadeInSection>
 
       <FadeInSection delay={0.16}>
+        <UseCasesSection />
+      </FadeInSection>
+
+      <FadeInSection delay={0.2}>
         <section className="space-y-5">
           <div>
             <h2 className="text-3xl font-bold tracking-tight">Latest Ideas</h2>
@@ -51,19 +56,19 @@ export default async function Home() {
         </section>
       </FadeInSection>
 
-      <FadeInSection delay={0.2}>
+      <FadeInSection delay={0.24}>
         <ImpactSection />
       </FadeInSection>
 
-      <FadeInSection delay={0.24}>
+      <FadeInSection delay={0.28}>
         <HomeFaqSection />
       </FadeInSection>
 
-      <FadeInSection delay={0.28}>
+      <FadeInSection delay={0.32}>
         <ActionCtaSection />
       </FadeInSection>
 
-      <FadeInSection delay={0.32}>
+      <FadeInSection delay={0.36}>
         <NewsletterForm />
       </FadeInSection>
     </main>

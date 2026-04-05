@@ -1,3 +1,8 @@
+"use client"
+
+import { useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ChevronDown } from "lucide-react"
 import { SectionHeader } from "@/components/shared/SectionHeader"
 
 const faqs = [
@@ -24,6 +29,8 @@ const faqs = [
 ]
 
 export function HomeFaqSection() {
+  const [openIndex, setOpenIndex] = useState<number>(0)
+
   return (
     <section className="rounded-xl border bg-card p-6 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.35)] md:p-8">
       <SectionHeader
@@ -31,11 +38,35 @@ export function HomeFaqSection() {
         description="Key details about submissions, moderation, and premium idea access."
         className="mb-6"
       />
-      <div className="grid gap-4 md:grid-cols-2">
-        {faqs.map((faq) => (
-          <article key={faq.question} className="rounded-xl border bg-background p-5">
-            <h3 className="text-base font-semibold tracking-tight">{faq.question}</h3>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">{faq.answer}</p>
+      <div className="space-y-3">
+        {faqs.map((faq, index) => (
+          <article key={faq.question} className="overflow-hidden rounded-xl border bg-background">
+            <button
+              type="button"
+              className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left transition-colors hover:bg-muted/50"
+              onClick={() => setOpenIndex((prev) => (prev === index ? -1 : index))}
+              aria-expanded={openIndex === index}
+            >
+              <h3 className="text-base font-semibold tracking-tight">{faq.question}</h3>
+              <ChevronDown
+                className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
+                  openIndex === index ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            <AnimatePresence initial={false}>
+              {openIndex === index ? (
+                <motion.div
+                  key="content"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
+                >
+                  <p className="px-5 pb-5 text-sm leading-6 text-muted-foreground">{faq.answer}</p>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
           </article>
         ))}
       </div>
