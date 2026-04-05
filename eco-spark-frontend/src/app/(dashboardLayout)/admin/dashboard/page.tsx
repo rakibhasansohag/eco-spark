@@ -1,12 +1,11 @@
 import { getAdminDashboardStats } from "@/services/dashboard.services"
+import { CheckCircle2, Clock3, Lightbulb, Users } from "lucide-react"
 import { StatsCard } from "@/components/shared/StatsCard"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { IAdminDashboardStats } from "@/types/dashboard.types"
-import { DashboardStatusDonutChart } from "@/components/shared/charts/DashboardStatusDonutChart"
-import { DashboardMetricsBarChart } from "@/components/shared/charts/DashboardMetricsBarChart"
-import { getMyProfile } from "@/services/user.services"
-import { buildProfileChecklist, getProfileCompletion } from "@/lib/profileCompletion"
-import { ProfileCompletionChecklistCard } from "@/components/modules/Profile/ProfileCompletionChecklistCard"
+import { AdminStatusBarChart } from "@/components/shared/charts/AdminStatusBarChart"
+import { AdminOverviewHorizontalBarChart } from "@/components/shared/charts/AdminOverviewHorizontalBarChart"
+import { AdminRecentActivityTable } from "@/components/shared/table/AdminRecentActivityTable"
 import { FadeInSection } from "@/components/shared/motion/FadeInSection"
 
 export default async function AdminDashboardPage() {
@@ -21,20 +20,47 @@ export default async function AdminDashboardPage() {
     },
   }
   let hasLoadError = false
-  let profileCompletion = 0
-  let profileChecklist = buildProfileChecklist({})
 
   try {
-    const [statsResult, profileResult] = await Promise.all([
-      getAdminDashboardStats(),
-      getMyProfile(),
-    ])
+    const statsResult = await getAdminDashboardStats()
     stats = statsResult.data
-    profileCompletion = getProfileCompletion(profileResult.data)
-    profileChecklist = buildProfileChecklist(profileResult.data)
   } catch {
     hasLoadError = true
   }
+
+  const reviewQueue = stats.ideasByStatus.pending + stats.ideasByStatus.underReview
+  const approvalRate =
+    stats.totalIdeas > 0
+      ? Math.round((stats.ideasByStatus.approved / stats.totalIdeas) * 100)
+      : 0
+
+  const activityRows = [
+    {
+      label: "Approved",
+      count: stats.ideasByStatus.approved,
+      share: stats.totalIdeas > 0 ? Math.round((stats.ideasByStatus.approved / stats.totalIdeas) * 100) : 0,
+      priority: "Published",
+    },
+    {
+      label: "Pending",
+      count: stats.ideasByStatus.pending,
+      share: stats.totalIdeas > 0 ? Math.round((stats.ideasByStatus.pending / stats.totalIdeas) * 100) : 0,
+      priority: "Medium",
+    },
+    {
+      label: "Under Review",
+      count: stats.ideasByStatus.underReview,
+      share:
+        stats.totalIdeas > 0 ? Math.round((stats.ideasByStatus.underReview / stats.totalIdeas) * 100) : 0,
+      priority: "High",
+    },
+    {
+      label: "Rejected",
+      count: stats.ideasByStatus.rejected,
+      share: stats.totalIdeas > 0 ? Math.round((stats.ideasByStatus.rejected / stats.totalIdeas) * 100) : 0,
+      priority: "Follow-up",
+    },
+  ]
 
   return (
     <section className="space-y-6">
@@ -42,47 +68,44 @@ export default async function AdminDashboardPage() {
         title="Admin Dashboard"
         description="Monitor platform health, content pipeline status, and member activity in one place."
         eyebrow="Command Center"
-      >
-        <div className="rounded-full border bg-background/80 px-3 py-1.5 text-xs font-semibold text-muted-foreground">
-          Profile {profileCompletion}% complete
-        </div>
-      </PageHeader>
-      <FadeInSection>
-        <ProfileCompletionChecklistCard completion={profileCompletion} items={profileChecklist} />
-      </FadeInSection>
+      />
       {hasLoadError ? (
         <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
           Unable to load dashboard stats right now. Please refresh.
         </p>
       ) : null}
       <FadeInSection delay={0.04}>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <StatsCard title="Total Members" value={stats.totalMembers} />
-        <StatsCard title="Total Ideas" value={stats.totalIdeas} />
-        <StatsCard title="Approved Ideas" value={stats.ideasByStatus.approved} />
-      </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <StatsCard title="Total Members" value={stats.totalMembers} icon={Users} />
+          <StatsCard title="Total Ideas" value={stats.totalIdeas} icon={Lightbulb} />
+          <StatsCard title="Approval Rate" value={`${approvalRate}%`} icon={CheckCircle2} />
+          <StatsCard title="Review Queue" value={reviewQueue} icon={Clock3} />
+        </div>
       </FadeInSection>
       <FadeInSection delay={0.08}>
-      <div className="grid gap-4 xl:grid-cols-2">
-        <DashboardStatusDonutChart
-          title="Idea Status Distribution"
-          data={[
-            { label: "Approved", value: stats.ideasByStatus.approved },
-            { label: "Pending", value: stats.ideasByStatus.pending },
-            { label: "Under Review", value: stats.ideasByStatus.underReview },
-            { label: "Rejected", value: stats.ideasByStatus.rejected },
-          ]}
-        />
-        <DashboardMetricsBarChart
-          title="Platform Overview"
-          data={[
-            { label: "Members", value: stats.totalMembers },
-            { label: "Ideas", value: stats.totalIdeas },
-            { label: "Approved", value: stats.ideasByStatus.approved },
-            { label: "Pending", value: stats.ideasByStatus.pending },
-          ]}
-        />
-      </div>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <AdminStatusBarChart
+            title="Idea Status Counts"
+            data={[
+              { label: "Approved", value: stats.ideasByStatus.approved },
+              { label: "Pending", value: stats.ideasByStatus.pending },
+              { label: "Under Review", value: stats.ideasByStatus.underReview },
+              { label: "Rejected", value: stats.ideasByStatus.rejected },
+            ]}
+          />
+          <AdminOverviewHorizontalBarChart
+            title="Platform Comparison"
+            data={[
+              { label: "Members", value: stats.totalMembers },
+              { label: "Ideas", value: stats.totalIdeas },
+              { label: "Approved", value: stats.ideasByStatus.approved },
+              { label: "In Queue", value: reviewQueue },
+            ]}
+          />
+        </div>
+      </FadeInSection>
+      <FadeInSection delay={0.12}>
+        <AdminRecentActivityTable rows={activityRows} />
       </FadeInSection>
     </section>
   )
