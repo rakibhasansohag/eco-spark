@@ -1,5 +1,6 @@
 import { Factory, GraduationCap, Users } from "lucide-react"
 import { SectionHeader } from "@/components/shared/SectionHeader"
+import { BeamHoverCard } from "@/components/shared/interactive/BeamHoverCard"
 
 const useCases = [
   {
@@ -31,16 +32,18 @@ export function UseCasesSection() {
       />
       <div className="grid gap-5 md:grid-cols-3">
         {useCases.map((item) => (
-          <article
+          <BeamHoverCard
             key={item.title}
-            className="rounded-xl border bg-card p-6 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.35)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30"
+            className="rounded-xl border bg-card p-6 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.35)] transition-all duration-300 hover:border-primary/30"
           >
+            <article>
             <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-2.5">
               <item.icon className="size-5 text-primary" />
             </div>
             <h3 className="text-lg font-semibold tracking-tight">{item.title}</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>
-          </article>
+            </article>
+          </BeamHoverCard>
         ))}
       </div>
     </section>

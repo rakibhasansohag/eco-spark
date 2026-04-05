@@ -1,4 +1,5 @@
 import { SectionHeader } from "@/components/shared/SectionHeader"
+import { BeamHoverCard } from "@/components/shared/interactive/BeamHoverCard"
 
 const organizations = [
   "Green Campus Network",
@@ -18,12 +19,12 @@ export function TrustedBySection() {
       />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {organizations.map((name) => (
-          <div
+          <BeamHoverCard
             key={name}
-            className="rounded-xl border bg-card px-4 py-4 text-center text-sm font-semibold tracking-tight text-muted-foreground shadow-[0_8px_30px_-18px_rgba(15,23,42,0.35)]"
+            className="rounded-xl border bg-card px-4 py-4 text-center text-sm font-semibold tracking-tight text-muted-foreground shadow-[0_8px_30px_-18px_rgba(15,23,42,0.35)] transition-all duration-300 hover:border-primary/30"
           >
-            {name}
-          </div>
+            <div>{name}</div>
+          </BeamHoverCard>
         ))}
       </div>
     </section>
