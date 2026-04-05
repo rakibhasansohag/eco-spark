@@ -23,21 +23,15 @@ export function BeamHoverCard({
     const y = event.clientY - rect.top
     const px = x / rect.width
     const py = y / rect.height
-    const rotateX = (0.5 - py) * intensity
-    const rotateY = (px - 0.5) * intensity
-
-    element.style.setProperty("--beam-rx", `${rotateX.toFixed(2)}deg`)
-    element.style.setProperty("--beam-ry", `${rotateY.toFixed(2)}deg`)
     element.style.setProperty("--beam-mx", `${(px * 100).toFixed(2)}%`)
     element.style.setProperty("--beam-my", `${(py * 100).toFixed(2)}%`)
+    element.style.setProperty("--beam-size", `${220 + intensity * 4}px`)
     element.style.setProperty("--beam-opacity", "1")
     onMouseMove?.(event)
   }
 
   const handleMouseLeave = (event: React.MouseEvent<HTMLDivElement>) => {
     const element = event.currentTarget
-    element.style.setProperty("--beam-rx", "0deg")
-    element.style.setProperty("--beam-ry", "0deg")
     element.style.setProperty("--beam-mx", "50%")
     element.style.setProperty("--beam-my", "50%")
     element.style.setProperty("--beam-opacity", "0")
@@ -46,15 +40,14 @@ export function BeamHoverCard({
 
   return (
     <div
-      className="group/beam relative [perspective:1200px]"
+      className="group/beam relative"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       {...props}
     >
       <div
         className={cn(
-          "relative overflow-hidden transition-transform duration-300 ease-out will-change-transform [transform-style:preserve-3d]",
-          "[transform:rotateX(var(--beam-rx,0deg))_rotateY(var(--beam-ry,0deg))_translateZ(0)]",
+          "relative overflow-hidden transition-colors duration-300 ease-out",
           className
         )}
       >
@@ -63,7 +56,7 @@ export function BeamHoverCard({
           className="pointer-events-none absolute inset-0 z-10 rounded-[inherit] opacity-[var(--beam-opacity,0)] transition-opacity duration-300"
           style={{
             background:
-              "radial-gradient(260px circle at var(--beam-mx,50%) var(--beam-my,50%), hsl(var(--primary)/0.22), transparent 62%), linear-gradient(125deg, hsl(var(--primary)/0.12) 0%, transparent 42%, hsl(var(--chart-2)/0.16) 100%)",
+              "radial-gradient(var(--beam-size,260px) circle at var(--beam-mx,50%) var(--beam-my,50%), hsl(var(--primary)/0.22), transparent 62%), linear-gradient(125deg, hsl(var(--primary)/0.12) 0%, transparent 42%, hsl(var(--chart-2)/0.16) 100%)",
           }}
         />
         <div
