@@ -7,6 +7,9 @@ import { ImpactSection } from "@/components/modules/Home/ImpactSection"
 import { NewsletterForm } from "@/components/modules/Home/NewsletterForm"
 import { HowItWorksSection } from "@/components/modules/Home/HowItWorksSection"
 import { FadeInSection } from "@/components/shared/motion/FadeInSection"
+import { UseCasesSection } from "@/components/modules/Home/UseCasesSection"
+import { HomeFaqSection } from "@/components/modules/Home/HomeFaqSection"
+import { ActionCtaSection } from "@/components/modules/Home/ActionCtaSection"
 
 export default async function Home() {
   const queryClient = new QueryClient()
@@ -31,24 +34,36 @@ export default async function Home() {
       </FadeInSection>
 
       <FadeInSection delay={0.12}>
-      <section className="space-y-5">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Latest Ideas</h2>
-          <p className="mt-2 text-base leading-7 text-muted-foreground">
-            Recently approved ideas from the EcoSpark community.
-          </p>
-        </div>
-        <HydrationBoundary state={dehydrate(queryClient)}>
-          <HomeFeatured initialParams={params} />
-        </HydrationBoundary>
-      </section>
+        <UseCasesSection />
       </FadeInSection>
 
       <FadeInSection delay={0.16}>
-        <ImpactSection />
+        <section className="space-y-5">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Latest Ideas</h2>
+            <p className="mt-2 text-base leading-7 text-muted-foreground">
+              Recently approved ideas from the EcoSpark community.
+            </p>
+          </div>
+          <HydrationBoundary state={dehydrate(queryClient)}>
+            <HomeFeatured initialParams={params} />
+          </HydrationBoundary>
+        </section>
       </FadeInSection>
 
       <FadeInSection delay={0.2}>
+        <ImpactSection />
+      </FadeInSection>
+
+      <FadeInSection delay={0.24}>
+        <HomeFaqSection />
+      </FadeInSection>
+
+      <FadeInSection delay={0.28}>
+        <ActionCtaSection />
+      </FadeInSection>
+
+      <FadeInSection delay={0.32}>
         <NewsletterForm />
       </FadeInSection>
     </main>
