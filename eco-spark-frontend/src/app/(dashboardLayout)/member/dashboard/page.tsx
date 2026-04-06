@@ -6,6 +6,7 @@ import { IMemberDashboardStats } from "@/types/dashboard.types"
 import { AdminStatusBarChart } from "@/components/shared/charts/AdminStatusBarChart"
 import { AdminOverviewHorizontalBarChart } from "@/components/shared/charts/AdminOverviewHorizontalBarChart"
 import { MemberRecentActivityTable } from "@/components/shared/table/MemberRecentActivityTable"
+import { getMyProfile } from "@/services/user.services"
 import { FadeInSection } from "@/components/shared/motion/FadeInSection"
 
 export default async function MemberDashboardPage() {
@@ -20,6 +21,7 @@ export default async function MemberDashboardPage() {
     totalCommentsReceived: 0,
   }
   let hasLoadError = false
+  let canChangePassword = true
 
   try {
     const statsResult = await getMemberDashboardStats()
@@ -27,6 +29,11 @@ export default async function MemberDashboardPage() {
   } catch {
     hasLoadError = true
   }
+
+  try {
+    const profile = await getMyProfile()
+    canChangePassword = profile.data.canChangePassword !== false
+  } catch {}
 
   const inReviewCount = stats.ideasByStatus.pending
   const approvalRate =
@@ -74,6 +81,11 @@ export default async function MemberDashboardPage() {
       {hasLoadError ? (
         <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
           Unable to load dashboard stats right now. Please refresh.
+        </p>
+      ) : null}
+      {!canChangePassword ? (
+        <p className="rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-sm text-primary">
+          You are signed in with Google. Password changes are managed from your Google account.
         </p>
       ) : null}
       <FadeInSection delay={0.04}>

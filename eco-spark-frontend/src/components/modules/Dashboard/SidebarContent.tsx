@@ -8,13 +8,16 @@ import { getCommonProtectedNavItems, getRoleNavItems } from "@/lib/navItems"
 
 interface SidebarContentProps {
   role: AppRole
+  canChangePassword?: boolean
   onNavigate?: () => void
 }
 
-export function SidebarContent({ role, onNavigate }: SidebarContentProps) {
+export function SidebarContent({ role, canChangePassword = true, onNavigate }: SidebarContentProps) {
   const pathname = usePathname()
   const roleItems = getRoleNavItems(role)
-  const commonItems = getCommonProtectedNavItems()
+  const commonItems = getCommonProtectedNavItems().filter(
+    (item) => canChangePassword || item.href !== "/change-password",
+  )
   const allItems = [...roleItems, ...commonItems]
 
   const activeHref =

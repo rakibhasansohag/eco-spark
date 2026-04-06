@@ -43,9 +43,29 @@ export const UserService = {
   },
 
   getMyProfile: async (userId: string) => {
-    const user = await prisma.user.findUnique({ where: { id: userId }, select: publicUserSelect });
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        ...publicUserSelect,
+        accounts: {
+          select: {
+            providerId: true,
+            password: true,
+          },
+        },
+      },
+    });
     if (!user) throw new AppError(StatusCodes.NOT_FOUND, "User not found");
-    return user;
+
+    const canChangePassword = user.accounts.some(
+      (account) => account.providerId === "credential" && Boolean(account.password),
+    );
+    const { accounts: _accounts, ...publicUser } = user;
+
+    return {
+      ...publicUser,
+      canChangePassword,
+    };
   },
 
   updateMyProfile: async (userId: string, payload: IUpdateUserProfile, file?: Express.Multer.File) => {

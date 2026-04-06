@@ -38,7 +38,7 @@ export function LoginForm() {
   const handleGoogleSignIn = async () => {
     try {
       setIsGoogleLoading(true)
-      const callbackURL = `${API_BASE_URL}/auth/google/callback`
+      const callbackURL = `${window.location.origin}/oauth/google/callback`
       const response = await fetch(`${BACKEND_BASE_URL}/api/auth/sign-in/social`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

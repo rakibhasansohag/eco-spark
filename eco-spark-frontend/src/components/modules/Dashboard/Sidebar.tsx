@@ -3,6 +3,7 @@ import { Leaf } from "lucide-react"
 import { AppRole } from "@/lib/authUtils"
 import { getAccessToken } from "@/lib/tokenUtils"
 import { decodeAccessToken } from "@/lib/jwtUtils"
+import { getMyProfile } from "@/services/user.services"
 import { SidebarContent } from "./SidebarContent"
 
 const resolveRole = async (): Promise<AppRole> => {
@@ -13,6 +14,9 @@ const resolveRole = async (): Promise<AppRole> => {
 
 export async function Sidebar() {
   const role = await resolveRole()
+  const canChangePassword = await getMyProfile()
+    .then((res) => res.data.canChangePassword !== false)
+    .catch(() => true)
 
   return (
     <aside className="hidden w-64 shrink-0 flex-col border-r bg-background md:flex">
@@ -26,7 +30,7 @@ export async function Sidebar() {
         </Link>
       </div>
       <div className="flex-1 overflow-y-auto">
-        <SidebarContent role={role} />
+        <SidebarContent role={role} canChangePassword={canChangePassword} />
       </div>
     </aside>
   )

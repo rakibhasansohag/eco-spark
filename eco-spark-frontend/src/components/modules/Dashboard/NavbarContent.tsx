@@ -18,9 +18,10 @@ import { ThemeToggle } from "@/components/shared/ThemeToggle"
 interface NavbarContentProps {
   name: string
   role: "ADMIN" | "MEMBER"
+  canChangePassword: boolean
 }
 
-export function NavbarContent({ name, role }: NavbarContentProps) {
+export function NavbarContent({ name, role, canChangePassword }: NavbarContentProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
@@ -47,7 +48,11 @@ export function NavbarContent({ name, role }: NavbarContentProps) {
                 <span>EcoSpark Hub</span>
               </Link>
             </div>
-            <SidebarContent role={role} onNavigate={() => setSidebarOpen(false)} />
+            <SidebarContent
+              role={role}
+              canChangePassword={canChangePassword}
+              onNavigate={() => setSidebarOpen(false)}
+            />
           </SheetContent>
         </Sheet>
       </div>
@@ -55,7 +60,7 @@ export function NavbarContent({ name, role }: NavbarContentProps) {
       {/* Right slot: theme toggle + user menu */}
       <div className="ml-auto flex items-center gap-1">
         <ThemeToggle />
-        <UserMenu name={name} role={role} />
+        <UserMenu name={name} role={role} canChangePassword={canChangePassword} />
       </div>
     </>
   )

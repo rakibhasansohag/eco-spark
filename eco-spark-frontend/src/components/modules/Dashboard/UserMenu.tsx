@@ -20,6 +20,7 @@ import { logoutAction } from "@/app/(dashboardLayout)/_action"
 interface UserMenuProps {
   name: string
   role: "ADMIN" | "MEMBER"
+  canChangePassword?: boolean
 }
 
 const getInitials = (name: string) =>
@@ -30,7 +31,7 @@ const getInitials = (name: string) =>
     .map((p) => p[0]?.toUpperCase() ?? "")
     .join("")
 
-export function UserMenu({ name, role }: UserMenuProps) {
+export function UserMenu({ name, role, canChangePassword = true }: UserMenuProps) {
   const router = useRouter()
 
   const handleLogout = async () => {
@@ -69,12 +70,19 @@ export function UserMenu({ name, role }: UserMenuProps) {
             My Profile
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/change-password" className="flex cursor-pointer items-center gap-2">
+        {canChangePassword ? (
+          <DropdownMenuItem asChild>
+            <Link href="/change-password" className="flex cursor-pointer items-center gap-2">
+              <Lock className="size-4" />
+              Change Password
+            </Link>
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem disabled className="flex items-center gap-2 opacity-70">
             <Lock className="size-4" />
-            Change Password
-          </Link>
-        </DropdownMenuItem>
+            Password managed by Google
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuSeparator />
 

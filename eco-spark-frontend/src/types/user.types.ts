@@ -11,6 +11,7 @@ export interface IUser {
   phone?: string | null;
   role: "ADMIN" | "MEMBER";
   status: "ACTIVE" | "INACTIVE";
+  canChangePassword?: boolean;
   createdAt: string;
   updatedAt: string;
 }
