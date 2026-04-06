@@ -6,8 +6,70 @@ import AppError from "../../errorHelpers/AppError.js";
 import { generateTokenPair } from "../../utils/token.js";
 import { verifyRefreshToken } from "../../utils/jwt.js";
 import { Role, UserStatus } from "../../../generated/prisma/index.js";
+import { envVars } from "../../config/env.js";
 
 export const AuthService = {
+  getGoogleSignInUrl: async () => {
+    const callbackURL = `${envVars.BETTER_AUTH_URL}/api/v1/auth/google/callback`;
+
+    const result = await auth.api.signInSocial({
+      body: {
+        provider: "google",
+        callbackURL,
+        disableRedirect: true,
+      },
+    });
+
+    if (!result?.url) {
+      throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, "Unable to start Google sign-in");
+    }
+
+    return result.url;
+  },
+
+  resolveGoogleCallback: async (headers: Record<string, string | string[] | undefined>) => {
+    const session = await auth.api.getSession({
+      headers: headers as Record<string, string>,
+    });
+
+    const sessionUser = session?.user;
+    if (!sessionUser?.id) {
+      throw new AppError(StatusCodes.UNAUTHORIZED, "Google sign-in session was not found");
+    }
+
+    let user = await prisma.user.findUnique({ where: { id: sessionUser.id } });
+    if (!user && sessionUser.email) {
+      user = await prisma.user.findUnique({ where: { email: sessionUser.email } });
+    }
+
+    if (!user) {
+      throw new AppError(StatusCodes.UNAUTHORIZED, "User not found after Google sign-in");
+    }
+
+    if (user.email.toLowerCase() === "admin@ecosparkhub.com" && user.role !== Role.ADMIN) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { role: Role.ADMIN },
+      });
+    }
+
+    if (user.status !== UserStatus.ACTIVE) {
+      throw new AppError(StatusCodes.FORBIDDEN, "Account is deactivated");
+    }
+
+    const tokens = generateTokenPair({
+      userId: user.id,
+      role: user.role,
+      name: user.name,
+      email: user.email,
+    });
+
+    return {
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      ...tokens,
+    };
+  },
+
   register: async (payload: { name: string; email: string; password: string }) => {
     const existing = await prisma.user.findUnique({ where: { email: payload.email } });
     if (existing) {
