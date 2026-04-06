@@ -11,10 +11,10 @@ interface AdminStatusBarChartProps {
 }
 
 const palette = [
-  "hsl(var(--primary))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
+  "var(--color-primary)",
+  "var(--color-chart-2)",
+  "var(--color-chart-3)",
+  "var(--color-chart-4)",
 ]
 
 export function AdminStatusBarChart({ title, data }: AdminStatusBarChartProps) {
@@ -24,26 +24,26 @@ export function AdminStatusBarChart({ title, data }: AdminStatusBarChartProps) {
       <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
             <XAxis
               dataKey="label"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+              tick={{ fontSize: 12, fill: "var(--color-muted-foreground)" }}
             />
             <YAxis
               allowDecimals={false}
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+              tick={{ fontSize: 12, fill: "var(--color-muted-foreground)" }}
             />
             <Tooltip
               formatter={(value) => [Number(value).toLocaleString(), "Count"]}
               contentStyle={{
                 borderRadius: 12,
-                border: "1px solid hsl(var(--border))",
-                background: "hsl(var(--card))",
-                color: "hsl(var(--card-foreground))",
+                border: "1px solid var(--color-border)",
+                background: "var(--color-card)",
+                color: "var(--color-card-foreground)",
               }}
             />
             <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={34}>

@@ -1,5 +1,3 @@
-"use client"
-
 import { SectionHeader } from "@/components/shared/SectionHeader"
 import { StatsCard } from "@/components/shared/StatsCard"
 

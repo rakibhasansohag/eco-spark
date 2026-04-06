@@ -11,10 +11,10 @@ interface AdminOverviewHorizontalBarChartProps {
 }
 
 const palette = [
-  "hsl(var(--chart-2))",
-  "hsl(var(--primary))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
+  "var(--color-primary)",
+  "var(--color-chart-2)",
+  "var(--color-chart-3)",
+  "var(--color-chart-4)",
 ]
 
 export function AdminOverviewHorizontalBarChart({ title, data }: AdminOverviewHorizontalBarChartProps) {
@@ -26,13 +26,13 @@ export function AdminOverviewHorizontalBarChart({ title, data }: AdminOverviewHo
       <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={sortedData} layout="vertical" margin={{ top: 8, right: 8, left: 12, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--color-border)" />
             <XAxis
               type="number"
               allowDecimals={false}
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+              tick={{ fontSize: 12, fill: "var(--color-muted-foreground)" }}
             />
             <YAxis
               type="category"
@@ -40,15 +40,15 @@ export function AdminOverviewHorizontalBarChart({ title, data }: AdminOverviewHo
               width={112}
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+              tick={{ fontSize: 12, fill: "var(--color-muted-foreground)" }}
             />
             <Tooltip
               formatter={(value) => [Number(value).toLocaleString(), "Value"]}
               contentStyle={{
                 borderRadius: 12,
-                border: "1px solid hsl(var(--border))",
-                background: "hsl(var(--card))",
-                color: "hsl(var(--card-foreground))",
+                border: "1px solid var(--color-border)",
+                background: "var(--color-card)",
+                color: "var(--color-card-foreground)",
               }}
             />
             <Bar dataKey="value" radius={[0, 8, 8, 0]} barSize={18}>
