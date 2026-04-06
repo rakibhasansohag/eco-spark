@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { getAccessToken } from "@/lib/tokenUtils"
 import { decodeAccessToken } from "@/lib/jwtUtils"
+import { getMyProfile } from "@/services/user.services"
 
 export default async function AdminDashboardLayout({
   children,
@@ -9,12 +10,18 @@ export default async function AdminDashboardLayout({
 }) {
   const token = await getAccessToken()
   const decoded = decodeAccessToken(token)
+  let role = decoded?.role
 
-  if (!decoded?.role) {
-    redirect("/login")
+  if (!role) {
+    try {
+      const profile = await getMyProfile()
+      role = profile.data.role
+    } catch {
+      redirect("/login")
+    }
   }
 
-  if (decoded.role !== "ADMIN") {
+  if (role !== "ADMIN") {
     redirect("/member/dashboard")
   }
 

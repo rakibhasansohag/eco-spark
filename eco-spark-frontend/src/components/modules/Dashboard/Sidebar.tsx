@@ -9,7 +9,16 @@ import { SidebarContent } from "./SidebarContent"
 const resolveRole = async (): Promise<AppRole> => {
   const accessToken = await getAccessToken()
   const decoded = decodeAccessToken(accessToken)
-  return decoded?.role === "ADMIN" ? "ADMIN" : "MEMBER"
+  if (decoded?.role) {
+    return decoded.role === "ADMIN" ? "ADMIN" : "MEMBER"
+  }
+
+  try {
+    const profile = await getMyProfile()
+    return profile.data.role === "ADMIN" ? "ADMIN" : "MEMBER"
+  } catch {
+    return "MEMBER"
+  }
 }
 
 export async function Sidebar() {

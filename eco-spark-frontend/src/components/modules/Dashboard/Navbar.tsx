@@ -6,12 +6,16 @@ import { NavbarContent } from "./NavbarContent"
 export async function Navbar() {
   const accessToken = await getAccessToken()
   const decoded = decodeAccessToken(accessToken)
+  let role: "ADMIN" | "MEMBER" = decoded?.role === "ADMIN" ? "ADMIN" : "MEMBER"
+  let name = decoded?.name ?? "EcoSpark User"
+  let canChangePassword = true
 
-  const role = decoded?.role === "ADMIN" ? "ADMIN" : "MEMBER"
-  const name = decoded?.name ?? "EcoSpark User"
-  const canChangePassword = await getMyProfile()
-    .then((res) => res.data.canChangePassword !== false)
-    .catch(() => true)
+  try {
+    const profile = await getMyProfile()
+    role = profile.data.role === "ADMIN" ? "ADMIN" : "MEMBER"
+    name = profile.data.name
+    canChangePassword = profile.data.canChangePassword !== false
+  } catch {}
 
   return (
     <header className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">

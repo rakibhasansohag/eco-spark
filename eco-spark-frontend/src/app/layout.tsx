@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/shared/ThemeProvider"
 import { AppShell } from "@/components/shared/layout/AppShell"
 import { getAccessToken } from "@/lib/tokenUtils"
 import { decodeAccessToken } from "@/lib/jwtUtils"
+import { getMyProfile } from "@/services/user.services"
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -31,9 +32,19 @@ export default async function RootLayout({
 }>) {
   const accessToken = await getAccessToken()
   const decoded = decodeAccessToken(accessToken)
-  const isLoggedIn = !!decoded
-  const userName = decoded?.name ?? "EcoSpark User"
-  const userRole = decoded?.role === "ADMIN" ? "ADMIN" : "MEMBER"
+  let isLoggedIn = !!decoded
+  let userName = decoded?.name ?? "EcoSpark User"
+  let userRole: "ADMIN" | "MEMBER" | undefined =
+    decoded?.role === "ADMIN" ? "ADMIN" : decoded?.role ? "MEMBER" : undefined
+
+  if (!decoded) {
+    try {
+      const profile = await getMyProfile()
+      isLoggedIn = true
+      userName = profile.data.name
+      userRole = profile.data.role === "ADMIN" ? "ADMIN" : "MEMBER"
+    } catch {}
+  }
 
   return (
     <html
