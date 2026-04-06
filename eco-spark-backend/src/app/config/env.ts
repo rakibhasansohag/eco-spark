@@ -19,6 +19,8 @@ export const envVars = {
 
   BETTER_AUTH_SECRET: require("BETTER_AUTH_SECRET"),
   BETTER_AUTH_URL: process.env.BETTER_AUTH_URL ?? "http://localhost:5000",
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
 
   FRONTEND_URL: process.env.FRONTEND_URL ?? "http://localhost:3000",
 

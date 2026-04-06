@@ -6,12 +6,17 @@ import { useForm } from "@tanstack/react-form"
 import { toast } from "sonner"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { Home } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { AppField } from "@/components/shared/form/AppField"
 import { AppSubmitButton } from "@/components/shared/form/AppSubmitButton"
+import { Button } from "@/components/ui/button"
 import { getDefaultDashboardRoute } from "@/lib/authUtils"
 import { loginAction } from "@/app/(commonLayout)/(authRouteGroup)/login/_action"
 import { loginZodSchema } from "@/zod/auth.validation"
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api/v1"
+const GOOGLE_LOGIN_URL = `${API_BASE_URL}/auth/google`
 
 const normalizeErrors = (errors: unknown[]): string[] =>
   errors.map((error) => {
@@ -69,6 +74,17 @@ export function LoginForm() {
         <CardDescription>Sign in to your EcoSpark Hub account</CardDescription>
       </CardHeader>
       <CardContent>
+        <Button asChild variant="outline" className="h-10 w-full rounded-xl">
+          <Link href={GOOGLE_LOGIN_URL}>
+            <Home className="size-4" />
+            Continue with Google
+          </Link>
+        </Button>
+        <div className="my-4 flex items-center gap-3">
+          <div className="h-px flex-1 bg-border" />
+          <span className="text-xs text-muted-foreground">OR</span>
+          <div className="h-px flex-1 bg-border" />
+        </div>
         <form
           className="space-y-4"
           onSubmit={(event) => {

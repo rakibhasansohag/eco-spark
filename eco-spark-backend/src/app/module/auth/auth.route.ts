@@ -7,6 +7,8 @@ import { Role } from "../../../generated/prisma/index.js";
 
 const router = Router();
 
+router.get("/google", AuthController.googleSignIn);
+router.get("/google/callback", AuthController.googleCallback);
 router.post("/register", validateRequest(registerZodSchema), AuthController.register);
 router.post("/login", validateRequest(loginZodSchema), AuthController.login);
 router.post("/refresh-token", AuthController.refreshToken);

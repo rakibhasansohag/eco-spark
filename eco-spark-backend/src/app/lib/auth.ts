@@ -8,6 +8,16 @@ export const auth = betterAuth({
   secret: envVars.BETTER_AUTH_SECRET,
   baseURL: envVars.BETTER_AUTH_URL,
   trustedOrigins: [envVars.FRONTEND_URL],
+  ...(envVars.GOOGLE_CLIENT_ID && envVars.GOOGLE_CLIENT_SECRET
+    ? {
+        socialProviders: {
+          google: {
+            clientId: envVars.GOOGLE_CLIENT_ID,
+            clientSecret: envVars.GOOGLE_CLIENT_SECRET,
+          },
+        },
+      }
+    : {}),
   emailAndPassword: {
     enabled: true,
     autoSignIn: false,
