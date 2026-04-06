@@ -17,7 +17,7 @@ app.use("/api/v1/payments/webhook", express.raw({ type: "application/json" }));
 app.use(cors({ origin: envVars.FRONTEND_URL, credentials: true }));
 
 // 3. Auth library handler — BEFORE body parsers
-app.all("/api/auth/{*path}", toNodeHandler(auth));
+app.all(/^\/api\/auth(\/.*)?$/, toNodeHandler(auth));
 
 // 4. Body parsers
 app.use(express.json());

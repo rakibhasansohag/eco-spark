@@ -9,7 +9,7 @@ import { envVars } from "../../config/env.js";
 
 export const AuthController = {
   googleSignIn: catchAsync(async (_req: Request, res: Response) => {
-    const signInUrl = AuthService.getGoogleSignInUrl();
+    const signInUrl = await AuthService.getGoogleSignInUrl();
     res.redirect(signInUrl);
   }),
 

@@ -6,17 +6,17 @@ import { useForm } from "@tanstack/react-form"
 import { toast } from "sonner"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Home } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { AppField } from "@/components/shared/form/AppField"
 import { AppSubmitButton } from "@/components/shared/form/AppSubmitButton"
 import { Button } from "@/components/ui/button"
+import { GoogleIcon } from "@/components/shared/icons/GoogleIcon"
 import { getDefaultDashboardRoute } from "@/lib/authUtils"
 import { registerAction } from "@/app/(commonLayout)/(authRouteGroup)/register/_action"
 import { registerZodSchema } from "@/zod/auth.validation"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api/v1"
-const GOOGLE_LOGIN_URL = `${API_BASE_URL}/auth/google`
+const BACKEND_BASE_URL = API_BASE_URL.replace(/\/api\/v1\/?$/, "")
 
 const normalizeErrors = (errors: unknown[]): string[] =>
   errors.map((error) => {
@@ -33,6 +33,35 @@ export function RegisterForm() {
   const mutation = useMutation({ mutationFn: registerAction })
   const [serverErrors, setServerErrors] = useState<Record<string, string[]>>({})
   const [formError, setFormError] = useState<string | null>(null)
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsGoogleLoading(true)
+      const callbackURL = `${API_BASE_URL}/auth/google/callback`
+      const response = await fetch(`${BACKEND_BASE_URL}/api/auth/sign-in/social`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          provider: "google",
+          callbackURL,
+          disableRedirect: true,
+        }),
+      })
+
+      const payload = (await response.json()) as { url?: string }
+      if (!response.ok || !payload?.url) {
+        throw new Error("Google sign-in initiation failed")
+      }
+
+      window.location.href = payload.url
+    } catch {
+      toast.error("Google sign-in failed. Please try again.")
+    } finally {
+      setIsGoogleLoading(false)
+    }
+  }
 
   const clearFieldError = (field: string) => {
     setServerErrors((prev) => {
@@ -75,11 +104,15 @@ export function RegisterForm() {
         <CardDescription>Create your EcoSpark Hub account</CardDescription>
       </CardHeader>
       <CardContent>
-        <Button asChild variant="outline" className="h-10 w-full rounded-xl">
-          <Link href={GOOGLE_LOGIN_URL}>
-            <Home className="size-4" />
-            Continue with Google
-          </Link>
+        <Button
+          type="button"
+          variant="outline"
+          className="h-10 w-full rounded-xl"
+          onClick={handleGoogleSignIn}
+          disabled={isGoogleLoading}
+        >
+          <GoogleIcon className="size-4" />
+          {isGoogleLoading ? "Redirecting..." : "Continue with Google"}
         </Button>
         <div className="my-4 flex items-center gap-3">
           <div className="h-px flex-1 bg-border" />

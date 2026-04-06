@@ -9,14 +9,22 @@ import { Role, UserStatus } from "../../../generated/prisma/index.js";
 import { envVars } from "../../config/env.js";
 
 export const AuthService = {
-  getGoogleSignInUrl: () => {
+  getGoogleSignInUrl: async () => {
     const callbackURL = `${envVars.BETTER_AUTH_URL}/api/v1/auth/google/callback`;
-    const params = new URLSearchParams({
-      provider: "google",
-      callbackURL,
+
+    const result = await auth.api.signInSocial({
+      body: {
+        provider: "google",
+        callbackURL,
+        disableRedirect: true,
+      },
     });
 
-    return `${envVars.BETTER_AUTH_URL}/api/auth/sign-in/social?${params.toString()}`;
+    if (!result?.url) {
+      throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, "Unable to start Google sign-in");
+    }
+
+    return result.url;
   },
 
   resolveGoogleCallback: async (headers: Record<string, string | string[] | undefined>) => {
