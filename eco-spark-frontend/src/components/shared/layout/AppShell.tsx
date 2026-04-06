@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, Leaf } from "lucide-react"
@@ -25,6 +25,7 @@ const DASHBOARD_PREFIXES = [
 ]
 
 const PUBLIC_NAV_LINKS = [{ href: "/ideas", label: "Ideas" }]
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api/v1"
 
 function isActivePath(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/"
@@ -42,6 +43,23 @@ export function AppShell({ children, isLoggedIn, userName, userRole }: AppShellP
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const inDashboard = DASHBOARD_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+
+  useEffect(() => {
+    if (!isLoggedIn) return
+
+    const refreshSession = async () => {
+      try {
+        await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+          method: "POST",
+          credentials: "include",
+        })
+      } catch {}
+    }
+
+    void refreshSession()
+    const intervalId = window.setInterval(refreshSession, 10 * 60 * 1000)
+    return () => window.clearInterval(intervalId)
+  }, [isLoggedIn])
 
   return (
     <>

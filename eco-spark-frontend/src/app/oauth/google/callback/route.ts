@@ -18,7 +18,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL("/login?error=google_login_failed", req.url))
   }
 
-  const response = NextResponse.redirect(new URL(getDashboardPath(role), req.url))
+  const nextPath = getDashboardPath(role)
+  const finalizeURL = new URL("/oauth/google/finalize", req.url)
+  finalizeURL.searchParams.set("next", nextPath)
+  const response = NextResponse.redirect(finalizeURL)
   const secure = process.env.NODE_ENV === "production"
 
   response.cookies.set("accessToken", accessToken, {
