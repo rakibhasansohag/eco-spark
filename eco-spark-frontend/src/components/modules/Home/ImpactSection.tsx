@@ -1,5 +1,5 @@
 import { SectionHeader } from "@/components/shared/SectionHeader"
-import { StatsCard } from "@/components/shared/StatsCard"
+import { ImpactMetricCard } from "@/components/modules/Home/ImpactMetricCard"
 
 export function ImpactSection() {
   return (
@@ -9,25 +9,29 @@ export function ImpactSection() {
         description="A focused product environment for measurable sustainability collaboration."
       />
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-        <StatsCard
+        <ImpactMetricCard
           title="Community Members"
-          value="2K+"
           description="Growing eco-focused network"
+          target={2000}
+          mode="compact-plus"
         />
-        <StatsCard
+        <ImpactMetricCard
           title="Ideas Shared"
-          value="1.2K+"
           description="Across energy, water and waste"
+          target={1200}
+          mode="compact-plus"
         />
-        <StatsCard
+        <ImpactMetricCard
           title="Ideas Funded"
-          value="180+"
           description="Premium solutions unlocked"
+          target={180}
+          mode="plus"
         />
-        <StatsCard
+        <ImpactMetricCard
           title="Avg. Response Time"
-          value="<24h"
           description="Fast feedback from peers"
+          target={24}
+          mode="lt-hours"
         />
       </div>
     </section>
