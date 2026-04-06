@@ -11,13 +11,15 @@ interface AdminStatusBarChartProps {
 }
 
 const palette = [
-  "var(--color-primary)",
   "var(--color-chart-2)",
   "var(--color-chart-3)",
   "var(--color-chart-4)",
 ]
 
 export function AdminStatusBarChart({ title, data }: AdminStatusBarChartProps) {
+  const getBarColor = (index: number) =>
+    index === 0 ? "var(--color-primary)" : palette[(index - 1) % palette.length]
+
   return (
     <div className="rounded-xl border bg-card p-6 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.35)]">
       <p className="mb-4 text-sm font-medium text-muted-foreground">{title}</p>
@@ -48,7 +50,7 @@ export function AdminStatusBarChart({ title, data }: AdminStatusBarChartProps) {
             />
             <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={34}>
               {data.map((item, index) => (
-                <Cell key={item.label} fill={palette[index % palette.length]} />
+                <Cell key={item.label} fill={getBarColor(index)} />
               ))}
             </Bar>
           </BarChart>

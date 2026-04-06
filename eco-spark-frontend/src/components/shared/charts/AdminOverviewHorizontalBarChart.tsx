@@ -11,7 +11,6 @@ interface AdminOverviewHorizontalBarChartProps {
 }
 
 const palette = [
-  "var(--color-primary)",
   "var(--color-chart-2)",
   "var(--color-chart-3)",
   "var(--color-chart-4)",
@@ -19,6 +18,8 @@ const palette = [
 
 export function AdminOverviewHorizontalBarChart({ title, data }: AdminOverviewHorizontalBarChartProps) {
   const sortedData = [...data].sort((a, b) => b.value - a.value)
+  const getBarColor = (index: number) =>
+    index === 0 ? "var(--color-primary)" : palette[(index - 1) % palette.length]
 
   return (
     <div className="rounded-xl border bg-card p-6 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.35)]">
@@ -53,7 +54,7 @@ export function AdminOverviewHorizontalBarChart({ title, data }: AdminOverviewHo
             />
             <Bar dataKey="value" radius={[0, 8, 8, 0]} barSize={18}>
               {sortedData.map((item, index) => (
-                <Cell key={item.label} fill={palette[index % palette.length]} />
+                <Cell key={item.label} fill={getBarColor(index)} />
               ))}
             </Bar>
           </BarChart>
