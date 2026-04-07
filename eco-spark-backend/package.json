@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "description": "EcoSpark Hub backend API — sustainability idea-sharing portal",
   "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "prebuild": "prisma generate",
+    "build": "tsc && node scripts/copy-generated-prisma.mjs",
     "start": "node dist/server.js",
     "seed": "tsx src/app/utils/seed.ts"
   },
