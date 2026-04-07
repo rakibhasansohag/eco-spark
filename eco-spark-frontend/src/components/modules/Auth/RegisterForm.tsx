@@ -16,8 +16,6 @@ import { registerAction } from "@/app/(commonLayout)/(authRouteGroup)/register/_
 import { registerZodSchema } from "@/zod/auth.validation"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api/v1"
-const BACKEND_BASE_URL = API_BASE_URL.replace(/\/api\/v1\/?$/, "")
-const GOOGLE_CALLBACK_URL = `${API_BASE_URL}/auth/google/callback`
 
 const normalizeErrors = (errors: unknown[]): string[] =>
   errors.map((error) => {
@@ -39,10 +37,7 @@ export function RegisterForm() {
   const handleGoogleSignIn = async () => {
     try {
       setIsGoogleLoading(true)
-      const signInUrl = new URL(`${BACKEND_BASE_URL}/api/auth/sign-in/social`)
-      signInUrl.searchParams.set("provider", "google")
-      signInUrl.searchParams.set("callbackURL", GOOGLE_CALLBACK_URL)
-      window.location.href = signInUrl.toString()
+      window.location.href = `${API_BASE_URL}/auth/google`
     } catch {
       toast.error("Google sign-in failed. Please try again.")
     } finally {
