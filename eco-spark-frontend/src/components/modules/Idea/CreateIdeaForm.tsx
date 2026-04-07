@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
@@ -80,10 +81,20 @@ function CategorySelect({
 export function CreateIdeaForm() {
   const router = useRouter()
   const [isPaid, setIsPaid] = useState(false)
+  const [activeStep, setActiveStep] = useState<"core" | "context" | "publishing">("core")
   const [images, setImages] = useState<File[]>([])
   const [serverErrors, setServerErrors] = useState<Record<string, string[]>>({})
   const [formError, setFormError] = useState<string | null>(null)
   const mutation = useMutation({ mutationFn: createIdeaAction })
+  const steps: Array<{
+    id: "core" | "context" | "publishing"
+    title: string
+    subtitle: string
+  }> = [
+    { id: "core", title: "Core Idea", subtitle: "Problem, solution, category" },
+    { id: "context", title: "Impact Context", subtitle: "Execution and outcomes" },
+    { id: "publishing", title: "Media & Access", subtitle: "Images and monetization" },
+  ]
 
   const clearFieldError = (field: string) => {
     setServerErrors((prev) => {
@@ -146,6 +157,7 @@ export function CreateIdeaForm() {
         form.reset()
         setImages([])
         setIsPaid(false)
+        setActiveStep("core")
         router.push("/member/dashboard/my-ideas")
         router.refresh()
       } else {
@@ -170,6 +182,29 @@ export function CreateIdeaForm() {
         </p>
       ) : null}
 
+      <div className="rounded-lg border bg-card p-3">
+        <div className="grid gap-2 md:grid-cols-3">
+          {steps.map((step, index) => (
+            <button
+              key={step.id}
+              type="button"
+              onClick={() => setActiveStep(step.id)}
+              className={`rounded-md border px-3 py-2 text-left transition ${
+                activeStep === step.id
+                  ? "border-primary bg-primary/10"
+                  : "border-border bg-background hover:border-primary/30"
+              }`}
+            >
+              <p className="text-xs text-muted-foreground">Step {index + 1}</p>
+              <p className="text-sm font-semibold">{step.title}</p>
+              <p className="text-xs text-muted-foreground">{step.subtitle}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {activeStep === "core" ? (
+        <>
       <form.Field name="title" validators={{ onChange: createIdeaZodSchema.shape.title }}>
         {(field) => (
           (() => {
@@ -320,7 +355,11 @@ export function CreateIdeaForm() {
           })()
         )}
       </form.Field>
+        </>
+      ) : null}
 
+      {activeStep === "context" ? (
+      <>
       <div className="space-y-4 rounded-lg border bg-muted/40 p-4">
         <h3 className="text-sm font-semibold text-foreground">Implementation context</h3>
         <form.Field name="targetAudience">
@@ -491,7 +530,11 @@ export function CreateIdeaForm() {
           )}
         </form.Field>
       </div>
+      </>
+      ) : null}
 
+      {activeStep === "publishing" ? (
+        <>
       <AppFileInput
         id="idea-images"
         label="Images (optional)"
@@ -552,17 +595,52 @@ export function CreateIdeaForm() {
           </form.Field>
         ) : null}
       </div>
+        </>
+      ) : null}
 
-      <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
-        {([canSubmit, isSubmitting]) => (
-          <AppSubmitButton
-            label="Create Idea"
-            loadingLabel="Creating…"
-            canSubmit={canSubmit}
-            isSubmitting={isSubmitting}
-          />
-        )}
-      </form.Subscribe>
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-card p-3">
+        <Button
+          type="button"
+          variant="outline"
+          disabled={activeStep === "core"}
+          onClick={() =>
+            setActiveStep((prev) =>
+              prev === "publishing" ? "context" : prev === "context" ? "core" : "core",
+            )
+          }
+        >
+          Previous Step
+        </Button>
+        <div className="flex items-center gap-2">
+          {activeStep !== "publishing" ? (
+            <Button
+              type="button"
+              onClick={() =>
+                setActiveStep((prev) => (prev === "core" ? "context" : "publishing"))
+              }
+            >
+              Next Step
+            </Button>
+          ) : null}
+        </div>
+      </div>
+
+      {activeStep === "publishing" ? (
+        <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
+          {([canSubmit, isSubmitting]) => (
+            <AppSubmitButton
+              label="Create Idea"
+              loadingLabel="Creating…"
+              canSubmit={canSubmit}
+              isSubmitting={isSubmitting}
+            />
+          )}
+        </form.Subscribe>
+      ) : (
+        <Button type="button" className="w-full" onClick={() => setActiveStep("publishing")}>
+          Review Media & Publish
+        </Button>
+      )}
     </form>
   )
 }

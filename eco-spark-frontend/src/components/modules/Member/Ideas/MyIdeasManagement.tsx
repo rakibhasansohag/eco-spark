@@ -16,6 +16,7 @@ import { StatusBadgeCell } from "@/components/shared/cell/StatusBadgeCell"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { SearchBar } from "@/components/shared/form/SearchBar"
 import { EmptyState } from "@/components/shared/EmptyState"
+import { TableSkeleton } from "@/components/shared/skeleton/TableSkeleton"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -134,7 +135,7 @@ export default function MyIdeasManagement({
   searchParams: Record<string, string>
 }) {
   const { setFilter, setFilters } = useServerManagedDataTableFilters({ searchParams })
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["member-my-ideas", searchParams],
     queryFn: () => getMyIdeas(searchParams),
   })
@@ -279,7 +280,9 @@ export default function MyIdeasManagement({
         </div>
       ) : null}
 
-      {(data?.data?.length ?? 0) === 0 ? (
+      {isLoading ? (
+        <TableSkeleton rows={6} />
+      ) : (data?.data?.length ?? 0) === 0 ? (
         <EmptyState
           title="No ideas match your filters"
           description="Try another stage/location filter, or create a fresh idea draft."

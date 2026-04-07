@@ -27,6 +27,7 @@ import { StatusBadgeCell } from "@/components/shared/cell/StatusBadgeCell"
 import { SearchBar } from "@/components/shared/form/SearchBar"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { EmptyState } from "@/components/shared/EmptyState"
+import { TableSkeleton } from "@/components/shared/skeleton/TableSkeleton"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -206,7 +207,7 @@ export default function AdminIdeasManagement({
   searchParams: Record<string, string>
 }) {
   const { setFilter, setFilters } = useServerManagedDataTableFilters({ searchParams })
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["admin-ideas", searchParams],
     queryFn: () => getIdeasForAdmin(searchParams),
   })
@@ -391,7 +392,9 @@ export default function AdminIdeasManagement({
         </div>
       </div>
 
-      {(data?.data?.length ?? 0) === 0 ? (
+      {isLoading ? (
+        <TableSkeleton rows={6} />
+      ) : (data?.data?.length ?? 0) === 0 ? (
         <EmptyState
           title="No ideas found"
           description="Adjust stage/location filters or search term to find submissions."
