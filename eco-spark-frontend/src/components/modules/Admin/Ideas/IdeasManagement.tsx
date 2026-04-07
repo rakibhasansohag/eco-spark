@@ -205,7 +205,7 @@ export default function AdminIdeasManagement({
 }: {
   searchParams: Record<string, string>
 }) {
-  const { setFilter } = useServerManagedDataTableFilters({ searchParams })
+  const { setFilter, setFilters } = useServerManagedDataTableFilters({ searchParams })
   const { data } = useQuery({
     queryKey: ["admin-ideas", searchParams],
     queryFn: () => getIdeasForAdmin(searchParams),
@@ -236,6 +236,14 @@ export default function AdminIdeasManagement({
   }, {})
   const topStage =
     Object.entries(stageCounts).sort((a, b) => b[1] - a[1])[0]?.[0]?.replace("_", " ") ?? "Not specified"
+  const activePreset =
+    searchParams.status === "UNDER_REVIEW"
+      ? "under_review"
+      : searchParams.implementationStage === "PILOT"
+        ? "pilot"
+        : searchParams.isPaid === "true"
+          ? "paid"
+          : "all"
 
   const { table, pagination } = useServerManagedDataTable<IIdea>({
     data: ideas,
@@ -273,6 +281,65 @@ export default function AdminIdeasManagement({
         />
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant={activePreset === "all" ? "default" : "outline"}
+          onClick={() =>
+            setFilters({
+              status: "",
+              implementationStage: "",
+              isPaid: "",
+            })
+          }
+        >
+          All Ideas
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={activePreset === "under_review" ? "default" : "outline"}
+          onClick={() =>
+            setFilters({
+              status: "UNDER_REVIEW",
+              implementationStage: "",
+              isPaid: "",
+            })
+          }
+        >
+          Needs Review
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={activePreset === "pilot" ? "default" : "outline"}
+          onClick={() =>
+            setFilters({
+              status: "",
+              implementationStage: "PILOT",
+              isPaid: "",
+            })
+          }
+        >
+          Pilot Stage
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={activePreset === "paid" ? "default" : "outline"}
+          onClick={() =>
+            setFilters({
+              status: "",
+              implementationStage: "",
+              isPaid: "true",
+            })
+          }
+        >
+          Paid Ideas
+        </Button>
+      </div>
+
       {activeFilters.length > 0 ? (
         <div className="flex flex-wrap items-center gap-2">
           {activeFilters.map((filter) => (
@@ -293,9 +360,13 @@ export default function AdminIdeasManagement({
             size="sm"
             className="h-7 text-xs"
             onClick={() => {
-              setFilter("searchTerm", "")
-              setFilter("implementationStage", "")
-              setFilter("locationScope", "")
+              setFilters({
+                searchTerm: "",
+                implementationStage: "",
+                locationScope: "",
+                status: "",
+                isPaid: "",
+              })
             }}
           >
             Clear all

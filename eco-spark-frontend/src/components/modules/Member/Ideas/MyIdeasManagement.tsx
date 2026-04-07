@@ -133,7 +133,7 @@ export default function MyIdeasManagement({
 }: {
   searchParams: Record<string, string>
 }) {
-  const { setFilter } = useServerManagedDataTableFilters({ searchParams })
+  const { setFilter, setFilters } = useServerManagedDataTableFilters({ searchParams })
   const { data } = useQuery({
     queryKey: ["member-my-ideas", searchParams],
     queryFn: () => getMyIdeas(searchParams),
@@ -146,6 +146,14 @@ export default function MyIdeasManagement({
       : null,
     searchParams.locationScope ? { key: "locationScope", label: `Location: ${searchParams.locationScope}` } : null,
   ].filter(Boolean) as Array<{ key: string; label: string }>
+  const activePreset =
+    searchParams.status === "DRAFT"
+      ? "drafts"
+      : searchParams.status === "REJECTED"
+        ? "rejected"
+        : searchParams.implementationStage === "PILOT"
+          ? "pilot"
+          : "all"
 
   const { table, pagination } = useServerManagedDataTable<IIdea>({
     data: ideas,
@@ -183,6 +191,61 @@ export default function MyIdeasManagement({
         />
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant={activePreset === "all" ? "default" : "outline"}
+          onClick={() =>
+            setFilters({
+              status: "",
+              implementationStage: "",
+            })
+          }
+        >
+          All Ideas
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={activePreset === "drafts" ? "default" : "outline"}
+          onClick={() =>
+            setFilters({
+              status: "DRAFT",
+              implementationStage: "",
+            })
+          }
+        >
+          Drafts
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={activePreset === "rejected" ? "default" : "outline"}
+          onClick={() =>
+            setFilters({
+              status: "REJECTED",
+              implementationStage: "",
+            })
+          }
+        >
+          Rejected
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={activePreset === "pilot" ? "default" : "outline"}
+          onClick={() =>
+            setFilters({
+              status: "",
+              implementationStage: "PILOT",
+            })
+          }
+        >
+          Pilot Stage
+        </Button>
+      </div>
+
       {activeFilters.length > 0 ? (
         <div className="flex flex-wrap items-center gap-2">
           {activeFilters.map((filter) => (
@@ -203,9 +266,12 @@ export default function MyIdeasManagement({
             size="sm"
             className="h-7 text-xs"
             onClick={() => {
-              setFilter("searchTerm", "")
-              setFilter("implementationStage", "")
-              setFilter("locationScope", "")
+              setFilters({
+                searchTerm: "",
+                implementationStage: "",
+                locationScope: "",
+                status: "",
+              })
             }}
           >
             Clear all
