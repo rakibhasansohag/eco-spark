@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { ColumnDef } from "@tanstack/react-table"
 import { toast } from "sonner"
-import { CheckCircle, XCircle, Trash2 } from "lucide-react"
+import { CheckCircle, Lightbulb, XCircle, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -21,15 +21,27 @@ import { getIdeasForAdmin } from "@/services/idea.services"
 import { IIdea } from "@/types/idea.types"
 import { DataTable } from "@/components/shared/table/DataTable"
 import { useServerManagedDataTable } from "@/hooks/useServerManagedDataTable"
+import { useServerManagedDataTableFilters } from "@/hooks/useServerManagedDataTableFilters"
 import { DateCell } from "@/components/shared/cell/DateCell"
 import { StatusBadgeCell } from "@/components/shared/cell/StatusBadgeCell"
 import { SearchBar } from "@/components/shared/form/SearchBar"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
+import { EmptyState } from "@/components/shared/EmptyState"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   approveIdeaAction,
   rejectIdeaAction,
   deleteIdeaByAdminAction,
 } from "@/app/(dashboardLayout)/admin/dashboard/ideas-management/_action"
+
+const stageOptions = ["CONCEPT", "PILOT", "SCALING", "IMPLEMENTED"] as const
 
 function RejectDialog({ idea }: { idea: IIdea }) {
   const [open, setOpen] = useState(false)
@@ -193,6 +205,7 @@ export default function AdminIdeasManagement({
 }: {
   searchParams: Record<string, string>
 }) {
+  const { setFilter } = useServerManagedDataTableFilters({ searchParams })
   const { data } = useQuery({
     queryKey: ["admin-ideas", searchParams],
     queryFn: () => getIdeasForAdmin(searchParams),
@@ -207,8 +220,47 @@ export default function AdminIdeasManagement({
 
   return (
     <div className="space-y-3">
-      <SearchBar searchParams={searchParams} />
-      <DataTable table={table} pagination={pagination} />
+      <div className="grid gap-3 md:grid-cols-4">
+        <div className="md:col-span-2">
+          <SearchBar searchParams={searchParams} />
+        </div>
+        <Select
+          value={searchParams.implementationStage ?? "all"}
+          onValueChange={(value) => setFilter("implementationStage", value === "all" ? "" : value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Filter by stage" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Stages</SelectItem>
+            {stageOptions.map((stage) => (
+              <SelectItem key={stage} value={stage}>
+                {stage.replace("_", " ")}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Input
+          placeholder="Filter by location"
+          value={searchParams.locationScope ?? ""}
+          onChange={(e) => setFilter("locationScope", e.target.value)}
+        />
+      </div>
+
+      {(data?.data?.length ?? 0) === 0 ? (
+        <EmptyState
+          title="No ideas found"
+          description="Adjust stage/location filters or search term to find submissions."
+          icon={Lightbulb}
+          action={
+            <Button asChild variant="outline" size="sm">
+              <Link href="/ideas">Browse Public Ideas</Link>
+            </Button>
+          }
+        />
+      ) : (
+        <DataTable table={table} pagination={pagination} />
+      )}
     </div>
   )
 }

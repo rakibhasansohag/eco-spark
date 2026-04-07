@@ -3,21 +3,33 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { ColumnDef } from "@tanstack/react-table"
 import { toast } from "sonner"
-import { Send, Trash2 } from "lucide-react"
+import { Lightbulb, Send, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { getMyIdeas } from "@/services/idea.services"
 import { IIdea } from "@/types/idea.types"
 import { DataTable } from "@/components/shared/table/DataTable"
 import { useServerManagedDataTable } from "@/hooks/useServerManagedDataTable"
+import { useServerManagedDataTableFilters } from "@/hooks/useServerManagedDataTableFilters"
 import { DateCell } from "@/components/shared/cell/DateCell"
 import { StatusBadgeCell } from "@/components/shared/cell/StatusBadgeCell"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { SearchBar } from "@/components/shared/form/SearchBar"
+import { EmptyState } from "@/components/shared/EmptyState"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   submitIdeaAction,
   deleteMyIdeaAction,
 } from "@/app/(dashboardLayout)/member/dashboard/my-ideas/_action"
+
+const stageOptions = ["CONCEPT", "PILOT", "SCALING", "IMPLEMENTED"] as const
 
 function MyIdeaActionsCell({ idea }: { idea: IIdea }) {
   const qc = useQueryClient()
@@ -121,6 +133,7 @@ export default function MyIdeasManagement({
 }: {
   searchParams: Record<string, string>
 }) {
+  const { setFilter } = useServerManagedDataTableFilters({ searchParams })
   const { data } = useQuery({
     queryKey: ["member-my-ideas", searchParams],
     queryFn: () => getMyIdeas(searchParams),
@@ -135,8 +148,47 @@ export default function MyIdeasManagement({
 
   return (
     <div className="space-y-3">
-      <SearchBar searchParams={searchParams} />
-      <DataTable table={table} pagination={pagination} />
+      <div className="grid gap-3 md:grid-cols-4">
+        <div className="md:col-span-2">
+          <SearchBar searchParams={searchParams} />
+        </div>
+        <Select
+          value={searchParams.implementationStage ?? "all"}
+          onValueChange={(value) => setFilter("implementationStage", value === "all" ? "" : value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Filter by stage" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Stages</SelectItem>
+            {stageOptions.map((stage) => (
+              <SelectItem key={stage} value={stage}>
+                {stage.replace("_", " ")}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Input
+          placeholder="Filter by location"
+          value={searchParams.locationScope ?? ""}
+          onChange={(e) => setFilter("locationScope", e.target.value)}
+        />
+      </div>
+
+      {(data?.data?.length ?? 0) === 0 ? (
+        <EmptyState
+          title="No ideas match your filters"
+          description="Try another stage/location filter, or create a fresh idea draft."
+          icon={Lightbulb}
+          action={
+            <Button asChild size="sm">
+              <Link href="/member/dashboard/create-idea">Create New Idea</Link>
+            </Button>
+          }
+        />
+      ) : (
+        <DataTable table={table} pagination={pagination} />
+      )}
     </div>
   )
 }
