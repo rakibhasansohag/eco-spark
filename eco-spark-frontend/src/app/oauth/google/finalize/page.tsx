@@ -1,11 +1,11 @@
 "use client"
 
-import { useEffect } from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Leaf, Loader2 } from "lucide-react"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api/v1"
+const TELEMETRY_URL = "/api/telemetry/auth"
 
 export default function GoogleFinalizePage() {
   const router = useRouter()
@@ -16,28 +16,49 @@ export default function GoogleFinalizePage() {
 
   useEffect(() => {
     let finished = false
+    const postTelemetry = async (event: string, errorCode: string) => {
+      try {
+        await fetch(TELEMETRY_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ event, errorCode }),
+        })
+      } catch {}
+    }
+
+    const refreshWithRetry = async () => {
+      await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+        method: "POST",
+        credentials: "include",
+      })
+      await new Promise((resolve) => window.setTimeout(resolve, 250))
+      await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+        method: "POST",
+        credentials: "include",
+      })
+    }
+
     const run = async () => {
       const timeoutId = window.setTimeout(() => {
         if (finished) return
         finished = true
         setStatusText("Sign-in is taking longer than expected")
-        setSubText("Redirecting you to login so you can retry safely.")
-        router.replace("/login?error=google_login_timeout")
+        setSubText("Redirecting you to a recovery page.")
+        void postTelemetry("oauth_finalize_timeout", "google_login_timeout")
+        router.replace("/auth/error?error=google_login_timeout")
       }, 10000)
 
       try {
         setStatusText("Refreshing secure access")
-        await fetch(`${API_BASE_URL}/auth/refresh-token`, {
-          method: "POST",
-          credentials: "include",
-        })
+        await refreshWithRetry()
       } catch {
         if (!finished) {
           finished = true
           window.clearTimeout(timeoutId)
           setStatusText("Unable to finalize sign-in")
-          setSubText("Redirecting you to login to try again.")
-          router.replace("/login?error=google_finalize_failed")
+          setSubText("Redirecting you to a recovery page.")
+          void postTelemetry("oauth_finalize_failed", "google_finalize_failed")
+          router.replace("/auth/error?error=google_finalize_failed")
           return
         }
       }

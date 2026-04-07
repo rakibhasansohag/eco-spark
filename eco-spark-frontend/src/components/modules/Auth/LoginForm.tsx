@@ -12,6 +12,7 @@ import { AppSubmitButton } from "@/components/shared/form/AppSubmitButton"
 import { Button } from "@/components/ui/button"
 import { GoogleIcon } from "@/components/shared/icons/GoogleIcon"
 import { getDefaultDashboardRoute } from "@/lib/authUtils"
+import { getAuthErrorMessage } from "@/lib/authErrorMessages"
 import { loginAction } from "@/app/(commonLayout)/(authRouteGroup)/login/_action"
 import { loginZodSchema } from "@/zod/auth.validation"
 
@@ -36,25 +37,24 @@ export function LoginForm() {
   const [formError, setFormError] = useState<string | null>(null)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const oauthError = searchParams.get("error")
-
-  const oauthErrorMessage = useMemo(() => {
-    if (!oauthError) return null
-    if (oauthError === "state_mismatch") return "Google sign-in session expired. Please try again."
-    if (oauthError === "google_login_failed") return "Google sign-in failed. Please try again."
-    if (oauthError === "google_login_timeout") return "Google sign-in timed out. Please try again."
-    if (oauthError === "google_finalize_failed") return "We could not secure your session. Please try again."
-    if (oauthError === "access_denied") return "Google sign-in was cancelled."
-    return "Google sign-in failed. Please try again."
-  }, [oauthError])
+  const oauthErrorMessage = useMemo(() => getAuthErrorMessage(oauthError), [oauthError])
 
   useEffect(() => {
     if (!oauthErrorMessage) return
+    void fetch("/api/telemetry/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event: "oauth_error_query",
+        errorCode: oauthError,
+      }),
+    }).catch(() => undefined)
     toast.error(oauthErrorMessage)
     const next = new URLSearchParams(searchParams.toString())
     next.delete("error")
     const nextQuery = next.toString()
     router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname)
-  }, [oauthErrorMessage, pathname, router, searchParams])
+  }, [oauthError, oauthErrorMessage, pathname, router, searchParams])
 
   const displayFormError = formError ?? oauthErrorMessage
 
