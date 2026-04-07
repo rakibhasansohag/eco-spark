@@ -16,8 +16,6 @@ import { loginAction } from "@/app/(commonLayout)/(authRouteGroup)/login/_action
 import { loginZodSchema } from "@/zod/auth.validation"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api/v1"
-const BACKEND_BASE_URL = API_BASE_URL.replace(/\/api\/v1\/?$/, "")
-const GOOGLE_CALLBACK_URL = `${API_BASE_URL}/auth/google/callback`
 
 const normalizeErrors = (errors: unknown[]): string[] =>
   errors.map((error) => {
@@ -38,31 +36,7 @@ export function LoginForm() {
 
   const handleGoogleSignIn = () => {
     setIsGoogleLoading(true)
-
-    const form = document.createElement("form")
-    form.method = "POST"
-    form.action = `${BACKEND_BASE_URL}/api/auth/sign-in/social`
-
-    const providerInput = document.createElement("input")
-    providerInput.type = "hidden"
-    providerInput.name = "provider"
-    providerInput.value = "google"
-    form.appendChild(providerInput)
-
-    const callbackInput = document.createElement("input")
-    callbackInput.type = "hidden"
-    callbackInput.name = "callbackURL"
-    callbackInput.value = GOOGLE_CALLBACK_URL
-    form.appendChild(callbackInput)
-
-    const disableRedirectInput = document.createElement("input")
-    disableRedirectInput.type = "hidden"
-    disableRedirectInput.name = "disableRedirect"
-    disableRedirectInput.value = "false"
-    form.appendChild(disableRedirectInput)
-
-    document.body.appendChild(form)
-    form.submit()
+    window.location.href = `${API_BASE_URL}/auth/google`
   }
 
   const clearFieldError = (field: string) => {

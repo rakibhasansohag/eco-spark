@@ -9,8 +9,42 @@ import { envVars } from "../../config/env.js";
 
 export const AuthController = {
   googleSignIn: catchAsync(async (_req: Request, res: Response) => {
-    const signInUrl = await AuthService.getGoogleSignInUrl();
-    res.redirect(signInUrl);
+    const callbackURL = `${envVars.BETTER_AUTH_URL}/api/v1/auth/google/callback`;
+    const html = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Redirecting...</title>
+  </head>
+  <body>
+    <script>
+      (async () => {
+        try {
+          const response = await fetch("/api/auth/sign-in/social", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              provider: "google",
+              callbackURL: "${callbackURL}",
+              disableRedirect: true
+            })
+          });
+          const payload = await response.json();
+          if (!response.ok || !payload || !payload.url) {
+            window.location.href = "${envVars.FRONTEND_URL}/login?error=google_login_failed";
+            return;
+          }
+          window.location.href = payload.url;
+        } catch {
+          window.location.href = "${envVars.FRONTEND_URL}/login?error=google_login_failed";
+        }
+      })();
+    </script>
+  </body>
+</html>`;
+    res.status(StatusCodes.OK).setHeader("Content-Type", "text/html; charset=utf-8").send(html);
   }),
 
   googleCallback: catchAsync(async (req: Request, res: Response) => {
