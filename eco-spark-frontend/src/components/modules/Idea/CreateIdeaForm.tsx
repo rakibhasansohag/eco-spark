@@ -1,10 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useForm } from "@tanstack/react-form"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { AnimatePresence, motion } from "framer-motion"
+import { CheckCircle2 } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -20,6 +22,7 @@ import { AppTextarea } from "@/components/shared/form/AppTextarea"
 import { AppFileInput } from "@/components/shared/form/AppFileInput"
 import { AppSubmitButton } from "@/components/shared/form/AppSubmitButton"
 import { normalizeErrors } from "@/lib/formUtils"
+import { cn } from "@/lib/utils"
 import { createIdeaZodSchema, ideaStageOptions } from "@/zod/idea.validation"
 import { createIdeaAction } from "@/app/(dashboardLayout)/member/dashboard/create-idea/_action"
 import { ApiResponse } from "@/types/api.types"
@@ -27,6 +30,39 @@ import { ICategory } from "@/types/category.types"
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api/v1"
+const IDEA_DRAFT_STORAGE_KEY = "ecoSpark:createIdeaDraft:v1"
+type IdeaDraftShape = {
+  activeStep?: "core" | "context" | "publishing"
+  isPaid?: boolean
+  values?: {
+    title?: string
+    problemStatement?: string
+    proposedSolution?: string
+    description?: string
+    targetAudience?: string
+    implementationStage?: "" | (typeof ideaStageOptions)[number]
+    estimatedBudgetMin?: number
+    estimatedBudgetMax?: number
+    timelineWeeks?: number
+    locationScope?: string
+    expectedImpact?: string
+    risksAndMitigation?: string
+    externalLinks?: string
+    categoryId?: string
+    price?: number
+  }
+}
+
+const getInitialIdeaDraft = (): IdeaDraftShape | null => {
+  if (typeof window === "undefined") return null
+  try {
+    const raw = window.localStorage.getItem(IDEA_DRAFT_STORAGE_KEY)
+    if (!raw) return null
+    return JSON.parse(raw) as IdeaDraftShape
+  } catch {
+    return null
+  }
+}
 
 const IDEA_STAGE_LABELS: Record<(typeof ideaStageOptions)[number], string> = {
   CONCEPT: "Concept",
@@ -80,8 +116,11 @@ function CategorySelect({
 
 export function CreateIdeaForm() {
   const router = useRouter()
-  const [isPaid, setIsPaid] = useState(false)
-  const [activeStep, setActiveStep] = useState<"core" | "context" | "publishing">("core")
+  const initialDraft = useMemo(() => getInitialIdeaDraft(), [])
+  const [isPaid, setIsPaid] = useState(initialDraft?.isPaid ?? false)
+  const [activeStep, setActiveStep] = useState<"core" | "context" | "publishing">(
+    initialDraft?.activeStep ?? "core",
+  )
   const [images, setImages] = useState<File[]>([])
   const [serverErrors, setServerErrors] = useState<Record<string, string[]>>({})
   const [formError, setFormError] = useState<string | null>(null)
@@ -107,21 +146,22 @@ export function CreateIdeaForm() {
 
   const form = useForm({
     defaultValues: {
-      title: "",
-      problemStatement: "",
-      proposedSolution: "",
-      description: "",
-      targetAudience: "",
-      implementationStage: "" as "" | (typeof ideaStageOptions)[number],
-      estimatedBudgetMin: undefined as number | undefined,
-      estimatedBudgetMax: undefined as number | undefined,
-      timelineWeeks: undefined as number | undefined,
-      locationScope: "",
-      expectedImpact: "",
-      risksAndMitigation: "",
-      externalLinks: "",
-      categoryId: "",
-      price: undefined as number | undefined,
+      title: initialDraft?.values?.title ?? "",
+      problemStatement: initialDraft?.values?.problemStatement ?? "",
+      proposedSolution: initialDraft?.values?.proposedSolution ?? "",
+      description: initialDraft?.values?.description ?? "",
+      targetAudience: initialDraft?.values?.targetAudience ?? "",
+      implementationStage:
+        initialDraft?.values?.implementationStage ?? ("" as "" | (typeof ideaStageOptions)[number]),
+      estimatedBudgetMin: initialDraft?.values?.estimatedBudgetMin ?? (undefined as number | undefined),
+      estimatedBudgetMax: initialDraft?.values?.estimatedBudgetMax ?? (undefined as number | undefined),
+      timelineWeeks: initialDraft?.values?.timelineWeeks ?? (undefined as number | undefined),
+      locationScope: initialDraft?.values?.locationScope ?? "",
+      expectedImpact: initialDraft?.values?.expectedImpact ?? "",
+      risksAndMitigation: initialDraft?.values?.risksAndMitigation ?? "",
+      externalLinks: initialDraft?.values?.externalLinks ?? "",
+      categoryId: initialDraft?.values?.categoryId ?? "",
+      price: initialDraft?.values?.price ?? (undefined as number | undefined),
     },
     onSubmit: async ({ value }) => {
       const formData = new FormData()
@@ -158,6 +198,7 @@ export function CreateIdeaForm() {
         setImages([])
         setIsPaid(false)
         setActiveStep("core")
+        window.localStorage.removeItem(IDEA_DRAFT_STORAGE_KEY)
         router.push("/member/dashboard/my-ideas")
         router.refresh()
       } else {
@@ -167,6 +208,59 @@ export function CreateIdeaForm() {
       }
     },
   })
+  const formValues = form.state.values
+
+  useEffect(() => {
+    const payload = {
+      activeStep,
+      isPaid,
+      values: formValues,
+    }
+    window.localStorage.setItem(IDEA_DRAFT_STORAGE_KEY, JSON.stringify(payload))
+  }, [activeStep, formValues, isPaid])
+
+  const stepCompletion = useMemo(() => {
+    const coreComplete =
+      createIdeaZodSchema.shape.title.safeParse(formValues.title).success &&
+      createIdeaZodSchema.shape.problemStatement.safeParse(formValues.problemStatement).success &&
+      createIdeaZodSchema.shape.proposedSolution.safeParse(formValues.proposedSolution).success &&
+      createIdeaZodSchema.shape.description.safeParse(formValues.description).success &&
+      createIdeaZodSchema.shape.categoryId.safeParse(formValues.categoryId).success
+
+    const contextComplete =
+      createIdeaZodSchema.shape.targetAudience.safeParse(formValues.targetAudience || undefined).success &&
+      createIdeaZodSchema.shape.implementationStage.safeParse(formValues.implementationStage || undefined)
+        .success &&
+      createIdeaZodSchema.shape.estimatedBudgetMin.safeParse(formValues.estimatedBudgetMin).success &&
+      createIdeaZodSchema.shape.estimatedBudgetMax.safeParse(formValues.estimatedBudgetMax).success &&
+      createIdeaZodSchema.shape.timelineWeeks.safeParse(formValues.timelineWeeks).success &&
+      createIdeaZodSchema.shape.locationScope.safeParse(formValues.locationScope || undefined).success &&
+      createIdeaZodSchema.shape.expectedImpact.safeParse(formValues.expectedImpact || undefined).success &&
+      createIdeaZodSchema.shape.risksAndMitigation.safeParse(formValues.risksAndMitigation || undefined)
+        .success &&
+      createIdeaZodSchema.shape.externalLinks.safeParse(formValues.externalLinks || undefined).success
+
+    const publishingComplete =
+      !isPaid || createIdeaZodSchema.shape.price.safeParse(formValues.price).success
+
+    return {
+      core: coreComplete,
+      context: contextComplete,
+      publishing: publishingComplete,
+    }
+  }, [formValues, isPaid])
+  const canAccessStep = (step: "core" | "context" | "publishing") => {
+    if (step === "core") return true
+    if (step === "context") return stepCompletion.core
+    return stepCompletion.core && stepCompletion.context
+  }
+  const goToStep = (step: "core" | "context" | "publishing") => {
+    if (!canAccessStep(step)) {
+      toast.error("Complete the current required step before moving ahead.")
+      return
+    }
+    setActiveStep(step)
+  }
 
   return (
     <form
@@ -182,27 +276,53 @@ export function CreateIdeaForm() {
         </p>
       ) : null}
 
-      <div className="rounded-lg border bg-card p-3">
-        <div className="grid gap-2 md:grid-cols-3">
-          {steps.map((step, index) => (
-            <button
-              key={step.id}
-              type="button"
-              onClick={() => setActiveStep(step.id)}
-              className={`rounded-md border px-3 py-2 text-left transition ${
-                activeStep === step.id
-                  ? "border-primary bg-primary/10"
-                  : "border-border bg-background hover:border-primary/30"
-              }`}
-            >
-              <p className="text-xs text-muted-foreground">Step {index + 1}</p>
-              <p className="text-sm font-semibold">{step.title}</p>
-              <p className="text-xs text-muted-foreground">{step.subtitle}</p>
-            </button>
-          ))}
+      <div className="rounded-xl border bg-card p-4">
+        <div className="relative">
+          <div className="absolute left-0 right-0 top-5 h-px bg-border" />
+          <div className="relative grid gap-3 md:grid-cols-3">
+            {steps.map((step, index) => {
+              const complete = stepCompletion[step.id]
+              const active = activeStep === step.id
+              const unlocked = canAccessStep(step.id)
+              return (
+                <button
+                  key={step.id}
+                  type="button"
+                  disabled={!unlocked}
+                  onClick={() => goToStep(step.id)}
+                  className={cn(
+                    "rounded-lg p-2 text-center transition",
+                    active ? "bg-primary/10" : "bg-background/80",
+                    !unlocked && "cursor-not-allowed opacity-60",
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "mx-auto flex h-10 w-10 items-center justify-center rounded-full border text-sm font-semibold",
+                      active ? "border-primary bg-primary/15 text-primary" : "border-border bg-card",
+                    )}
+                  >
+                    {complete ? <CheckCircle2 className="h-5 w-5 text-primary" /> : <span>{index + 1}</span>}
+                  </div>
+                  <p className="mt-2 text-sm font-semibold">{step.title}</p>
+                  <p className="text-xs text-muted-foreground">{step.subtitle}</p>
+                  {!unlocked ? <p className="mt-1 text-[11px] text-muted-foreground">Locked</p> : null}
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
 
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={activeStep}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
+          className="space-y-5"
+        >
       {activeStep === "core" ? (
         <>
       <form.Field name="title" validators={{ onChange: createIdeaZodSchema.shape.title }}>
@@ -357,6 +477,8 @@ export function CreateIdeaForm() {
       </form.Field>
         </>
       ) : null}
+        </motion.div>
+      </AnimatePresence>
 
       {activeStep === "context" ? (
       <>
@@ -603,11 +725,7 @@ export function CreateIdeaForm() {
           type="button"
           variant="outline"
           disabled={activeStep === "core"}
-          onClick={() =>
-            setActiveStep((prev) =>
-              prev === "publishing" ? "context" : prev === "context" ? "core" : "core",
-            )
-          }
+          onClick={() => goToStep(activeStep === "publishing" ? "context" : "core")}
         >
           Previous Step
         </Button>
@@ -615,8 +733,15 @@ export function CreateIdeaForm() {
           {activeStep !== "publishing" ? (
             <Button
               type="button"
+              disabled={
+                activeStep === "core"
+                  ? !stepCompletion.core
+                  : activeStep === "context"
+                    ? !stepCompletion.context
+                    : false
+              }
               onClick={() =>
-                setActiveStep((prev) => (prev === "core" ? "context" : "publishing"))
+                goToStep(activeStep === "core" ? "context" : "publishing")
               }
             >
               Next Step
@@ -637,7 +762,7 @@ export function CreateIdeaForm() {
           )}
         </form.Subscribe>
       ) : (
-        <Button type="button" className="w-full" onClick={() => setActiveStep("publishing")}>
+        <Button type="button" className="w-full" onClick={() => goToStep("publishing")}>
           Review Media & Publish
         </Button>
       )}
