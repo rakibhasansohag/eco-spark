@@ -121,6 +121,14 @@ export function CreateIdeaForm() {
   const [activeStep, setActiveStep] = useState<"core" | "context" | "publishing">(
     initialDraft?.activeStep ?? "core",
   )
+  const [coreSnapshot, setCoreSnapshot] = useState({
+    title: initialDraft?.values?.title ?? "",
+    problemStatement: initialDraft?.values?.problemStatement ?? "",
+    proposedSolution: initialDraft?.values?.proposedSolution ?? "",
+    description: initialDraft?.values?.description ?? "",
+    categoryId: initialDraft?.values?.categoryId ?? "",
+  })
+  const [priceSnapshot, setPriceSnapshot] = useState<number | undefined>(initialDraft?.values?.price)
   const [images, setImages] = useState<File[]>([])
   const [serverErrors, setServerErrors] = useState<Record<string, string[]>>({})
   const [formError, setFormError] = useState<string | null>(null)
@@ -208,47 +216,39 @@ export function CreateIdeaForm() {
       }
     },
   })
-  const formValues = form.state.values
-
   useEffect(() => {
-    const payload = {
-      activeStep,
-      isPaid,
-      values: formValues,
+    const saveDraft = () => {
+      const payload = {
+        activeStep,
+        isPaid,
+        values: form.state.values,
+      }
+      window.localStorage.setItem(IDEA_DRAFT_STORAGE_KEY, JSON.stringify(payload))
     }
-    window.localStorage.setItem(IDEA_DRAFT_STORAGE_KEY, JSON.stringify(payload))
-  }, [activeStep, formValues, isPaid])
+    saveDraft()
+    const interval = window.setInterval(saveDraft, 800)
+    return () => window.clearInterval(interval)
+  }, [activeStep, form, isPaid])
 
   const stepCompletion = useMemo(() => {
     const coreComplete =
-      createIdeaZodSchema.shape.title.safeParse(formValues.title).success &&
-      createIdeaZodSchema.shape.problemStatement.safeParse(formValues.problemStatement).success &&
-      createIdeaZodSchema.shape.proposedSolution.safeParse(formValues.proposedSolution).success &&
-      createIdeaZodSchema.shape.description.safeParse(formValues.description).success &&
-      createIdeaZodSchema.shape.categoryId.safeParse(formValues.categoryId).success
+      createIdeaZodSchema.shape.title.safeParse(coreSnapshot.title).success &&
+      createIdeaZodSchema.shape.problemStatement.safeParse(coreSnapshot.problemStatement).success &&
+      createIdeaZodSchema.shape.proposedSolution.safeParse(coreSnapshot.proposedSolution).success &&
+      createIdeaZodSchema.shape.description.safeParse(coreSnapshot.description).success &&
+      createIdeaZodSchema.shape.categoryId.safeParse(coreSnapshot.categoryId).success
 
-    const contextComplete =
-      createIdeaZodSchema.shape.targetAudience.safeParse(formValues.targetAudience || undefined).success &&
-      createIdeaZodSchema.shape.implementationStage.safeParse(formValues.implementationStage || undefined)
-        .success &&
-      createIdeaZodSchema.shape.estimatedBudgetMin.safeParse(formValues.estimatedBudgetMin).success &&
-      createIdeaZodSchema.shape.estimatedBudgetMax.safeParse(formValues.estimatedBudgetMax).success &&
-      createIdeaZodSchema.shape.timelineWeeks.safeParse(formValues.timelineWeeks).success &&
-      createIdeaZodSchema.shape.locationScope.safeParse(formValues.locationScope || undefined).success &&
-      createIdeaZodSchema.shape.expectedImpact.safeParse(formValues.expectedImpact || undefined).success &&
-      createIdeaZodSchema.shape.risksAndMitigation.safeParse(formValues.risksAndMitigation || undefined)
-        .success &&
-      createIdeaZodSchema.shape.externalLinks.safeParse(formValues.externalLinks || undefined).success
+    const contextComplete = true
 
     const publishingComplete =
-      !isPaid || createIdeaZodSchema.shape.price.safeParse(formValues.price).success
+      !isPaid || createIdeaZodSchema.shape.price.safeParse(priceSnapshot).success
 
     return {
       core: coreComplete,
       context: contextComplete,
       publishing: publishingComplete,
     }
-  }, [formValues, isPaid])
+  }, [coreSnapshot, isPaid, priceSnapshot])
   const canAccessStep = (step: "core" | "context" | "publishing") => {
     if (step === "core") return true
     if (step === "context") return stepCompletion.core
@@ -277,21 +277,22 @@ export function CreateIdeaForm() {
       ) : null}
 
       <div className="rounded-xl border bg-card p-4">
-        <div className="relative">
-          <div className="absolute left-0 right-0 top-5 h-px bg-border" />
-          <div className="relative grid gap-3 md:grid-cols-3">
-            {steps.map((step, index) => {
-              const complete = stepCompletion[step.id]
-              const active = activeStep === step.id
-              const unlocked = canAccessStep(step.id)
-              return (
+        <div className="grid gap-3 md:grid-cols-3">
+          {steps.map((step, index) => {
+            const complete = stepCompletion[step.id]
+            const active = activeStep === step.id
+            const unlocked = canAccessStep(step.id)
+            return (
+              <div key={step.id} className="relative">
+                {index < steps.length - 1 ? (
+                  <span className="pointer-events-none absolute left-[calc(50%+1.5rem)] right-[-50%] top-5 hidden h-px bg-border md:block" />
+                ) : null}
                 <button
-                  key={step.id}
                   type="button"
                   disabled={!unlocked}
                   onClick={() => goToStep(step.id)}
                   className={cn(
-                    "rounded-lg p-2 text-center transition",
+                    "w-full rounded-lg p-2 text-center transition",
                     active ? "bg-primary/10" : "bg-background/80",
                     !unlocked && "cursor-not-allowed opacity-60",
                   )}
@@ -308,9 +309,9 @@ export function CreateIdeaForm() {
                   <p className="text-xs text-muted-foreground">{step.subtitle}</p>
                   {!unlocked ? <p className="mt-1 text-[11px] text-muted-foreground">Locked</p> : null}
                 </button>
-              )
-            })}
-          </div>
+              </div>
+            )
+          })}
         </div>
       </div>
 
@@ -340,6 +341,7 @@ export function CreateIdeaForm() {
             onChange={(value) => {
               clearFieldError("title")
               setFormError(null)
+              setCoreSnapshot((prev) => ({ ...prev, title: value }))
               field.handleChange(value)
             }}
             onBlur={field.handleBlur}
@@ -360,6 +362,7 @@ export function CreateIdeaForm() {
               handleChange: (value) => {
                 clearFieldError("categoryId")
                 setFormError(null)
+                setCoreSnapshot((prev) => ({ ...prev, categoryId: value }))
                 field.handleChange(value)
               },
               state: {
@@ -397,6 +400,7 @@ export function CreateIdeaForm() {
             onChange={(value) => {
               clearFieldError("problemStatement")
               setFormError(null)
+              setCoreSnapshot((prev) => ({ ...prev, problemStatement: value }))
               field.handleChange(value)
             }}
             onBlur={field.handleBlur}
@@ -430,6 +434,7 @@ export function CreateIdeaForm() {
             onChange={(value) => {
               clearFieldError("proposedSolution")
               setFormError(null)
+              setCoreSnapshot((prev) => ({ ...prev, proposedSolution: value }))
               field.handleChange(value)
             }}
             onBlur={field.handleBlur}
@@ -463,6 +468,7 @@ export function CreateIdeaForm() {
             onChange={(value) => {
               clearFieldError("description")
               setFormError(null)
+              setCoreSnapshot((prev) => ({ ...prev, description: value }))
               field.handleChange(value)
             }}
             onBlur={field.handleBlur}
@@ -675,7 +681,10 @@ export function CreateIdeaForm() {
             checked={isPaid}
             onChange={(e) => {
               setIsPaid(e.target.checked)
-              if (!e.target.checked) form.setFieldValue("price", undefined)
+              if (!e.target.checked) {
+                setPriceSnapshot(undefined)
+                form.setFieldValue("price", undefined)
+              }
             }}
           />
           <Label htmlFor="isPaid" className="cursor-pointer">
@@ -699,7 +708,9 @@ export function CreateIdeaForm() {
                     {
                       clearFieldError("price")
                       setFormError(null)
-                      field.handleChange(e.target.value ? Number(e.target.value) : undefined)
+                      const next = e.target.value ? Number(e.target.value) : undefined
+                      setPriceSnapshot(next)
+                      field.handleChange(next)
                     }
                   }
                   onBlur={field.handleBlur}
