@@ -25,8 +25,11 @@ export default function GoogleFinalizePage() {
   }, [nextPath, router])
 
   return (
-    <section className="flex min-h-[40vh] items-center justify-center">
-      <p className="text-sm text-muted-foreground">Finalizing sign in...</p>
+    <section className="flex min-h-[40vh] items-center justify-center px-4">
+      <div className="text-center">
+        <p className="text-sm font-medium text-foreground">Securing your session</p>
+        <p className="mt-1 text-xs text-muted-foreground">Please wait while we complete sign-in.</p>
+      </div>
     </section>
   )
 }
