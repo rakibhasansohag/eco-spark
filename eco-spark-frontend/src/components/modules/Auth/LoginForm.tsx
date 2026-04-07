@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useMutation } from "@tanstack/react-query"
 import { useForm } from "@tanstack/react-form"
 import { toast } from "sonner"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { AppField } from "@/components/shared/form/AppField"
 import { AppSubmitButton } from "@/components/shared/form/AppSubmitButton"
@@ -29,10 +29,34 @@ const normalizeErrors = (errors: unknown[]): string[] =>
 
 export function LoginForm() {
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const mutation = useMutation({ mutationFn: loginAction })
   const [serverErrors, setServerErrors] = useState<Record<string, string[]>>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  const oauthError = searchParams.get("error")
+
+  const oauthErrorMessage = useMemo(() => {
+    if (!oauthError) return null
+    if (oauthError === "state_mismatch") return "Google sign-in session expired. Please try again."
+    if (oauthError === "google_login_failed") return "Google sign-in failed. Please try again."
+    if (oauthError === "google_login_timeout") return "Google sign-in timed out. Please try again."
+    if (oauthError === "google_finalize_failed") return "We could not secure your session. Please try again."
+    if (oauthError === "access_denied") return "Google sign-in was cancelled."
+    return "Google sign-in failed. Please try again."
+  }, [oauthError])
+
+  useEffect(() => {
+    if (!oauthErrorMessage) return
+    toast.error(oauthErrorMessage)
+    const next = new URLSearchParams(searchParams.toString())
+    next.delete("error")
+    const nextQuery = next.toString()
+    router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname)
+  }, [oauthErrorMessage, pathname, router, searchParams])
+
+  const displayFormError = formError ?? oauthErrorMessage
 
   const handleGoogleSignIn = () => {
     setIsGoogleLoading(true)
@@ -101,9 +125,9 @@ export function LoginForm() {
             form.handleSubmit()
           }}
         >
-          {formError ? (
+          {displayFormError ? (
             <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
-              {formError}
+              {displayFormError}
             </p>
           ) : null}
 
