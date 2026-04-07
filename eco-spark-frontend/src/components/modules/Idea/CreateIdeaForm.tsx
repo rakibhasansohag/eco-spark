@@ -323,10 +323,7 @@ export function CreateIdeaForm() {
 
       <div className="space-y-4 rounded-lg border bg-muted/40 p-4">
         <h3 className="text-sm font-semibold text-foreground">Implementation context</h3>
-        <form.Field
-          name="targetAudience"
-          validators={{ onChange: createIdeaZodSchema.shape.targetAudience }}
-        >
+        <form.Field name="targetAudience">
           {(field) => (
             <AppField
               id={field.name}
@@ -345,10 +342,7 @@ export function CreateIdeaForm() {
           )}
         </form.Field>
 
-        <form.Field
-          name="implementationStage"
-          validators={{ onChange: createIdeaZodSchema.shape.implementationStage }}
-        >
+        <form.Field name="implementationStage">
           {(field) => (
             <div className="space-y-2">
               <Label htmlFor={field.name}>Implementation Stage (optional)</Label>
@@ -386,10 +380,7 @@ export function CreateIdeaForm() {
       <div className="space-y-4 rounded-lg border bg-muted/40 p-4">
         <h3 className="text-sm font-semibold text-foreground">Impact planning</h3>
         <div className="grid gap-4 sm:grid-cols-2">
-          <form.Field
-            name="estimatedBudgetMin"
-            validators={{ onChange: createIdeaZodSchema.shape.estimatedBudgetMin }}
-          >
+          <form.Field name="estimatedBudgetMin">
             {(field) => (
               <div className="space-y-2">
                 <Label htmlFor={field.name}>Budget Min (USD)</Label>
@@ -406,10 +397,7 @@ export function CreateIdeaForm() {
               </div>
             )}
           </form.Field>
-          <form.Field
-            name="estimatedBudgetMax"
-            validators={{ onChange: createIdeaZodSchema.shape.estimatedBudgetMax }}
-          >
+          <form.Field name="estimatedBudgetMax">
             {(field) => (
               <div className="space-y-2">
                 <Label htmlFor={field.name}>Budget Max (USD)</Label>
@@ -426,7 +414,7 @@ export function CreateIdeaForm() {
               </div>
             )}
           </form.Field>
-          <form.Field name="timelineWeeks" validators={{ onChange: createIdeaZodSchema.shape.timelineWeeks }}>
+          <form.Field name="timelineWeeks">
             {(field) => (
               <div className="space-y-2">
                 <Label htmlFor={field.name}>Timeline (weeks)</Label>
@@ -443,7 +431,7 @@ export function CreateIdeaForm() {
               </div>
             )}
           </form.Field>
-          <form.Field name="locationScope" validators={{ onChange: createIdeaZodSchema.shape.locationScope }}>
+          <form.Field name="locationScope">
             {(field) => (
               <AppField
                 id={field.name}
@@ -458,10 +446,7 @@ export function CreateIdeaForm() {
             )}
           </form.Field>
         </div>
-        <form.Field
-          name="expectedImpact"
-          validators={{ onChange: createIdeaZodSchema.shape.expectedImpact }}
-        >
+        <form.Field name="expectedImpact">
           {(field) => (
             <AppTextarea
               id={field.name}
@@ -476,10 +461,7 @@ export function CreateIdeaForm() {
             />
           )}
         </form.Field>
-        <form.Field
-          name="risksAndMitigation"
-          validators={{ onChange: createIdeaZodSchema.shape.risksAndMitigation }}
-        >
+        <form.Field name="risksAndMitigation">
           {(field) => (
             <AppTextarea
               id={field.name}
@@ -494,10 +476,7 @@ export function CreateIdeaForm() {
             />
           )}
         </form.Field>
-        <form.Field
-          name="externalLinks"
-          validators={{ onChange: createIdeaZodSchema.shape.externalLinks }}
-        >
+        <form.Field name="externalLinks">
           {(field) => (
             <AppField
               id={field.name}

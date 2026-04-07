@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { ColumnDef } from "@tanstack/react-table"
 import { toast } from "sonner"
 import { CheckCircle, XCircle, Trash2 } from "lucide-react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -145,8 +146,24 @@ function IdeaActionsCell({ idea }: { idea: IIdea }) {
 
 const columns: ColumnDef<IIdea>[] = [
   { header: "Title", accessorKey: "title", cell: ({ row }) => (
-    <span className="max-w-xs truncate block">{row.original.title}</span>
+    <div className="space-y-1">
+      <span className="block max-w-xs truncate font-medium">{row.original.title}</span>
+      <span className="text-xs text-muted-foreground">
+        {row.original.locationScope || "Location not specified"}
+      </span>
+    </div>
   )},
+  {
+    header: "Stage",
+    accessorKey: "implementationStage",
+    cell: ({ row }) => (
+      <span className="text-xs">
+        {row.original.implementationStage
+          ? row.original.implementationStage.replace("_", " ")
+          : "Not specified"}
+      </span>
+    ),
+  },
   {
     header: "Status",
     accessorKey: "status",
@@ -160,7 +177,14 @@ const columns: ColumnDef<IIdea>[] = [
   {
     id: "actions",
     header: "Actions",
-    cell: ({ row }) => <IdeaActionsCell idea={row.original} />,
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <Button asChild variant="ghost" size="sm">
+          <Link href={`/ideas/${row.original.id}`}>View</Link>
+        </Button>
+        <IdeaActionsCell idea={row.original} />
+      </div>
+    ),
   },
 ]
 
