@@ -4,6 +4,15 @@ model Idea {
   problemStatement  String
   proposedSolution  String
   description       String
+  targetAudience    String?
+  implementationStage IdeaStage?
+  estimatedBudgetMin Decimal?
+  estimatedBudgetMax Decimal?
+  timelineWeeks     Int?
+  locationScope     String?
+  expectedImpact    String?
+  risksAndMitigation String?
+  externalLinks     String[]
   status            IdeaStatus @default(DRAFT)
   isPaid            Boolean    @default(false)
   price             Decimal?

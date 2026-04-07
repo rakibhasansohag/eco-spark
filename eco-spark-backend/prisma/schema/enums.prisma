@@ -16,6 +16,13 @@ enum IdeaStatus {
   REJECTED
 }
 
+enum IdeaStage {
+  CONCEPT
+  PILOT
+  SCALING
+  IMPLEMENTED
+}
+
 enum VoteType {
   UPVOTE
   DOWNVOTE

@@ -30,6 +30,17 @@ export const IdeaService = {
           problemStatement: payload.problemStatement,
           proposedSolution: payload.proposedSolution,
           description: payload.description,
+          targetAudience: payload.targetAudience,
+          implementationStage: payload.implementationStage,
+          estimatedBudgetMin:
+            payload.estimatedBudgetMin != null ? new Prisma.Decimal(payload.estimatedBudgetMin) : null,
+          estimatedBudgetMax:
+            payload.estimatedBudgetMax != null ? new Prisma.Decimal(payload.estimatedBudgetMax) : null,
+          timelineWeeks: payload.timelineWeeks,
+          locationScope: payload.locationScope,
+          expectedImpact: payload.expectedImpact,
+          risksAndMitigation: payload.risksAndMitigation,
+          externalLinks: payload.externalLinks ?? [],
           categoryId: payload.categoryId,
           isPaid: payload.isPaid ?? false,
           price: payload.price != null ? new Prisma.Decimal(payload.price) : null,
@@ -187,6 +198,14 @@ export const IdeaService = {
         where: { id },
         data: {
           ...payload,
+          estimatedBudgetMin:
+            payload.estimatedBudgetMin != null
+              ? new Prisma.Decimal(payload.estimatedBudgetMin)
+              : undefined,
+          estimatedBudgetMax:
+            payload.estimatedBudgetMax != null
+              ? new Prisma.Decimal(payload.estimatedBudgetMax)
+              : undefined,
           price: payload.price != null ? new Prisma.Decimal(payload.price) : undefined,
         },
         include: ideaInclude,
