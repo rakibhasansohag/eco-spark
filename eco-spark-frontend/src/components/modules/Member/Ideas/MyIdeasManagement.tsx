@@ -138,9 +138,17 @@ export default function MyIdeasManagement({
     queryKey: ["member-my-ideas", searchParams],
     queryFn: () => getMyIdeas(searchParams),
   })
+  const ideas = data?.data ?? []
+  const activeFilters = [
+    searchParams.searchTerm ? { key: "searchTerm", label: `Search: ${searchParams.searchTerm}` } : null,
+    searchParams.implementationStage
+      ? { key: "implementationStage", label: `Stage: ${searchParams.implementationStage.replace("_", " ")}` }
+      : null,
+    searchParams.locationScope ? { key: "locationScope", label: `Location: ${searchParams.locationScope}` } : null,
+  ].filter(Boolean) as Array<{ key: string; label: string }>
 
   const { table, pagination } = useServerManagedDataTable<IIdea>({
-    data: data?.data ?? [],
+    data: ideas,
     columns,
     pageCount: data?.meta?.totalPages ?? 0,
     searchParams,
@@ -174,6 +182,36 @@ export default function MyIdeasManagement({
           onChange={(e) => setFilter("locationScope", e.target.value)}
         />
       </div>
+
+      {activeFilters.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-2">
+          {activeFilters.map((filter) => (
+            <Button
+              key={filter.key}
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-7 rounded-full px-3 text-xs"
+              onClick={() => setFilter(filter.key, "")}
+            >
+              {filter.label} ✕
+            </Button>
+          ))}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-7 text-xs"
+            onClick={() => {
+              setFilter("searchTerm", "")
+              setFilter("implementationStage", "")
+              setFilter("locationScope", "")
+            }}
+          >
+            Clear all
+          </Button>
+        </div>
+      ) : null}
 
       {(data?.data?.length ?? 0) === 0 ? (
         <EmptyState

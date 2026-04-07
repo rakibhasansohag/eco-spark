@@ -210,9 +210,35 @@ export default function AdminIdeasManagement({
     queryKey: ["admin-ideas", searchParams],
     queryFn: () => getIdeasForAdmin(searchParams),
   })
+  const ideas = data?.data ?? []
+  const activeFilters = [
+    searchParams.searchTerm ? { key: "searchTerm", label: `Search: ${searchParams.searchTerm}` } : null,
+    searchParams.implementationStage
+      ? { key: "implementationStage", label: `Stage: ${searchParams.implementationStage.replace("_", " ")}` }
+      : null,
+    searchParams.locationScope ? { key: "locationScope", label: `Location: ${searchParams.locationScope}` } : null,
+  ].filter(Boolean) as Array<{ key: string; label: string }>
+
+  const ideasWithBudget = ideas.filter(
+    (idea) => (idea.estimatedBudgetMin && Number(idea.estimatedBudgetMin) > 0) || (idea.estimatedBudgetMax && Number(idea.estimatedBudgetMax) > 0),
+  ).length
+  const timelineValues = ideas
+    .map((idea) => idea.timelineWeeks)
+    .filter((value): value is number => typeof value === "number" && value > 0)
+  const averageTimeline =
+    timelineValues.length > 0
+      ? Math.round(timelineValues.reduce((total, value) => total + value, 0) / timelineValues.length)
+      : null
+  const stageCounts = ideas.reduce<Record<string, number>>((acc, idea) => {
+    if (!idea.implementationStage) return acc
+    acc[idea.implementationStage] = (acc[idea.implementationStage] ?? 0) + 1
+    return acc
+  }, {})
+  const topStage =
+    Object.entries(stageCounts).sort((a, b) => b[1] - a[1])[0]?.[0]?.replace("_", " ") ?? "Not specified"
 
   const { table, pagination } = useServerManagedDataTable<IIdea>({
-    data: data?.data ?? [],
+    data: ideas,
     columns,
     pageCount: data?.meta?.totalPages ?? 0,
     searchParams,
@@ -245,6 +271,53 @@ export default function AdminIdeasManagement({
           value={searchParams.locationScope ?? ""}
           onChange={(e) => setFilter("locationScope", e.target.value)}
         />
+      </div>
+
+      {activeFilters.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-2">
+          {activeFilters.map((filter) => (
+            <Button
+              key={filter.key}
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-7 rounded-full px-3 text-xs"
+              onClick={() => setFilter(filter.key, "")}
+            >
+              {filter.label} ✕
+            </Button>
+          ))}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-7 text-xs"
+            onClick={() => {
+              setFilter("searchTerm", "")
+              setFilter("implementationStage", "")
+              setFilter("locationScope", "")
+            }}
+          >
+            Clear all
+          </Button>
+        </div>
+      ) : null}
+
+      <div className="grid gap-3 md:grid-cols-3">
+        <div className="rounded-lg border bg-card p-3">
+          <p className="text-xs text-muted-foreground">Visible Ideas</p>
+          <p className="text-lg font-semibold">{ideas.length}</p>
+        </div>
+        <div className="rounded-lg border bg-card p-3">
+          <p className="text-xs text-muted-foreground">With Budget Estimate</p>
+          <p className="text-lg font-semibold">{ideasWithBudget}</p>
+        </div>
+        <div className="rounded-lg border bg-card p-3">
+          <p className="text-xs text-muted-foreground">Avg Timeline / Top Stage</p>
+          <p className="text-lg font-semibold">
+            {averageTimeline ? `${averageTimeline}w` : "N/A"} · {topStage}
+          </p>
+        </div>
       </div>
 
       {(data?.data?.length ?? 0) === 0 ? (
