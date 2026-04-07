@@ -11,6 +11,10 @@ interface IdeaCardProps {
 }
 
 export function IdeaCard({ idea, href, className }: IdeaCardProps) {
+  const stageLabel = idea.implementationStage
+    ? idea.implementationStage.replace("_", " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
+    : null
+
   return (
     <Link
       href={href}
@@ -35,6 +39,21 @@ export function IdeaCard({ idea, href, className }: IdeaCardProps) {
       <h3 className="mt-3 line-clamp-2 text-lg font-semibold tracking-tight transition-colors group-hover:text-primary">
         {idea.title}
       </h3>
+
+      {stageLabel || idea.locationScope ? (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {stageLabel ? (
+            <Badge variant="outline" className="text-[11px]">
+              Stage: {stageLabel}
+            </Badge>
+          ) : null}
+          {idea.locationScope ? (
+            <Badge variant="outline" className="text-[11px]">
+              {idea.locationScope}
+            </Badge>
+          ) : null}
+        </div>
+      ) : null}
 
       <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
         {idea.description ?? "Content preview locked — purchase access to view."}

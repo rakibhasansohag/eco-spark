@@ -11,6 +11,9 @@ import { IdeaCommentSection } from "@/components/modules/Idea/IdeaCommentSection
 import { IdeaBuyButton } from "@/components/modules/Idea/IdeaBuyButton"
 import { humanizeStatus, formatDate } from "@/lib/formatUtils"
 
+const formatStage = (value?: string | null) =>
+  value ? value.replace("_", " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()) : null
+
 export default async function IdeaDetailsPage({
   params,
 }: {
@@ -98,6 +101,75 @@ export default async function IdeaDetailsPage({
               ) : null}
             </>
           )}
+
+          <div className="grid gap-3 rounded-md border bg-muted/30 p-4 text-sm sm:grid-cols-2">
+            {formatStage(idea.implementationStage) ? (
+              <div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Implementation Stage</p>
+                <p className="font-medium">{formatStage(idea.implementationStage)}</p>
+              </div>
+            ) : null}
+            {idea.targetAudience ? (
+              <div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Target Audience</p>
+                <p className="font-medium">{idea.targetAudience}</p>
+              </div>
+            ) : null}
+            {idea.locationScope ? (
+              <div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Location Scope</p>
+                <p className="font-medium">{idea.locationScope}</p>
+              </div>
+            ) : null}
+            {idea.timelineWeeks ? (
+              <div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Timeline</p>
+                <p className="font-medium">{idea.timelineWeeks} weeks</p>
+              </div>
+            ) : null}
+            {idea.estimatedBudgetMin || idea.estimatedBudgetMax ? (
+              <div className="sm:col-span-2">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Estimated Budget</p>
+                <p className="font-medium">
+                  {idea.estimatedBudgetMin ?? "0"} - {idea.estimatedBudgetMax ?? "N/A"} USD
+                </p>
+              </div>
+            ) : null}
+          </div>
+
+          {!contentLocked && idea.expectedImpact ? (
+            <div>
+              <h2 className="text-base font-semibold">Expected Impact</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{idea.expectedImpact}</p>
+            </div>
+          ) : null}
+
+          {!contentLocked && idea.risksAndMitigation ? (
+            <div>
+              <h2 className="text-base font-semibold">Risks and Mitigation</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{idea.risksAndMitigation}</p>
+            </div>
+          ) : null}
+
+          {!contentLocked && idea.externalLinks && idea.externalLinks.length > 0 ? (
+            <div>
+              <h2 className="text-base font-semibold">External Resources</h2>
+              <ul className="mt-2 space-y-1 text-sm">
+                {idea.externalLinks.map((link) => (
+                  <li key={link}>
+                    <a
+                      href={link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary underline underline-offset-4"
+                    >
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </div>
       </article>
 

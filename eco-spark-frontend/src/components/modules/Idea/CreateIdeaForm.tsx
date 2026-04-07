@@ -19,13 +19,20 @@ import { AppTextarea } from "@/components/shared/form/AppTextarea"
 import { AppFileInput } from "@/components/shared/form/AppFileInput"
 import { AppSubmitButton } from "@/components/shared/form/AppSubmitButton"
 import { normalizeErrors } from "@/lib/formUtils"
-import { createIdeaZodSchema } from "@/zod/idea.validation"
+import { createIdeaZodSchema, ideaStageOptions } from "@/zod/idea.validation"
 import { createIdeaAction } from "@/app/(dashboardLayout)/member/dashboard/create-idea/_action"
 import { ApiResponse } from "@/types/api.types"
 import { ICategory } from "@/types/category.types"
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api/v1"
+
+const IDEA_STAGE_LABELS: Record<(typeof ideaStageOptions)[number], string> = {
+  CONCEPT: "Concept",
+  PILOT: "Pilot",
+  SCALING: "Scaling",
+  IMPLEMENTED: "Implemented",
+}
 
 function CategorySelect({
   field,
@@ -93,6 +100,15 @@ export function CreateIdeaForm() {
       problemStatement: "",
       proposedSolution: "",
       description: "",
+      targetAudience: "",
+      implementationStage: "" as "" | (typeof ideaStageOptions)[number],
+      estimatedBudgetMin: undefined as number | undefined,
+      estimatedBudgetMax: undefined as number | undefined,
+      timelineWeeks: undefined as number | undefined,
+      locationScope: "",
+      expectedImpact: "",
+      risksAndMitigation: "",
+      externalLinks: "",
       categoryId: "",
       price: undefined as number | undefined,
     },
@@ -102,6 +118,19 @@ export function CreateIdeaForm() {
       formData.append("problemStatement", value.problemStatement)
       formData.append("proposedSolution", value.proposedSolution)
       formData.append("description", value.description)
+      if (value.targetAudience) formData.append("targetAudience", value.targetAudience)
+      if (value.implementationStage)
+        formData.append("implementationStage", value.implementationStage)
+      if (value.estimatedBudgetMin !== undefined)
+        formData.append("estimatedBudgetMin", String(value.estimatedBudgetMin))
+      if (value.estimatedBudgetMax !== undefined)
+        formData.append("estimatedBudgetMax", String(value.estimatedBudgetMax))
+      if (value.timelineWeeks !== undefined)
+        formData.append("timelineWeeks", String(value.timelineWeeks))
+      if (value.locationScope) formData.append("locationScope", value.locationScope)
+      if (value.expectedImpact) formData.append("expectedImpact", value.expectedImpact)
+      if (value.risksAndMitigation) formData.append("risksAndMitigation", value.risksAndMitigation)
+      if (value.externalLinks) formData.append("externalLinks", value.externalLinks)
       formData.append("categoryId", value.categoryId)
       formData.append("isPaid", String(isPaid))
       if (isPaid && value.price !== undefined) {
@@ -291,6 +320,198 @@ export function CreateIdeaForm() {
           })()
         )}
       </form.Field>
+
+      <div className="space-y-4 rounded-lg border bg-muted/40 p-4">
+        <h3 className="text-sm font-semibold text-foreground">Implementation context</h3>
+        <form.Field
+          name="targetAudience"
+          validators={{ onChange: createIdeaZodSchema.shape.targetAudience }}
+        >
+          {(field) => (
+            <AppField
+              id={field.name}
+              label="Target Audience (optional)"
+              value={field.state.value}
+              onChange={(value) => {
+                clearFieldError("targetAudience")
+                setFormError(null)
+                field.handleChange(value)
+              }}
+              onBlur={field.handleBlur}
+              touched={field.state.meta.isTouched || (serverErrors.targetAudience?.length ?? 0) > 0}
+              errors={[...normalizeErrors(field.state.meta.errors), ...(serverErrors.targetAudience ?? [])]}
+              placeholder="Students, local farmers, city households..."
+            />
+          )}
+        </form.Field>
+
+        <form.Field
+          name="implementationStage"
+          validators={{ onChange: createIdeaZodSchema.shape.implementationStage }}
+        >
+          {(field) => (
+            <div className="space-y-2">
+              <Label htmlFor={field.name}>Implementation Stage (optional)</Label>
+              <Select
+                value={field.state.value || "none"}
+                onValueChange={(value) => {
+                  clearFieldError("implementationStage")
+                  setFormError(null)
+                  field.handleChange(value === "none" ? "" : (value as (typeof ideaStageOptions)[number]))
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Choose current stage" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Not specified</SelectItem>
+                  {ideaStageOptions.map((stage) => (
+                    <SelectItem key={stage} value={stage}>
+                      {IDEA_STAGE_LABELS[stage]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {(field.state.meta.isTouched || (serverErrors.implementationStage?.length ?? 0) > 0) &&
+              [...normalizeErrors(field.state.meta.errors), ...(serverErrors.implementationStage ?? [])][0] ? (
+                <p className="text-sm text-destructive">
+                  {[...normalizeErrors(field.state.meta.errors), ...(serverErrors.implementationStage ?? [])][0]}
+                </p>
+              ) : null}
+            </div>
+          )}
+        </form.Field>
+      </div>
+
+      <div className="space-y-4 rounded-lg border bg-muted/40 p-4">
+        <h3 className="text-sm font-semibold text-foreground">Impact planning</h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <form.Field
+            name="estimatedBudgetMin"
+            validators={{ onChange: createIdeaZodSchema.shape.estimatedBudgetMin }}
+          >
+            {(field) => (
+              <div className="space-y-2">
+                <Label htmlFor={field.name}>Budget Min (USD)</Label>
+                <Input
+                  id={field.name}
+                  type="number"
+                  min={0}
+                  step={0.01}
+                  placeholder="e.g. 1000"
+                  value={field.state.value ?? ""}
+                  onChange={(e) => field.handleChange(e.target.value ? Number(e.target.value) : undefined)}
+                  onBlur={field.handleBlur}
+                />
+              </div>
+            )}
+          </form.Field>
+          <form.Field
+            name="estimatedBudgetMax"
+            validators={{ onChange: createIdeaZodSchema.shape.estimatedBudgetMax }}
+          >
+            {(field) => (
+              <div className="space-y-2">
+                <Label htmlFor={field.name}>Budget Max (USD)</Label>
+                <Input
+                  id={field.name}
+                  type="number"
+                  min={0}
+                  step={0.01}
+                  placeholder="e.g. 5000"
+                  value={field.state.value ?? ""}
+                  onChange={(e) => field.handleChange(e.target.value ? Number(e.target.value) : undefined)}
+                  onBlur={field.handleBlur}
+                />
+              </div>
+            )}
+          </form.Field>
+          <form.Field name="timelineWeeks" validators={{ onChange: createIdeaZodSchema.shape.timelineWeeks }}>
+            {(field) => (
+              <div className="space-y-2">
+                <Label htmlFor={field.name}>Timeline (weeks)</Label>
+                <Input
+                  id={field.name}
+                  type="number"
+                  min={1}
+                  step={1}
+                  placeholder="e.g. 12"
+                  value={field.state.value ?? ""}
+                  onChange={(e) => field.handleChange(e.target.value ? Number(e.target.value) : undefined)}
+                  onBlur={field.handleBlur}
+                />
+              </div>
+            )}
+          </form.Field>
+          <form.Field name="locationScope" validators={{ onChange: createIdeaZodSchema.shape.locationScope }}>
+            {(field) => (
+              <AppField
+                id={field.name}
+                label="Location Scope"
+                value={field.state.value}
+                onChange={(value) => field.handleChange(value)}
+                onBlur={field.handleBlur}
+                touched={field.state.meta.isTouched}
+                errors={normalizeErrors(field.state.meta.errors)}
+                placeholder="City-wide, regional, global..."
+              />
+            )}
+          </form.Field>
+        </div>
+        <form.Field
+          name="expectedImpact"
+          validators={{ onChange: createIdeaZodSchema.shape.expectedImpact }}
+        >
+          {(field) => (
+            <AppTextarea
+              id={field.name}
+              label="Expected Impact"
+              value={field.state.value}
+              onChange={(value) => field.handleChange(value)}
+              onBlur={field.handleBlur}
+              touched={field.state.meta.isTouched}
+              errors={normalizeErrors(field.state.meta.errors)}
+              placeholder="What measurable environmental or social impact is expected?"
+              rows={3}
+            />
+          )}
+        </form.Field>
+        <form.Field
+          name="risksAndMitigation"
+          validators={{ onChange: createIdeaZodSchema.shape.risksAndMitigation }}
+        >
+          {(field) => (
+            <AppTextarea
+              id={field.name}
+              label="Risks and Mitigation"
+              value={field.state.value}
+              onChange={(value) => field.handleChange(value)}
+              onBlur={field.handleBlur}
+              touched={field.state.meta.isTouched}
+              errors={normalizeErrors(field.state.meta.errors)}
+              placeholder="List key risks and how you plan to mitigate them."
+              rows={3}
+            />
+          )}
+        </form.Field>
+        <form.Field
+          name="externalLinks"
+          validators={{ onChange: createIdeaZodSchema.shape.externalLinks }}
+        >
+          {(field) => (
+            <AppField
+              id={field.name}
+              label="External Links (comma separated URLs)"
+              value={field.state.value}
+              onChange={(value) => field.handleChange(value)}
+              onBlur={field.handleBlur}
+              touched={field.state.meta.isTouched}
+              errors={normalizeErrors(field.state.meta.errors)}
+              placeholder="https://demo.com, https://docs.com"
+            />
+          )}
+        </form.Field>
+      </div>
 
       <AppFileInput
         id="idea-images"
