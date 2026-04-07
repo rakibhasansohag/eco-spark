@@ -17,6 +17,7 @@ import { loginZodSchema } from "@/zod/auth.validation"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api/v1"
 const BACKEND_BASE_URL = API_BASE_URL.replace(/\/api\/v1\/?$/, "")
+const GOOGLE_CALLBACK_URL = `${API_BASE_URL}/auth/google/callback`
 
 const normalizeErrors = (errors: unknown[]): string[] =>
   errors.map((error) => {
@@ -38,24 +39,10 @@ export function LoginForm() {
   const handleGoogleSignIn = async () => {
     try {
       setIsGoogleLoading(true)
-      const callbackURL = `${API_BASE_URL}/auth/google/callback`
-      const response = await fetch(`${BACKEND_BASE_URL}/api/auth/sign-in/social`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          provider: "google",
-          callbackURL,
-          disableRedirect: true,
-        }),
-      })
-
-      const payload = (await response.json()) as { url?: string }
-      if (!response.ok || !payload?.url) {
-        throw new Error("Google sign-in initiation failed")
-      }
-
-      window.location.href = payload.url
+      const signInUrl = new URL(`${BACKEND_BASE_URL}/api/auth/sign-in/social`)
+      signInUrl.searchParams.set("provider", "google")
+      signInUrl.searchParams.set("callbackURL", GOOGLE_CALLBACK_URL)
+      window.location.href = signInUrl.toString()
     } catch {
       toast.error("Google sign-in failed. Please try again.")
     } finally {
