@@ -109,8 +109,8 @@ function MyIdeaActionsCell({ idea }: { idea: IIdea }) {
 
 const columns: ColumnDef<IIdea>[] = [
   { header: "Title", accessorKey: "title", cell: ({ row }) => (
-    <div className="space-y-1">
-      <span className="block max-w-xs truncate font-medium">{row.original.title}</span>
+    <div className="min-w-[220px] space-y-1">
+      <span className="block max-w-[260px] truncate font-medium">{row.original.title}</span>
       <span className="text-xs text-muted-foreground">
         {toStageLabel(row.original.implementationStage)}
       </span>
@@ -120,7 +120,7 @@ const columns: ColumnDef<IIdea>[] = [
     header: "Location",
     accessorKey: "locationScope",
     cell: ({ row }) => (
-      <span className="text-xs text-muted-foreground">{row.original.locationScope ?? "Not specified"}</span>
+      <span className="min-w-[120px] text-xs text-muted-foreground">{row.original.locationScope ?? "Not specified"}</span>
     ),
   },
   {
@@ -135,13 +135,13 @@ const columns: ColumnDef<IIdea>[] = [
   {
     header: "Budget",
     id: "budget",
-    cell: ({ row }) => <span className="text-xs text-muted-foreground">{formatBudget(row.original)}</span>,
+    cell: ({ row }) => <span className="min-w-[170px] text-xs text-muted-foreground">{formatBudget(row.original)}</span>,
   },
   {
     header: "Access",
     id: "access",
     cell: ({ row }) => (
-      <span className="text-xs text-muted-foreground">
+      <span className="min-w-[120px] text-xs text-muted-foreground">
         {row.original.isPaid
           ? `Paid${row.original.price ? ` · ${formatCurrency(Number(row.original.price), "USD", true)}` : ""}`
           : "Free"}
@@ -162,7 +162,7 @@ const columns: ColumnDef<IIdea>[] = [
     id: "actions",
     header: "Actions",
     cell: ({ row }) => (
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-[170px] items-center gap-2">
         <Button asChild variant="ghost" size="sm">
           <Link href={`/ideas/${row.original.id}`}>View</Link>
         </Button>

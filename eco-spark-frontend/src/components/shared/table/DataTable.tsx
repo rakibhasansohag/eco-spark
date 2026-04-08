@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 interface IDataTablePagination {
   page: number
@@ -34,7 +35,13 @@ export function DataTable<TData>({ table, pagination }: DataTableProps<TData>) {
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    key={header.id}
+                    className={cn(
+                      header.column.id === "actions" &&
+                        "sticky right-0 z-20 bg-card shadow-[-10px_0_14px_-12px_rgba(15,23,42,0.45)]"
+                    )}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -51,7 +58,13 @@ export function DataTable<TData>({ table, pagination }: DataTableProps<TData>) {
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={cn(
+                        cell.column.id === "actions" &&
+                          "sticky right-0 z-10 bg-card shadow-[-10px_0_14px_-12px_rgba(15,23,42,0.45)]"
+                      )}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

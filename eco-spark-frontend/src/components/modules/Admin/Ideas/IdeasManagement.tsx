@@ -41,8 +41,20 @@ import {
   rejectIdeaAction,
   deleteIdeaByAdminAction,
 } from "@/app/(dashboardLayout)/admin/dashboard/ideas-management/_action"
+import { formatCurrency } from "@/lib/formatUtils"
 
 const stageOptions = ["CONCEPT", "PILOT", "SCALING", "IMPLEMENTED"] as const
+const toStageLabel = (value?: string | null) => (value ? value.replace("_", " ") : "Not specified")
+const formatBudget = (idea: IIdea) => {
+  const min = idea.estimatedBudgetMin ? Number(idea.estimatedBudgetMin) : null
+  const max = idea.estimatedBudgetMax ? Number(idea.estimatedBudgetMax) : null
+  if (min == null && max == null) return "N/A"
+  if (min != null && max != null) {
+    return `${formatCurrency(min, "USD", true)} - ${formatCurrency(max, "USD", true)}`
+  }
+  if (min != null) return `From ${formatCurrency(min, "USD", true)}`
+  return `Up to ${formatCurrency(max!, "USD", true)}`
+}
 
 function RejectDialog({ idea }: { idea: IIdea }) {
   const [open, setOpen] = useState(false)
@@ -159,8 +171,8 @@ function IdeaActionsCell({ idea }: { idea: IIdea }) {
 
 const columns: ColumnDef<IIdea>[] = [
   { header: "Title", accessorKey: "title", cell: ({ row }) => (
-    <div className="space-y-1">
-      <span className="block max-w-xs truncate font-medium">{row.original.title}</span>
+    <div className="min-w-[220px] space-y-1">
+      <span className="block max-w-[260px] truncate font-medium">{row.original.title}</span>
       <span className="text-xs text-muted-foreground">
         {row.original.locationScope || "Location not specified"}
       </span>
@@ -170,10 +182,33 @@ const columns: ColumnDef<IIdea>[] = [
     header: "Stage",
     accessorKey: "implementationStage",
     cell: ({ row }) => (
-      <span className="text-xs">
-        {row.original.implementationStage
-          ? row.original.implementationStage.replace("_", " ")
-          : "Not specified"}
+      <span className="min-w-[110px] text-xs">
+        {toStageLabel(row.original.implementationStage)}
+      </span>
+    ),
+  },
+  {
+    header: "Timeline",
+    accessorKey: "timelineWeeks",
+    cell: ({ row }) => (
+      <span className="min-w-[95px] text-xs text-muted-foreground">
+        {row.original.timelineWeeks ? `${row.original.timelineWeeks} weeks` : "N/A"}
+      </span>
+    ),
+  },
+  {
+    header: "Budget",
+    id: "budget",
+    cell: ({ row }) => <span className="min-w-[170px] text-xs text-muted-foreground">{formatBudget(row.original)}</span>,
+  },
+  {
+    header: "Access",
+    id: "access",
+    cell: ({ row }) => (
+      <span className="min-w-[120px] text-xs text-muted-foreground">
+        {row.original.isPaid
+          ? `Paid${row.original.price ? ` · ${formatCurrency(Number(row.original.price), "USD", true)}` : ""}`
+          : "Free"}
       </span>
     ),
   },
@@ -191,7 +226,7 @@ const columns: ColumnDef<IIdea>[] = [
     id: "actions",
     header: "Actions",
     cell: ({ row }) => (
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-[220px] items-center gap-2">
         <Button asChild variant="ghost" size="sm">
           <Link href={`/ideas/${row.original.id}`}>View</Link>
         </Button>
