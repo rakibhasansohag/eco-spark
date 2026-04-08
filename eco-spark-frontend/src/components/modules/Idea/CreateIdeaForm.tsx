@@ -276,23 +276,20 @@ export function CreateIdeaForm() {
         </p>
       ) : null}
 
-      <div className="rounded-xl border bg-card p-4">
-        <div className="grid gap-3 md:grid-cols-3">
+      <div className="rounded-xl border bg-card p-3">
+        <div className="grid gap-2 md:grid-cols-3">
           {steps.map((step, index) => {
             const complete = stepCompletion[step.id]
             const active = activeStep === step.id
             const unlocked = canAccessStep(step.id)
             return (
-              <div key={step.id} className="relative">
-                {index < steps.length - 1 ? (
-                  <span className="pointer-events-none absolute left-[calc(50%+1.5rem)] right-[-50%] top-5 hidden h-px bg-border md:block" />
-                ) : null}
+              <div key={step.id}>
                 <button
                   type="button"
                   disabled={!unlocked}
                   onClick={() => goToStep(step.id)}
                   className={cn(
-                    "w-full rounded-lg p-2 text-center transition",
+                    "w-full rounded-md p-2 text-center transition",
                     active ? "bg-primary/10" : "bg-background/80",
                     !unlocked && "cursor-not-allowed opacity-60",
                   )}
@@ -305,7 +302,7 @@ export function CreateIdeaForm() {
                   >
                     {complete ? <CheckCircle2 className="h-5 w-5 text-primary" /> : <span>{index + 1}</span>}
                   </div>
-                  <p className="mt-2 text-sm font-semibold">{step.title}</p>
+                  <p className="mt-2 text-sm font-semibold leading-none">{step.title}</p>
                   <p className="text-xs text-muted-foreground">{step.subtitle}</p>
                   {!unlocked ? <p className="mt-1 text-[11px] text-muted-foreground">Locked</p> : null}
                 </button>
