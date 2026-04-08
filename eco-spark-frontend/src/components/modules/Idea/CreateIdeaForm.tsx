@@ -70,6 +70,40 @@ const IDEA_STAGE_LABELS: Record<(typeof ideaStageOptions)[number], string> = {
   SCALING: "Scaling",
   IMPLEMENTED: "Implemented",
 }
+const FIELD_LABELS: Record<string, string> = {
+  title: "Title",
+  categoryId: "Category",
+  problemStatement: "Problem Statement",
+  proposedSolution: "Proposed Solution",
+  description: "Description",
+  targetAudience: "Target Audience",
+  implementationStage: "Implementation Stage",
+  estimatedBudgetMin: "Budget Minimum",
+  estimatedBudgetMax: "Budget Maximum",
+  timelineWeeks: "Timeline",
+  locationScope: "Location Scope",
+  expectedImpact: "Expected Impact",
+  risksAndMitigation: "Risks and Mitigation",
+  externalLinks: "External Links",
+  price: "Price",
+}
+const FIELD_STEPS: Record<string, "core" | "context" | "publishing"> = {
+  title: "core",
+  categoryId: "core",
+  problemStatement: "core",
+  proposedSolution: "core",
+  description: "core",
+  targetAudience: "context",
+  implementationStage: "context",
+  estimatedBudgetMin: "context",
+  estimatedBudgetMax: "context",
+  timelineWeeks: "context",
+  locationScope: "context",
+  expectedImpact: "context",
+  risksAndMitigation: "context",
+  externalLinks: "context",
+  price: "publishing",
+}
 
 function CategorySelect({
   field,
@@ -210,9 +244,20 @@ export function CreateIdeaForm() {
         router.push("/member/dashboard/my-ideas")
         router.refresh()
       } else {
-        setServerErrors(result.errors ?? {})
-        setFormError(result.message)
-        toast.error(result.message)
+        const nextErrors = result.errors ?? {}
+        const firstErrorKey = Object.keys(nextErrors)[0]
+        if (firstErrorKey) {
+          const targetStep = FIELD_STEPS[firstErrorKey]
+          if (targetStep) setActiveStep(targetStep)
+        }
+        const inlineMessage =
+          firstErrorKey && nextErrors[firstErrorKey]?.[0]
+            ? `${FIELD_LABELS[firstErrorKey] ?? firstErrorKey}: ${nextErrors[firstErrorKey][0]}`
+            : result.message
+
+        setServerErrors(nextErrors)
+        setFormError(inlineMessage)
+        toast.error(inlineMessage)
       }
     },
   })

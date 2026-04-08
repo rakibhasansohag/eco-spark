@@ -1,6 +1,21 @@
 import { z } from "zod/v4";
 
 export const ideaStageOptions = ["CONCEPT", "PILOT", "SCALING", "IMPLEMENTED"] as const;
+const requiredText = (label: string, min: number) =>
+  z
+    .string()
+    .trim()
+    .min(min, `${label} must be at least ${min} characters`);
+
+const optionalText = (label: string, min: number) =>
+  z.preprocess((value) => {
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      return trimmed || undefined;
+    }
+    return value;
+  }, z.string().min(min, `${label} must be at least ${min} characters`).optional());
+
 const linksFromInput = z.preprocess((value) => {
   if (Array.isArray(value)) return value;
   if (typeof value === "string") {
@@ -16,20 +31,20 @@ const linksFromInput = z.preprocess((value) => {
 
 export const createIdeaZodSchema = z
   .object({
-    title: z.string().min(5),
-    problemStatement: z.string().min(10),
-    proposedSolution: z.string().min(10),
-    description: z.string().min(20),
-    targetAudience: z.string().min(5).optional(),
+    title: requiredText("Title", 5),
+    problemStatement: requiredText("Problem statement", 10),
+    proposedSolution: requiredText("Proposed solution", 10),
+    description: requiredText("Description", 20),
+    targetAudience: optionalText("Target audience", 5),
     implementationStage: z.enum(ideaStageOptions).optional(),
     estimatedBudgetMin: z.number().nonnegative().optional(),
     estimatedBudgetMax: z.number().nonnegative().optional(),
     timelineWeeks: z.number().int().positive().optional(),
-    locationScope: z.string().min(2).optional(),
-    expectedImpact: z.string().min(10).optional(),
-    risksAndMitigation: z.string().min(10).optional(),
+    locationScope: optionalText("Location scope", 2),
+    expectedImpact: optionalText("Expected impact", 10),
+    risksAndMitigation: optionalText("Risks and mitigation", 10),
     externalLinks: linksFromInput.optional(),
-    categoryId: z.string().min(1),
+    categoryId: z.string().trim().min(1, "Category is required"),
     isPaid: z.boolean().optional(),
     price: z.number().positive().optional(),
   })
@@ -50,20 +65,20 @@ export const createIdeaZodSchema = z
 
 export const updateIdeaZodSchema = z
   .object({
-    title: z.string().min(5).optional(),
-    problemStatement: z.string().min(10).optional(),
-    proposedSolution: z.string().min(10).optional(),
-    description: z.string().min(20).optional(),
-    targetAudience: z.string().min(5).optional(),
+    title: optionalText("Title", 5),
+    problemStatement: optionalText("Problem statement", 10),
+    proposedSolution: optionalText("Proposed solution", 10),
+    description: optionalText("Description", 20),
+    targetAudience: optionalText("Target audience", 5),
     implementationStage: z.enum(ideaStageOptions).optional(),
     estimatedBudgetMin: z.number().nonnegative().optional(),
     estimatedBudgetMax: z.number().nonnegative().optional(),
     timelineWeeks: z.number().int().positive().optional(),
-    locationScope: z.string().min(2).optional(),
-    expectedImpact: z.string().min(10).optional(),
-    risksAndMitigation: z.string().min(10).optional(),
+    locationScope: optionalText("Location scope", 2),
+    expectedImpact: optionalText("Expected impact", 10),
+    risksAndMitigation: optionalText("Risks and mitigation", 10),
     externalLinks: linksFromInput.optional(),
-    categoryId: z.string().optional(),
+    categoryId: z.string().trim().min(1, "Category is required").optional(),
     isPaid: z.boolean().optional(),
     price: z.number().positive().optional(),
   });
