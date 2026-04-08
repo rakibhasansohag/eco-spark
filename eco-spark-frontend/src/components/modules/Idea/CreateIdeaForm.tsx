@@ -312,6 +312,10 @@ export function CreateIdeaForm() {
       className="space-y-5"
       onSubmit={(e) => {
         e.preventDefault()
+        if (activeStep !== "publishing") {
+          goToStep(activeStep === "core" ? "context" : "publishing")
+          return
+        }
         form.handleSubmit()
       }}
     >
@@ -600,9 +604,21 @@ export function CreateIdeaForm() {
                   step={0.01}
                   placeholder="e.g. 1000"
                   value={field.state.value ?? ""}
-                  onChange={(e) => field.handleChange(e.target.value ? Number(e.target.value) : undefined)}
+                  onChange={(e) => {
+                    clearFieldError("estimatedBudgetMin")
+                    setFormError(null)
+                    field.handleChange(e.target.value ? Number(e.target.value) : undefined)
+                  }}
                   onBlur={field.handleBlur}
                 />
+                {field.state.meta.isTouched || (serverErrors.estimatedBudgetMin?.length ?? 0) > 0 ? (
+                  <p className="text-sm text-destructive">
+                    {[
+                      ...normalizeErrors(field.state.meta.errors),
+                      ...(serverErrors.estimatedBudgetMin ?? []),
+                    ][0]}
+                  </p>
+                ) : null}
               </div>
             )}
           </form.Field>
@@ -617,9 +633,21 @@ export function CreateIdeaForm() {
                   step={0.01}
                   placeholder="e.g. 5000"
                   value={field.state.value ?? ""}
-                  onChange={(e) => field.handleChange(e.target.value ? Number(e.target.value) : undefined)}
+                  onChange={(e) => {
+                    clearFieldError("estimatedBudgetMax")
+                    setFormError(null)
+                    field.handleChange(e.target.value ? Number(e.target.value) : undefined)
+                  }}
                   onBlur={field.handleBlur}
                 />
+                {field.state.meta.isTouched || (serverErrors.estimatedBudgetMax?.length ?? 0) > 0 ? (
+                  <p className="text-sm text-destructive">
+                    {[
+                      ...normalizeErrors(field.state.meta.errors),
+                      ...(serverErrors.estimatedBudgetMax ?? []),
+                    ][0]}
+                  </p>
+                ) : null}
               </div>
             )}
           </form.Field>
@@ -634,9 +662,21 @@ export function CreateIdeaForm() {
                   step={1}
                   placeholder="e.g. 12"
                   value={field.state.value ?? ""}
-                  onChange={(e) => field.handleChange(e.target.value ? Number(e.target.value) : undefined)}
+                  onChange={(e) => {
+                    clearFieldError("timelineWeeks")
+                    setFormError(null)
+                    field.handleChange(e.target.value ? Number(e.target.value) : undefined)
+                  }}
                   onBlur={field.handleBlur}
                 />
+                {field.state.meta.isTouched || (serverErrors.timelineWeeks?.length ?? 0) > 0 ? (
+                  <p className="text-sm text-destructive">
+                    {[
+                      ...normalizeErrors(field.state.meta.errors),
+                      ...(serverErrors.timelineWeeks ?? []),
+                    ][0]}
+                  </p>
+                ) : null}
               </div>
             )}
           </form.Field>
@@ -646,10 +686,14 @@ export function CreateIdeaForm() {
                 id={field.name}
                 label="Location Scope"
                 value={field.state.value}
-                onChange={(value) => field.handleChange(value)}
+                onChange={(value) => {
+                  clearFieldError("locationScope")
+                  setFormError(null)
+                  field.handleChange(value)
+                }}
                 onBlur={field.handleBlur}
-                touched={field.state.meta.isTouched}
-                errors={normalizeErrors(field.state.meta.errors)}
+                touched={field.state.meta.isTouched || (serverErrors.locationScope?.length ?? 0) > 0}
+                errors={[...normalizeErrors(field.state.meta.errors), ...(serverErrors.locationScope ?? [])]}
                 placeholder="City-wide, regional, global..."
               />
             )}
@@ -661,10 +705,14 @@ export function CreateIdeaForm() {
               id={field.name}
               label="Expected Impact"
               value={field.state.value}
-              onChange={(value) => field.handleChange(value)}
+              onChange={(value) => {
+                clearFieldError("expectedImpact")
+                setFormError(null)
+                field.handleChange(value)
+              }}
               onBlur={field.handleBlur}
-              touched={field.state.meta.isTouched}
-              errors={normalizeErrors(field.state.meta.errors)}
+              touched={field.state.meta.isTouched || (serverErrors.expectedImpact?.length ?? 0) > 0}
+              errors={[...normalizeErrors(field.state.meta.errors), ...(serverErrors.expectedImpact ?? [])]}
               placeholder="What measurable environmental or social impact is expected?"
               rows={3}
             />
@@ -676,10 +724,17 @@ export function CreateIdeaForm() {
               id={field.name}
               label="Risks and Mitigation"
               value={field.state.value}
-              onChange={(value) => field.handleChange(value)}
+              onChange={(value) => {
+                clearFieldError("risksAndMitigation")
+                setFormError(null)
+                field.handleChange(value)
+              }}
               onBlur={field.handleBlur}
-              touched={field.state.meta.isTouched}
-              errors={normalizeErrors(field.state.meta.errors)}
+              touched={field.state.meta.isTouched || (serverErrors.risksAndMitigation?.length ?? 0) > 0}
+              errors={[
+                ...normalizeErrors(field.state.meta.errors),
+                ...(serverErrors.risksAndMitigation ?? []),
+              ]}
               placeholder="List key risks and how you plan to mitigate them."
               rows={3}
             />
@@ -691,10 +746,14 @@ export function CreateIdeaForm() {
               id={field.name}
               label="External Links (comma separated URLs)"
               value={field.state.value}
-              onChange={(value) => field.handleChange(value)}
+              onChange={(value) => {
+                clearFieldError("externalLinks")
+                setFormError(null)
+                field.handleChange(value)
+              }}
               onBlur={field.handleBlur}
-              touched={field.state.meta.isTouched}
-              errors={normalizeErrors(field.state.meta.errors)}
+              touched={field.state.meta.isTouched || (serverErrors.externalLinks?.length ?? 0) > 0}
+              errors={[...normalizeErrors(field.state.meta.errors), ...(serverErrors.externalLinks ?? [])]}
               placeholder="https://demo.com, https://docs.com"
             />
           )}

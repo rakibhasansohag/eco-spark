@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { ColumnDef } from "@tanstack/react-table"
 import { toast } from "sonner"
@@ -207,6 +207,7 @@ export default function AdminIdeasManagement({
   searchParams: Record<string, string>
 }) {
   const { setFilter, setFilters } = useServerManagedDataTableFilters({ searchParams })
+  const [locationInput, setLocationInput] = useState(searchParams.locationScope ?? "")
   const { data, isLoading } = useQuery({
     queryKey: ["admin-ideas", searchParams],
     queryFn: () => getIdeasForAdmin(searchParams),
@@ -246,6 +247,14 @@ export default function AdminIdeasManagement({
           ? "paid"
           : "all"
 
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      if ((searchParams.locationScope ?? "") === locationInput) return
+      setFilter("locationScope", locationInput)
+    }, 350)
+    return () => window.clearTimeout(timeoutId)
+  }, [locationInput, searchParams.locationScope, setFilter])
+
   const { table, pagination } = useServerManagedDataTable<IIdea>({
     data: ideas,
     columns,
@@ -277,8 +286,8 @@ export default function AdminIdeasManagement({
         </Select>
         <Input
           placeholder="Filter by location"
-          value={searchParams.locationScope ?? ""}
-          onChange={(e) => setFilter("locationScope", e.target.value)}
+          value={locationInput}
+          onChange={(e) => setLocationInput(e.target.value)}
         />
       </div>
 
@@ -287,13 +296,14 @@ export default function AdminIdeasManagement({
           type="button"
           size="sm"
           variant={activePreset === "all" ? "default" : "outline"}
-          onClick={() =>
+          onClick={() => {
             setFilters({
               status: "",
               implementationStage: "",
               isPaid: "",
             })
-          }
+            setLocationInput("")
+          }}
         >
           All Ideas
         </Button>
@@ -301,13 +311,14 @@ export default function AdminIdeasManagement({
           type="button"
           size="sm"
           variant={activePreset === "under_review" ? "default" : "outline"}
-          onClick={() =>
+          onClick={() => {
             setFilters({
               status: "UNDER_REVIEW",
               implementationStage: "",
               isPaid: "",
             })
-          }
+            setLocationInput("")
+          }}
         >
           Needs Review
         </Button>
@@ -315,13 +326,14 @@ export default function AdminIdeasManagement({
           type="button"
           size="sm"
           variant={activePreset === "pilot" ? "default" : "outline"}
-          onClick={() =>
+          onClick={() => {
             setFilters({
               status: "",
               implementationStage: "PILOT",
               isPaid: "",
             })
-          }
+            setLocationInput("")
+          }}
         >
           Pilot Stage
         </Button>
@@ -329,13 +341,14 @@ export default function AdminIdeasManagement({
           type="button"
           size="sm"
           variant={activePreset === "paid" ? "default" : "outline"}
-          onClick={() =>
+          onClick={() => {
             setFilters({
               status: "",
               implementationStage: "",
               isPaid: "true",
             })
-          }
+            setLocationInput("")
+          }}
         >
           Paid Ideas
         </Button>
@@ -368,6 +381,7 @@ export default function AdminIdeasManagement({
                 status: "",
                 isPaid: "",
               })
+              setLocationInput("")
             }}
           >
             Clear all

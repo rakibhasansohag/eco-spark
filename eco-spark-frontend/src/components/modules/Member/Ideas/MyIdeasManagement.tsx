@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { ColumnDef } from "@tanstack/react-table"
 import { toast } from "sonner"
@@ -29,8 +30,20 @@ import {
   submitIdeaAction,
   deleteMyIdeaAction,
 } from "@/app/(dashboardLayout)/member/dashboard/my-ideas/_action"
+import { formatCurrency } from "@/lib/formatUtils"
 
 const stageOptions = ["CONCEPT", "PILOT", "SCALING", "IMPLEMENTED"] as const
+const toStageLabel = (value?: string | null) => (value ? value.replace("_", " ") : "Not specified")
+const formatBudget = (idea: IIdea) => {
+  const min = idea.estimatedBudgetMin ? Number(idea.estimatedBudgetMin) : null
+  const max = idea.estimatedBudgetMax ? Number(idea.estimatedBudgetMax) : null
+  if (min == null && max == null) return "N/A"
+  if (min != null && max != null) {
+    return `${formatCurrency(min, "USD", true)} - ${formatCurrency(max, "USD", true)}`
+  }
+  if (min != null) return `From ${formatCurrency(min, "USD", true)}`
+  return `Up to ${formatCurrency(max!, "USD", true)}`
+}
 
 function MyIdeaActionsCell({ idea }: { idea: IIdea }) {
   const qc = useQueryClient()
@@ -99,12 +112,42 @@ const columns: ColumnDef<IIdea>[] = [
     <div className="space-y-1">
       <span className="block max-w-xs truncate font-medium">{row.original.title}</span>
       <span className="text-xs text-muted-foreground">
-        {row.original.implementationStage
-          ? row.original.implementationStage.replace("_", " ")
-          : "Stage not specified"}
+        {toStageLabel(row.original.implementationStage)}
       </span>
     </div>
   )},
+  {
+    header: "Location",
+    accessorKey: "locationScope",
+    cell: ({ row }) => (
+      <span className="text-xs text-muted-foreground">{row.original.locationScope ?? "Not specified"}</span>
+    ),
+  },
+  {
+    header: "Timeline",
+    accessorKey: "timelineWeeks",
+    cell: ({ row }) => (
+      <span className="text-xs text-muted-foreground">
+        {row.original.timelineWeeks ? `${row.original.timelineWeeks} weeks` : "N/A"}
+      </span>
+    ),
+  },
+  {
+    header: "Budget",
+    id: "budget",
+    cell: ({ row }) => <span className="text-xs text-muted-foreground">{formatBudget(row.original)}</span>,
+  },
+  {
+    header: "Access",
+    id: "access",
+    cell: ({ row }) => (
+      <span className="text-xs text-muted-foreground">
+        {row.original.isPaid
+          ? `Paid${row.original.price ? ` · ${formatCurrency(Number(row.original.price), "USD", true)}` : ""}`
+          : "Free"}
+      </span>
+    ),
+  },
   {
     header: "Status",
     accessorKey: "status",
@@ -135,6 +178,7 @@ export default function MyIdeasManagement({
   searchParams: Record<string, string>
 }) {
   const { setFilter, setFilters } = useServerManagedDataTableFilters({ searchParams })
+  const [locationInput, setLocationInput] = useState(searchParams.locationScope ?? "")
   const { data, isLoading } = useQuery({
     queryKey: ["member-my-ideas", searchParams],
     queryFn: () => getMyIdeas(searchParams),
@@ -155,6 +199,18 @@ export default function MyIdeasManagement({
         : searchParams.implementationStage === "PILOT"
           ? "pilot"
           : "all"
+  const draftCount = ideas.filter((idea) => idea.status === "DRAFT").length
+  const approvedCount = ideas.filter((idea) => idea.status === "APPROVED").length
+  const rejectedCount = ideas.filter((idea) => idea.status === "REJECTED").length
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      if ((searchParams.locationScope ?? "") === locationInput) return
+      setFilter("locationScope", locationInput)
+    }, 350)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [locationInput, searchParams.locationScope, setFilter])
 
   const { table, pagination } = useServerManagedDataTable<IIdea>({
     data: ideas,
@@ -165,6 +221,25 @@ export default function MyIdeasManagement({
 
   return (
     <div className="space-y-3">
+      <div className="grid gap-3 md:grid-cols-4">
+        <div className="rounded-lg border bg-card p-3">
+          <p className="text-xs text-muted-foreground">Visible Ideas</p>
+          <p className="text-lg font-semibold">{ideas.length}</p>
+        </div>
+        <div className="rounded-lg border bg-card p-3">
+          <p className="text-xs text-muted-foreground">Drafts</p>
+          <p className="text-lg font-semibold">{draftCount}</p>
+        </div>
+        <div className="rounded-lg border bg-card p-3">
+          <p className="text-xs text-muted-foreground">Approved</p>
+          <p className="text-lg font-semibold">{approvedCount}</p>
+        </div>
+        <div className="rounded-lg border bg-card p-3">
+          <p className="text-xs text-muted-foreground">Rejected</p>
+          <p className="text-lg font-semibold">{rejectedCount}</p>
+        </div>
+      </div>
+
       <div className="grid gap-3 md:grid-cols-4">
         <div className="md:col-span-2">
           <SearchBar searchParams={searchParams} />
@@ -187,8 +262,8 @@ export default function MyIdeasManagement({
         </Select>
         <Input
           placeholder="Filter by location"
-          value={searchParams.locationScope ?? ""}
-          onChange={(e) => setFilter("locationScope", e.target.value)}
+          value={locationInput}
+          onChange={(e) => setLocationInput(e.target.value)}
         />
       </div>
 
@@ -197,12 +272,13 @@ export default function MyIdeasManagement({
           type="button"
           size="sm"
           variant={activePreset === "all" ? "default" : "outline"}
-          onClick={() =>
+          onClick={() => {
             setFilters({
               status: "",
               implementationStage: "",
             })
-          }
+            setLocationInput("")
+          }}
         >
           All Ideas
         </Button>
@@ -210,12 +286,13 @@ export default function MyIdeasManagement({
           type="button"
           size="sm"
           variant={activePreset === "drafts" ? "default" : "outline"}
-          onClick={() =>
+          onClick={() => {
             setFilters({
               status: "DRAFT",
               implementationStage: "",
             })
-          }
+            setLocationInput("")
+          }}
         >
           Drafts
         </Button>
@@ -223,12 +300,13 @@ export default function MyIdeasManagement({
           type="button"
           size="sm"
           variant={activePreset === "rejected" ? "default" : "outline"}
-          onClick={() =>
+          onClick={() => {
             setFilters({
               status: "REJECTED",
               implementationStage: "",
             })
-          }
+            setLocationInput("")
+          }}
         >
           Rejected
         </Button>
@@ -236,12 +314,13 @@ export default function MyIdeasManagement({
           type="button"
           size="sm"
           variant={activePreset === "pilot" ? "default" : "outline"}
-          onClick={() =>
+          onClick={() => {
             setFilters({
               status: "",
               implementationStage: "PILOT",
             })
-          }
+            setLocationInput("")
+          }}
         >
           Pilot Stage
         </Button>
@@ -273,6 +352,7 @@ export default function MyIdeasManagement({
                 locationScope: "",
                 status: "",
               })
+              setLocationInput("")
             }}
           >
             Clear all
