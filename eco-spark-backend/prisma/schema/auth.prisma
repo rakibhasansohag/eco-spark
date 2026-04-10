@@ -25,7 +25,8 @@ model User {
   comments      Comment[]
   payments      Payment[]
   ideaAccesses  IdeaAccess[]
-
+  watchlists    Watchlist[]
+  reviews       Review[]
   @@map("users")
 }
 

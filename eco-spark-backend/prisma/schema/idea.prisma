@@ -29,6 +29,7 @@ model Idea {
   comments     Comment[]
   payments     Payment[]
   ideaAccesses IdeaAccess[]
-
+  watchlists   Watchlist[]
+  reviews      Review[]
   @@map("ideas")
 }

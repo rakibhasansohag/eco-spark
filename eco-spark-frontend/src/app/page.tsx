@@ -11,6 +11,7 @@ import { UseCasesSection } from "@/components/modules/Home/UseCasesSection"
 import { HomeFaqSection } from "@/components/modules/Home/HomeFaqSection"
 import { ActionCtaSection } from "@/components/modules/Home/ActionCtaSection"
 import { TrustedBySection } from "@/components/modules/Home/TrustedBySection"
+import { TestimonialsSection } from "@/components/modules/Home/TestimonialsSection"
 
 export default async function Home() {
   const queryClient = new QueryClient()
@@ -57,10 +58,14 @@ export default async function Home() {
       </FadeInSection>
 
       <FadeInSection delay={0.24}>
-        <ImpactSection />
+        <TestimonialsSection />
       </FadeInSection>
 
       <FadeInSection delay={0.28}>
+        <ImpactSection />
+      </FadeInSection>
+
+      <FadeInSection delay={0.32}>
         <HomeFaqSection />
       </FadeInSection>
 
