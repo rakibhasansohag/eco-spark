@@ -60,11 +60,13 @@ export const UserService = {
     const canChangePassword = user.accounts.some(
       (account) => account.providerId === "credential" && Boolean(account.password),
     );
+    const connectedProviders = Array.from(new Set(user.accounts.map((account) => account.providerId)));
     const { accounts: _accounts, ...publicUser } = user;
 
     return {
       ...publicUser,
       canChangePassword,
+      connectedProviders,
     };
   },
 

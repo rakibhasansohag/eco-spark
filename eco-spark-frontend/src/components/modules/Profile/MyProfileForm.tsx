@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label"
 
 interface MyProfileFormProps {
   initialName: string
+  initialEmail: string
   initialImage: string
   initialBio?: string
   initialOrganization?: string
@@ -26,6 +27,7 @@ interface MyProfileFormProps {
 
 export function MyProfileForm({
   initialName,
+  initialEmail,
   initialImage,
   initialBio = "",
   initialOrganization = "",
@@ -114,17 +116,31 @@ export function MyProfileForm({
 
       <form.Field name="name">
         {(field) => (
-          <div id="profile-name" className="scroll-mt-24">
-            <AppField
-              id={field.name}
-              label="Name"
-              value={field.state.value}
-              onChange={field.handleChange}
-              onBlur={field.handleBlur}
-              touched={field.state.meta.isTouched}
-              errors={normalizeErrors(field.state.meta.errors)}
-              placeholder="Your full name"
-            />
+          <div className="grid gap-4 md:grid-cols-2">
+            <div id="profile-name" className="scroll-mt-24">
+              <AppField
+                id={field.name}
+                label="Name"
+                value={field.state.value}
+                onChange={field.handleChange}
+                onBlur={field.handleBlur}
+                touched={field.state.meta.isTouched}
+                errors={normalizeErrors(field.state.meta.errors)}
+                placeholder="Your full name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="profile-email">Connected Email</Label>
+              <Input
+                id="profile-email"
+                value={initialEmail}
+                disabled
+                readOnly
+                className="h-11"
+                aria-readonly="true"
+              />
+              <p className="text-xs text-muted-foreground">This email is managed by your sign-in provider.</p>
+            </div>
           </div>
         )}
       </form.Field>

@@ -12,6 +12,7 @@ export interface IUser {
   role: "ADMIN" | "MEMBER";
   status: "ACTIVE" | "INACTIVE";
   canChangePassword?: boolean;
+  connectedProviders?: string[];
   createdAt: string;
   updatedAt: string;
 }
