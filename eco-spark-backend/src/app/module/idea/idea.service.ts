@@ -299,7 +299,6 @@ Do not wrap the array in markdown code blocks like \`\`\`json, return just the a
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         generationConfig: { 
           temperature: 0.8,
-          responseMimeType: "application/json"
         }
       }),
     });

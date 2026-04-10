@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { getWatchlist } from "@/services/watchlist.services"
+import { getMyWatchlist } from "@/services/watchlist.services"
 import { IWatchlist } from "@/types/watchlist.types"
 import { IIdea } from "@/types/idea.types"
 import { IdeaCard } from "@/components/shared/card/IdeaCard"
@@ -12,7 +12,7 @@ export default function MyWatchlistContent() {
   const { data, isLoading } = useQuery({
     queryKey: ["my-watchlist-all"],
     queryFn: async () => {
-      const res = await getWatchlist("")  // empty ideaId = fetch all for current user
+      const res = await getMyWatchlist()
       return res.data as (IWatchlist & { idea?: IIdea })[]
     },
   })
