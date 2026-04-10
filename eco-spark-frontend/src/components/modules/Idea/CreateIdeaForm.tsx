@@ -6,7 +6,7 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { AnimatePresence, motion } from "framer-motion"
-import { CheckCircle2 } from "lucide-react"
+import { CheckCircle2, Loader2 } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -104,6 +104,23 @@ const FIELD_STEPS: Record<string, "core" | "context" | "publishing"> = {
   externalLinks: "context",
   price: "publishing",
 }
+const EMPTY_FORM_VALUES = {
+  title: "",
+  problemStatement: "",
+  proposedSolution: "",
+  description: "",
+  targetAudience: "",
+  implementationStage: "" as "" | (typeof ideaStageOptions)[number],
+  estimatedBudgetMin: undefined as number | undefined,
+  estimatedBudgetMax: undefined as number | undefined,
+  timelineWeeks: undefined as number | undefined,
+  locationScope: "",
+  expectedImpact: "",
+  risksAndMitigation: "",
+  externalLinks: "",
+  categoryId: "",
+  price: undefined as number | undefined,
+}
 
 function CategorySelect({
   field,
@@ -166,6 +183,7 @@ export function CreateIdeaForm() {
   const [images, setImages] = useState<File[]>([])
   const [serverErrors, setServerErrors] = useState<Record<string, string[]>>({})
   const [formError, setFormError] = useState<string | null>(null)
+  const [isRedirecting, setIsRedirecting] = useState(false)
   const mutation = useMutation({ mutationFn: createIdeaAction })
   const steps: Array<{
     id: "core" | "context" | "publishing"
@@ -188,22 +206,22 @@ export function CreateIdeaForm() {
 
   const form = useForm({
     defaultValues: {
-      title: initialDraft?.values?.title ?? "",
-      problemStatement: initialDraft?.values?.problemStatement ?? "",
-      proposedSolution: initialDraft?.values?.proposedSolution ?? "",
-      description: initialDraft?.values?.description ?? "",
-      targetAudience: initialDraft?.values?.targetAudience ?? "",
+      title: initialDraft?.values?.title ?? EMPTY_FORM_VALUES.title,
+      problemStatement: initialDraft?.values?.problemStatement ?? EMPTY_FORM_VALUES.problemStatement,
+      proposedSolution: initialDraft?.values?.proposedSolution ?? EMPTY_FORM_VALUES.proposedSolution,
+      description: initialDraft?.values?.description ?? EMPTY_FORM_VALUES.description,
+      targetAudience: initialDraft?.values?.targetAudience ?? EMPTY_FORM_VALUES.targetAudience,
       implementationStage:
-        initialDraft?.values?.implementationStage ?? ("" as "" | (typeof ideaStageOptions)[number]),
-      estimatedBudgetMin: initialDraft?.values?.estimatedBudgetMin ?? (undefined as number | undefined),
-      estimatedBudgetMax: initialDraft?.values?.estimatedBudgetMax ?? (undefined as number | undefined),
-      timelineWeeks: initialDraft?.values?.timelineWeeks ?? (undefined as number | undefined),
-      locationScope: initialDraft?.values?.locationScope ?? "",
-      expectedImpact: initialDraft?.values?.expectedImpact ?? "",
-      risksAndMitigation: initialDraft?.values?.risksAndMitigation ?? "",
-      externalLinks: initialDraft?.values?.externalLinks ?? "",
-      categoryId: initialDraft?.values?.categoryId ?? "",
-      price: initialDraft?.values?.price ?? (undefined as number | undefined),
+        initialDraft?.values?.implementationStage ?? EMPTY_FORM_VALUES.implementationStage,
+      estimatedBudgetMin: initialDraft?.values?.estimatedBudgetMin ?? EMPTY_FORM_VALUES.estimatedBudgetMin,
+      estimatedBudgetMax: initialDraft?.values?.estimatedBudgetMax ?? EMPTY_FORM_VALUES.estimatedBudgetMax,
+      timelineWeeks: initialDraft?.values?.timelineWeeks ?? EMPTY_FORM_VALUES.timelineWeeks,
+      locationScope: initialDraft?.values?.locationScope ?? EMPTY_FORM_VALUES.locationScope,
+      expectedImpact: initialDraft?.values?.expectedImpact ?? EMPTY_FORM_VALUES.expectedImpact,
+      risksAndMitigation: initialDraft?.values?.risksAndMitigation ?? EMPTY_FORM_VALUES.risksAndMitigation,
+      externalLinks: initialDraft?.values?.externalLinks ?? EMPTY_FORM_VALUES.externalLinks,
+      categoryId: initialDraft?.values?.categoryId ?? EMPTY_FORM_VALUES.categoryId,
+      price: initialDraft?.values?.price ?? EMPTY_FORM_VALUES.price,
     },
     onSubmit: async ({ value }) => {
       const formData = new FormData()
@@ -233,16 +251,27 @@ export function CreateIdeaForm() {
 
       const result = await mutation.mutateAsync(formData)
       if (result.success) {
+        setIsRedirecting(true)
         setServerErrors({})
         setFormError(null)
         toast.success(result.message)
-        form.reset()
+        resetFormState()
         setImages([])
         setIsPaid(false)
+        setCoreSnapshot({
+          title: "",
+          problemStatement: "",
+          proposedSolution: "",
+          description: "",
+          categoryId: "",
+        })
+        setPriceSnapshot(undefined)
         setActiveStep("core")
         window.localStorage.removeItem(IDEA_DRAFT_STORAGE_KEY)
-        router.push("/member/dashboard/my-ideas")
-        router.refresh()
+        router.replace("/member/dashboard/my-ideas")
+        window.setTimeout(() => {
+          window.location.href = "/member/dashboard/my-ideas"
+        }, 350)
       } else {
         const nextErrors = result.errors ?? {}
         const firstErrorKey = Object.keys(nextErrors)[0]
@@ -262,6 +291,7 @@ export function CreateIdeaForm() {
     },
   })
   useEffect(() => {
+    if (isRedirecting) return
     const saveDraft = () => {
       const payload = {
         activeStep,
@@ -273,7 +303,25 @@ export function CreateIdeaForm() {
     saveDraft()
     const interval = window.setInterval(saveDraft, 800)
     return () => window.clearInterval(interval)
-  }, [activeStep, form, isPaid])
+  }, [activeStep, form, isPaid, isRedirecting])
+
+  const resetFormState = () => {
+    form.setFieldValue("title", EMPTY_FORM_VALUES.title)
+    form.setFieldValue("problemStatement", EMPTY_FORM_VALUES.problemStatement)
+    form.setFieldValue("proposedSolution", EMPTY_FORM_VALUES.proposedSolution)
+    form.setFieldValue("description", EMPTY_FORM_VALUES.description)
+    form.setFieldValue("targetAudience", EMPTY_FORM_VALUES.targetAudience)
+    form.setFieldValue("implementationStage", EMPTY_FORM_VALUES.implementationStage)
+    form.setFieldValue("estimatedBudgetMin", EMPTY_FORM_VALUES.estimatedBudgetMin)
+    form.setFieldValue("estimatedBudgetMax", EMPTY_FORM_VALUES.estimatedBudgetMax)
+    form.setFieldValue("timelineWeeks", EMPTY_FORM_VALUES.timelineWeeks)
+    form.setFieldValue("locationScope", EMPTY_FORM_VALUES.locationScope)
+    form.setFieldValue("expectedImpact", EMPTY_FORM_VALUES.expectedImpact)
+    form.setFieldValue("risksAndMitigation", EMPTY_FORM_VALUES.risksAndMitigation)
+    form.setFieldValue("externalLinks", EMPTY_FORM_VALUES.externalLinks)
+    form.setFieldValue("categoryId", EMPTY_FORM_VALUES.categoryId)
+    form.setFieldValue("price", EMPTY_FORM_VALUES.price)
+  }
 
   const stepCompletion = useMemo(() => {
     const coreComplete =
@@ -319,6 +367,14 @@ export function CreateIdeaForm() {
         form.handleSubmit()
       }}
     >
+      {isRedirecting ? (
+        <div className="rounded-md border bg-card p-4">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            Idea created successfully. Redirecting to your ideas...
+          </div>
+        </div>
+      ) : null}
       {formError ? (
         <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
           {formError}
