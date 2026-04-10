@@ -1,3 +1,4 @@
+import { Watchlist } from "../../../generated/prisma/index.js";
 import prisma from "../../lib/prisma.js";
 import QueryBuilder from "../../utils/QueryBuilder.js";
 import { IQueryParams } from "../../interfaces/query.interface.js";
@@ -7,7 +8,7 @@ export const WatchlistService = {
     return prisma.watchlist.create({ data: payload });
   },
   getAll: async (query: IQueryParams) => {
-    const qb = new QueryBuilder(prisma.watchlist, query, {
+    const qb = new QueryBuilder<Watchlist>(prisma.watchlist, query, {
       searchableFields: [],
       filterableFields: ["userId", "ideaId"],
     });
@@ -21,7 +22,7 @@ export const WatchlistService = {
 
     // Enriched with idea data and its nested relations
     const enrichedData = await Promise.all(
-      (data as any[]).map(async (item: any) => {
+      data.map(async (item) => {
         try {
           const idea = await prisma.idea.findUnique({
             where: { id: item.ideaId },
@@ -47,3 +48,4 @@ export const WatchlistService = {
     return prisma.watchlist.delete({ where: { id, userId } });
   },
 };
+

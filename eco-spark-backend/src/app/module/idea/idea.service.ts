@@ -4,7 +4,7 @@ import AppError from "../../errorHelpers/AppError.js";
 import QueryBuilder from "../../utils/QueryBuilder.js";
 import { ideaSearchableFields, ideaFilterableFields } from "./idea.constant.js";
 import { ICreateIdea, IUpdateIdea, IRejectIdea } from "./idea.interface.js";
-import { IdeaStatus, Prisma, Role } from "../../../generated/prisma/index.js";
+import { Idea, IdeaStatus, Prisma, Role } from "../../../generated/prisma/index.js";
 import { canViewFullContent, assertIdeaIsEditable, uploadManyImages } from "./idea.utils.js";
 import { IQueryParams } from "../../interfaces/query.interface.js";
 
@@ -71,7 +71,7 @@ export const IdeaService = {
   },
 
   getAll: async (query: IQueryParams, requestUserId?: string, requestUserRole?: string) => {
-    const qb = new QueryBuilder(
+    const qb = new QueryBuilder<Idea>(
       prisma.idea,
       { ...query, status: IdeaStatus.APPROVED },
       { searchableFields: ideaSearchableFields, filterableFields: ideaFilterableFields }
@@ -79,14 +79,7 @@ export const IdeaService = {
     const { data, meta } = await qb.search().filter().paginate().sort().execute();
     const total = await qb.count();
 
-    const ideas = data as Array<{
-      id: string;
-      isPaid: boolean;
-      authorId: string;
-      status: IdeaStatus;
-      description: string;
-      proposedSolution: string;
-    }>;
+    const ideas = data;
 
     const enriched = await Promise.all(
       ideas.map(async (idea) => {
@@ -113,7 +106,7 @@ export const IdeaService = {
   },
 
   getAllForAdmin: async (query: IQueryParams) => {
-    const qb = new QueryBuilder(prisma.idea, query, {
+    const qb = new QueryBuilder<Idea>(prisma.idea, query, {
       searchableFields: ideaSearchableFields,
       filterableFields: ideaFilterableFields,
     });
@@ -123,7 +116,7 @@ export const IdeaService = {
   },
 
   getMyIdeas: async (authorId: string, query: IQueryParams) => {
-    const qb = new QueryBuilder(
+    const qb = new QueryBuilder<Idea>(
       prisma.idea,
       { ...query, authorId },
       { searchableFields: ideaSearchableFields, filterableFields: ideaFilterableFields }

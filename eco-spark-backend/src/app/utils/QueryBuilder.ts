@@ -1,7 +1,7 @@
 import { IQueryParams } from "../interfaces/query.interface.js";
 
-interface PrismaDelegate {
-  findMany(args?: Record<string, unknown>): Promise<unknown[]>;
+interface PrismaDelegate<T> {
+  findMany(args?: Record<string, unknown>): Promise<T[]>;
   count(args?: Record<string, unknown>): Promise<number>;
 }
 
@@ -10,8 +10,8 @@ interface QueryBuilderOptions {
   filterableFields?: string[];
 }
 
-class QueryBuilder {
-  private readonly model: PrismaDelegate;
+class QueryBuilder<T> {
+  private readonly model: PrismaDelegate<T>;
   private readonly query: IQueryParams;
   private readonly options: QueryBuilderOptions;
 
@@ -22,7 +22,7 @@ class QueryBuilder {
   private includeClause: Record<string, unknown> = {};
 
   constructor(
-    model: PrismaDelegate,
+    model: PrismaDelegate<T>,
     query: IQueryParams,
     options: QueryBuilderOptions = {}
   ) {
@@ -101,7 +101,7 @@ class QueryBuilder {
     return this;
   }
 
-  async execute(): Promise<{ data: unknown[]; meta: { page: number; limit: number } }> {
+  async execute(): Promise<{ data: T[]; meta: { page: number; limit: number } }> {
     const page = Math.max(1, parseInt((this.query.page as string | undefined) ?? "1", 10));
     const limit = Math.min(100, parseInt((this.query.limit as string | undefined) ?? "10", 10));
 
@@ -120,5 +120,6 @@ class QueryBuilder {
     return this.model.count({ where: this.whereClause });
   }
 }
+
 
 export default QueryBuilder;

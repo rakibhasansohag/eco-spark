@@ -4,7 +4,7 @@ import AppError from "../../errorHelpers/AppError.js";
 import QueryBuilder from "../../utils/QueryBuilder.js";
 import { userSearchableFields, userFilterableFields } from "./user.constant.js";
 import { IUpdateUserProfile } from "./user.interface.js";
-import { Role, UserStatus } from "../../../generated/prisma/index.js";
+import { Role, User, UserStatus, Prisma } from "../../../generated/prisma/index.js";
 import { IQueryParams } from "../../interfaces/query.interface.js";
 import { uploadAvatarToCloudinary } from "./user.utils.js";
 
@@ -27,7 +27,7 @@ const publicUserSelect = {
 
 export const UserService = {
   getAll: async (query: IQueryParams) => {
-    const qb = new QueryBuilder(prisma.user, query, {
+    const qb = new QueryBuilder<User>(prisma.user, query, {
       searchableFields: userSearchableFields,
       filterableFields: userFilterableFields,
     });
@@ -72,14 +72,14 @@ export const UserService = {
 
   updateMyProfile: async (userId: string, payload: IUpdateUserProfile, file?: Express.Multer.File) => {
     const avatarUrl = file ? await uploadAvatarToCloudinary(file.buffer) : undefined;
-    const data = {
+    const data: Prisma.UserUpdateInput = {
       ...payload,
       ...(avatarUrl ? { image: avatarUrl } : {}),
     };
     return prisma.user.update({
       where: { id: userId },
-      data: data as any,
-      select: publicUserSelect as any,
+      data,
+      select: publicUserSelect,
     });
   },
 
