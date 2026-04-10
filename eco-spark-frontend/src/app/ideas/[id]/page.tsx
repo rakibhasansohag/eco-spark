@@ -9,6 +9,7 @@ import { BackLink } from "@/components/shared/BackLink"
 import { IdeaVoteSection } from "@/components/modules/Idea/IdeaVoteSection"
 import { IdeaCommentSection } from "@/components/modules/Idea/IdeaCommentSection"
 import { IdeaBuyButton } from "@/components/modules/Idea/IdeaBuyButton"
+import { PaidIdeaGate } from "@/components/modules/Idea/PaidIdeaGate"
 import { WatchlistButton } from "@/components/modules/Idea/WatchlistButton"
 import { ShareIdeaButton } from "@/components/modules/Idea/ShareIdeaButton"
 import { UserReviewsSection } from "@/components/modules/Idea/UserReviewsSection"
@@ -88,11 +89,12 @@ export default async function IdeaDetailsPage({
           </div>
 
           {contentLocked ? (
-            <IdeaBuyButton
+            <PaidIdeaGate
               ideaId={id}
               price={idea.price}
               isLoggedIn={isLoggedIn}
               userRole={userRole}
+              problemStatement={idea.problemStatement}
             />
           ) : (
             <>

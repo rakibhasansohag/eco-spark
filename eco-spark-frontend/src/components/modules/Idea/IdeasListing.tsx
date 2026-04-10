@@ -9,6 +9,7 @@ import { IIdea } from "@/types/idea.types"
 import { IdeaCard } from "@/components/shared/card/IdeaCard"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { SearchBar } from "@/components/shared/form/SearchBar"
+import { IdeaFilters } from "@/components/modules/Idea/IdeaFilters"
 import { Button } from "@/components/ui/button"
 
 export default function IdeasListing({
@@ -19,7 +20,7 @@ export default function IdeasListing({
   const router = useRouter()
   const pathname = usePathname()
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["public-ideas-list", searchParams],
     queryFn: () => getIdeaList(searchParams),
   })
@@ -39,22 +40,35 @@ export default function IdeasListing({
   return (
     <div className="space-y-4">
       {/* Toolbar */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex-1 sm:max-w-sm">
-          <SearchBar searchParams={searchParams} />
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex-1 sm:max-w-sm">
+            <SearchBar searchParams={searchParams} />
+          </div>
+          {data?.meta ? (
+            <p className="shrink-0 text-sm text-muted-foreground">
+              {totalCount} {totalCount === 1 ? "idea" : "ideas"}
+            </p>
+          ) : null}
         </div>
-        {data?.meta ? (
-          <p className="shrink-0 text-sm text-muted-foreground">
-            {totalCount} {totalCount === 1 ? "idea" : "ideas"}
-          </p>
-        ) : null}
+        {/* Filters Row */}
+        <IdeaFilters searchParams={searchParams} />
       </div>
 
       {/* Grid */}
-      {ideas.length === 0 ? (
+      {isLoading ? (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-48 rounded-lg border bg-muted/30 animate-pulse"
+            />
+          ))}
+        </div>
+      ) : ideas.length === 0 ? (
         <EmptyState
           title="No ideas found"
-          description="Try adjusting your search or check back for new community submissions."
+          description="Try adjusting your search or filters to discover more community submissions."
           icon={Lightbulb}
           action={
             <Button asChild variant="outline" size="sm">
