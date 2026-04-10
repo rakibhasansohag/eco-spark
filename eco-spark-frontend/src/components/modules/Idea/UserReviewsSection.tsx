@@ -13,6 +13,7 @@ import { IReview } from "@/types/review.types"
 interface UserReviewsSectionProps {
   ideaId: string
   isLoggedIn: boolean
+  canReview: boolean
 }
 
 // ─── Star Rating Component ──────────────────────────────────────────────────
@@ -131,7 +132,15 @@ export function UserReviewsSection({ ideaId, isLoggedIn }: UserReviewsSectionPro
       </div>
 
       {/* Submit Form */}
-      {isLoggedIn ? (
+      {!canReview ? (
+        <div className="rounded-xl border border-dashed bg-muted/20 p-5 text-center">
+          <p className="text-sm text-muted-foreground">
+            {isLoggedIn 
+              ? "You must unlock this premium idea to share your experience." 
+              : "Log in and unlock this idea to share your experience."}
+          </p>
+        </div>
+      ) : isLoggedIn ? (
         <div className="rounded-xl border bg-card p-5 shadow-sm space-y-5">
           <h3 className="text-sm font-semibold">Share Your Experience</h3>
 

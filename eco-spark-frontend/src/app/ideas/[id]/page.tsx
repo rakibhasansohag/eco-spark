@@ -193,7 +193,7 @@ export default async function IdeaDetailsPage({
         currentUserId={currentUserId}
       />
 
-      <UserReviewsSection ideaId={id} isLoggedIn={isLoggedIn} />
+      <UserReviewsSection ideaId={id} isLoggedIn={isLoggedIn} canReview={!contentLocked} />
     </main>
   )
 }

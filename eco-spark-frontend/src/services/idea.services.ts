@@ -58,3 +58,8 @@ export const rejectIdea = async (
   const res = await httpClient.patch<ApiResponse<IIdea>>(`/ideas/${id}/reject`, data);
   return res.data;
 };
+
+export const autoSeedIdeas = async (): Promise<ApiResponse<IIdea[]>> => {
+  const res = await httpClient.post<ApiResponse<IIdea[]>>("/ideas/auto-seed");
+  return res.data;
+};
