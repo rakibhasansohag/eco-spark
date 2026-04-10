@@ -63,7 +63,7 @@ function StarRating({
 }
 
 // ─── Main Section ───────────────────────────────────────────────────────────
-export function UserReviewsSection({ ideaId, isLoggedIn }: UserReviewsSectionProps) {
+export function UserReviewsSection({ ideaId, isLoggedIn, canReview }: UserReviewsSectionProps) {
   const qc = useQueryClient()
   const [experience, setExperience] = useState("")
   const [rating, setRating] = useState<number>(0)

@@ -292,33 +292,39 @@ Each object must have the following properties:
 - category: string (Must be exactly one of: ${categoryNames})
 Do not wrap the array in markdown code blocks like \`\`\`json, return just the array string.`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${envVars.GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${envVars.GEMINI_API_KEY}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.8 }
-      })
+        generationConfig: { 
+          temperature: 0.8,
+          responseMimeType: "application/json"
+        }
+      }),
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Gemini API Error:", errorText);
-      throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to generate AI ideas.");
+      const err = await response.json();
+      console.error("Gemini API Error:", JSON.stringify(err, null, 2));
+      throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, "AI Seeding failed. Check API key and quota.");
     }
 
-    const data = (await response.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
-    let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!rawText) throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, "Empty response from Gemini.");
+    const jsonResponse = await response.json();
+    let text = jsonResponse.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    // Clean markdown code blocks if gemini returned them anyway
-    rawText = rawText.replace(/^\s*```json\s*/, "").replace(/\s*```\s*$/, "");
+    if (!text) {
+      throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, "AI did not return any ideas.");
+    }
+
+    // Strip markdown code blocks if the AI included them despite instructions
+    text = text.replace(/```json\s?/, "").replace(/```\s?/, "").trim();
 
     let generatedIdeas: IGeneratedIdea[];
     try {
-      generatedIdeas = JSON.parse(rawText) as IGeneratedIdea[];
+      generatedIdeas = JSON.parse(text) as IGeneratedIdea[];
     } catch (err) {
-      console.error("Parse Error:", rawText);
+      console.error("Parse Error:", text);
       throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, "AI output was not valid JSON.");
     }
 

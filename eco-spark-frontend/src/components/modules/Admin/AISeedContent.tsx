@@ -49,7 +49,7 @@ export default function AISeedContent() {
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
                 <Bot className="size-4 text-primary" />
               </div>
-              <h2 className="font-semibold text-base">Gemini 1.5 Flash Engine</h2>
+              <h2 className="font-semibold text-base">Gemini 2.5 Flash Engine</h2>
             </div>
             <p className="text-sm text-muted-foreground max-w-lg">
               Automatically generate 3 unique, high-quality sustainability ideas using Google Gemini AI.
