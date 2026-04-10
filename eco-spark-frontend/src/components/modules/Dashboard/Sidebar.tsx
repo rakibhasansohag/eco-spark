@@ -28,7 +28,7 @@ export async function Sidebar() {
     .catch(() => true)
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r bg-background md:flex">
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r bg-background md:flex">
       <div className="flex h-14 shrink-0 items-center border-b px-4">
         <Link
           href="/"
@@ -38,7 +38,7 @@ export async function Sidebar() {
           <span>EcoSpark Hub</span>
         </Link>
       </div>
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-hidden">
         <SidebarContent role={role} canChangePassword={canChangePassword} />
       </div>
     </aside>
