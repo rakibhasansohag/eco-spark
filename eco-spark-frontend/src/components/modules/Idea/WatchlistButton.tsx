@@ -20,7 +20,7 @@ export function WatchlistButton({ ideaId, isLoggedIn }: WatchlistButtonProps) {
     queryKey: ["watchlist", ideaId],
     queryFn: async () => {
       if (!isLoggedIn) return []
-      const res = await httpClient.get(`/watchlists`, { params: { ideaId } })
+      const res: any = await httpClient.get(`/watchlists`, { params: { ideaId } })
       return res.data?.data || []
     },
     enabled: isLoggedIn,

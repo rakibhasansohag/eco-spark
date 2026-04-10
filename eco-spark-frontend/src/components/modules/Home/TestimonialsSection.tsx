@@ -31,8 +31,8 @@ export function TestimonialsSection() {
       <div className="grid gap-6 md:grid-cols-3 mx-auto">
         {ideas.map((idea: IIdea) => {
           // type override to grab nested details if present in backend query
-          const authorName = (idea as any).author?.name || "Anonymous Catalyst"
-          const categoryName = (idea as any).category?.name || "General"
+          const authorName = idea.author?.name || "Anonymous Catalyst"
+          const categoryName = idea.category?.name || "General"
 
           return (
             <Link 

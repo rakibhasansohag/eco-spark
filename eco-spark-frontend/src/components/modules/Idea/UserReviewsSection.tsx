@@ -59,7 +59,7 @@ export function UserReviewsSection({ ideaId, isLoggedIn }: UserReviewsSectionPro
       setEffectiveness(5)
       qc.invalidateQueries({ queryKey: ["idea-reviews", ideaId] })
     },
-    onError: (err: any) => {
+    onError: (err: Error & { response?: { data?: { message?: string } } }) => {
       toast.error(err.response?.data?.message || "Failed to submit review")
     },
   })

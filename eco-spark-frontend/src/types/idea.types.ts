@@ -22,6 +22,8 @@ export interface IIdea {
   rejectionFeedback: string | null;
   authorId: string;
   categoryId: string;
+  author?: { id: string; name: string; avatar?: string };
+  category?: { id: string; name: string };
   createdAt: string;
   updatedAt: string;
 }
