@@ -21,6 +21,11 @@ export const IdeaController = {
     sendResponse(res, { httpStatusCode: StatusCodes.OK, success: true, message: "All ideas fetched successfully", data: result.data, meta: result.meta });
   }),
 
+  autoSeed: catchAsync(async (req: Request, res: Response) => {
+    const result = await IdeaService.autoSeed(req.user!.userId);
+    sendResponse(res, { httpStatusCode: StatusCodes.CREATED, success: true, message: "AI ideas seeded successfully", data: result });
+  }),
+
   getMyIdeas: catchAsync(async (req: Request, res: Response) => {
     const result = await IdeaService.getMyIdeas(req.user!.userId, req.query as Record<string, string>);
     sendResponse(res, { httpStatusCode: StatusCodes.OK, success: true, message: "Your ideas fetched successfully", data: result.data, meta: result.meta });

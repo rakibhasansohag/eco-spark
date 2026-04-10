@@ -15,6 +15,14 @@ const ideaInclude = {
   _count: { select: { votes: true, comments: true } },
 } as const;
 
+interface IGeneratedIdea {
+  title: string;
+  problemStatement: string;
+  proposedSolution: string;
+  description: string;
+  category: string;
+}
+
 export const IdeaService = {
   create: async (
     authorId: string,
@@ -263,5 +271,75 @@ export const IdeaService = {
       where: { id },
       data: { status: IdeaStatus.REJECTED, rejectionFeedback: payload.rejectionFeedback },
     });
+  },
+
+  autoSeed: async (adminUserId: string) => {
+    const { envVars } = await import("../../config/env.js");
+    if (!envVars.GEMINI_API_KEY) {
+      throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, "GEMINI_API_KEY is not configured.");
+    }
+
+    const categories = await prisma.category.findMany();
+    if (categories.length === 0) throw new AppError(StatusCodes.BAD_REQUEST, "No categories exist.");
+    const categoryNames = categories.map(c => c.name).join(", ");
+
+    const prompt = `Generate exactly 3 unique, high-quality, practical sustainability project ideas. Return strictly valid JSON array of objects.
+Each object must have the following properties:
+- title: string
+- problemStatement: string (1-2 sentences)
+- proposedSolution: string (2-3 sentences)
+- description: string (Markdown formatted with bullet points)
+- category: string (Must be exactly one of: ${categoryNames})
+Do not wrap the array in markdown code blocks like \`\`\`json, return just the array string.`;
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${envVars.GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.8 }
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Gemini API Error:", errorText);
+      throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to generate AI ideas.");
+    }
+
+    const data = (await response.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+    let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!rawText) throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, "Empty response from Gemini.");
+
+    // Clean markdown code blocks if gemini returned them anyway
+    rawText = rawText.replace(/^\s*```json\s*/, "").replace(/\s*```\s*$/, "");
+
+    let generatedIdeas: IGeneratedIdea[];
+    try {
+      generatedIdeas = JSON.parse(rawText) as IGeneratedIdea[];
+    } catch (err) {
+      console.error("Parse Error:", rawText);
+      throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, "AI output was not valid JSON.");
+    }
+
+    const createdIdeas = [];
+    for (const idea of generatedIdeas) {
+      const cat = categories.find(c => c.name.toLowerCase() === idea.category.toLowerCase()) || categories[0];
+      const newIdea = await prisma.idea.create({
+        data: {
+          title: idea.title,
+          problemStatement: idea.problemStatement,
+          proposedSolution: idea.proposedSolution,
+          description: idea.description,
+          authorId: adminUserId,
+          categoryId: cat.id,
+          status: IdeaStatus.APPROVED,
+          isPaid: false
+        }
+      });
+      createdIdeas.push(newIdea);
+    }
+
+    return createdIdeas;
   },
 };

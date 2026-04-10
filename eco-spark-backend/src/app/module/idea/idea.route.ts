@@ -11,6 +11,7 @@ const router = Router();
 // Specific string paths MUST come before parameterized paths
 router.get("/my-ideas", checkAuth(Role.MEMBER), IdeaController.getMyIdeas);
 router.get("/admin-all", checkAuth(Role.ADMIN), IdeaController.getAllForAdmin);
+router.post("/auto-seed", checkAuth(Role.ADMIN), IdeaController.autoSeed);
 
 // Public routes
 router.get("/", IdeaController.getAll);

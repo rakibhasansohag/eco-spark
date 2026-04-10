@@ -22,6 +22,7 @@ export const envVars = {
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
 
+
   FRONTEND_URL: process.env.FRONTEND_URL ?? "http://localhost:3000",
 
   CLOUDINARY_CLOUD_NAME: require("CLOUDINARY_CLOUD_NAME"),
@@ -30,4 +31,6 @@ export const envVars = {
 
   STRIPE_SECRET_KEY: require("STRIPE_SECRET_KEY"),
   STRIPE_WEBHOOK_SECRET: require("STRIPE_WEBHOOK_SECRET"),
+
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY,
 } as const;

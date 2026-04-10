@@ -1,11 +1,10 @@
 "use client"
 
-import { useState } from "react"
 import { Bookmark, BookmarkCheck } from "lucide-react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import httpClient from "@/lib/axios/httpClient"
+import { getWatchlist, toggleWatchlistAction } from "@/services/watchlist.services"
 
 interface WatchlistButtonProps {
   ideaId: string
@@ -15,13 +14,12 @@ interface WatchlistButtonProps {
 export function WatchlistButton({ ideaId, isLoggedIn }: WatchlistButtonProps) {
   const qc = useQueryClient()
 
-  // We could implement getWatchlist endpoint in frontend services, but let's just make direct API call here
   const { data: watchlists } = useQuery({
     queryKey: ["watchlist", ideaId],
     queryFn: async () => {
       if (!isLoggedIn) return []
-      const res: any = await httpClient.get(`/watchlists`, { params: { ideaId } })
-      return res.data?.data || []
+      const res = await getWatchlist(ideaId)
+      return res.data
     },
     enabled: isLoggedIn,
   })
@@ -31,18 +29,16 @@ export function WatchlistButton({ ideaId, isLoggedIn }: WatchlistButtonProps) {
 
   const toggleMutation = useMutation({
     mutationFn: async () => {
-      if (isWatchlisted) {
-        return httpClient.delete(`/watchlists/${userWatchlistRecord.id}`)
-      } else {
-        return httpClient.post("/watchlists", { ideaId })
-      }
+      const res = await toggleWatchlistAction(ideaId, isWatchlisted, userWatchlistRecord?.id)
+      if (!res.success) throw new Error(res.message)
+      return res
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["watchlist", ideaId] })
       toast.success(isWatchlisted ? "Removed from Watchlist" : "Added to Watchlist")
     },
-    onError: () => {
-      toast.error("Failed to update watchlist")
+    onError: (err: Error) => {
+      toast.error(err.message || "Failed to update watchlist")
     }
   })
 

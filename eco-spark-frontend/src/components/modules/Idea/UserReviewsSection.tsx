@@ -7,7 +7,7 @@ import { Star, TrendingUp, UserRound } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { formatDate } from "@/lib/formatUtils"
-import httpClient from "@/lib/axios/httpClient"
+import { getReviews, createReviewAction } from "@/services/review.services"
 
 interface UserReviewsSectionProps {
   ideaId: string
@@ -21,7 +21,6 @@ interface IReview {
   experience: string
   userId: string
   createdAt: string
-  // User expand details might not be populated securely by default generic `genReview.js`, but we'll adapt.
   user?: { name?: string, image?: string }
 }
 
@@ -34,9 +33,8 @@ export function UserReviewsSection({ ideaId, isLoggedIn }: UserReviewsSectionPro
   const { data } = useQuery({
     queryKey: ["idea-reviews", ideaId],
     queryFn: async () => {
-      // Direct call since we don't have review.services.ts generated 
-      const res: any = await httpClient.get(`/reviews?ideaId=${ideaId}`)
-      return res.data?.data || []
+      const res = await getReviews(ideaId)
+      return res.data
     },
   })
 
@@ -50,7 +48,9 @@ export function UserReviewsSection({ ideaId, isLoggedIn }: UserReviewsSectionPro
         rating,
         effectiveness,
       }
-      return httpClient.post("/reviews", payload)
+      const res = await createReviewAction(payload)
+      if (!res.success) throw new Error(res.message)
+      return res
     },
     onSuccess: () => {
       toast.success("Review submitted successfully!")
@@ -59,8 +59,8 @@ export function UserReviewsSection({ ideaId, isLoggedIn }: UserReviewsSectionPro
       setEffectiveness(5)
       qc.invalidateQueries({ queryKey: ["idea-reviews", ideaId] })
     },
-    onError: (err: Error & { response?: { data?: { message?: string } } }) => {
-      toast.error(err.response?.data?.message || "Failed to submit review")
+    onError: (err: Error) => {
+      toast.error(err.message || "Failed to submit review")
     },
   })
 

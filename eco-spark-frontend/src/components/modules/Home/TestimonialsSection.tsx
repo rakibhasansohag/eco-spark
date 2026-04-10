@@ -51,7 +51,7 @@ export function TestimonialsSection() {
               </div>
               <h3 className="mb-3 text-lg font-bold leading-tight">{idea.title}</h3>
               <p className="line-clamp-4 text-sm text-muted-foreground flex-1 italic relative z-10">
-                "{idea.problemStatement}"
+                &quot;{idea.problemStatement}&quot;
               </p>
               
               <div className="mt-6 flex flex-col pt-4">

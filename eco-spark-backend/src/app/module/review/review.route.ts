@@ -3,7 +3,7 @@ import checkAuth from "../../middleware/checkAuth.js";
 import validateRequest from "../../middleware/validateRequest.js";
 import { ReviewController } from "./review.controller.js";
 import { createReviewZodSchema } from "./review.validation.js";
-import { Role } from "../../../generated/prisma/enums.js";
+import { Role } from "../../../generated/prisma/index.js";
 
 const router = Router();
 router.get("/", ReviewController.getAll); // Public can see reviews

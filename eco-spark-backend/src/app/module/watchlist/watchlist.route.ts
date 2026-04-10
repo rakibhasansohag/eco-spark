@@ -3,7 +3,7 @@ import checkAuth from "../../middleware/checkAuth.js";
 import validateRequest from "../../middleware/validateRequest.js";
 import { WatchlistController } from "./watchlist.controller.js";
 import { createWatchlistZodSchema } from "./watchlist.validation.js";
-import { Role } from "../../../generated/prisma/enums.js";
+import { Role } from "../../../generated/prisma/index.js";
 
 const router = Router();
 router.get("/", checkAuth(Role.MEMBER, Role.ADMIN), WatchlistController.getAll);
