@@ -35,6 +35,7 @@ export function WatchlistButton({ ideaId, isLoggedIn }: WatchlistButtonProps) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["watchlist", ideaId] })
+      qc.invalidateQueries({ queryKey: ["my-watchlist-all"] })
       toast.success(isWatchlisted ? "Removed from Watchlist" : "Added to Watchlist")
     },
     onError: (err: Error) => {
