@@ -9,6 +9,7 @@ import { BackLink } from "@/components/shared/BackLink"
 import { IdeaVoteSection } from "@/components/modules/Idea/IdeaVoteSection"
 import { IdeaCommentSection } from "@/components/modules/Idea/IdeaCommentSection"
 import { IdeaBuyButton } from "@/components/modules/Idea/IdeaBuyButton"
+import { WatchlistButton } from "@/components/modules/Idea/WatchlistButton"
 import { ShareIdeaButton } from "@/components/modules/Idea/ShareIdeaButton"
 import { humanizeStatus, formatDate } from "@/lib/formatUtils"
 
@@ -66,7 +67,10 @@ export default async function IdeaDetailsPage({
 
         <div className="flex items-start justify-between gap-4 mt-3">
           <h1 className="text-2xl font-bold tracking-tight">{idea.title}</h1>
-          <ShareIdeaButton ideaId={idea.id} title={idea.title} />
+          <div className="flex items-center gap-2">
+            <WatchlistButton ideaId={idea.id} isLoggedIn={isLoggedIn} />
+            <ShareIdeaButton ideaId={idea.id} title={idea.title} />
+          </div>
         </div>
 
         {idea.rejectionFeedback ? (

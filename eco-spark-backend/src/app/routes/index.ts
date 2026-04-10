@@ -12,6 +12,9 @@ import { DashboardRoutes } from "../module/dashboard/dashboard.route.js";
 
 const router = Router();
 
+import { WatchlistRoutes } from "../module/watchlist/watchlist.route.js";
+import { ReviewRoutes } from "../module/review/review.route.js";
+
 router.use("/auth", AuthRoutes);
 router.use("/users", UserRoutes);
 router.use("/categories", CategoryRoutes);
@@ -22,5 +25,7 @@ router.use("/payments", PaymentRoutes);
 router.use("/idea-accesses", IdeaAccessRoutes);
 router.use("/newsletter-subscriptions", NewsletterSubscriptionRoutes);
 router.use("/dashboard", DashboardRoutes);
+router.use("/watchlists", WatchlistRoutes);
+router.use("/reviews", ReviewRoutes);
 
 export default router;
