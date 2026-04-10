@@ -11,6 +11,7 @@ import { IdeaCommentSection } from "@/components/modules/Idea/IdeaCommentSection
 import { IdeaBuyButton } from "@/components/modules/Idea/IdeaBuyButton"
 import { WatchlistButton } from "@/components/modules/Idea/WatchlistButton"
 import { ShareIdeaButton } from "@/components/modules/Idea/ShareIdeaButton"
+import { UserReviewsSection } from "@/components/modules/Idea/UserReviewsSection"
 import { humanizeStatus, formatDate } from "@/lib/formatUtils"
 
 const formatStage = (value?: string | null) =>
@@ -189,6 +190,8 @@ export default async function IdeaDetailsPage({
         isLoggedIn={isLoggedIn}
         currentUserId={currentUserId}
       />
+
+      <UserReviewsSection ideaId={id} isLoggedIn={isLoggedIn} />
     </main>
   )
 }
