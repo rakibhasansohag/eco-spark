@@ -13,6 +13,8 @@ export default async function MyProfilePage() {
   const providerLabels = (user.connectedProviders ?? []).map((provider) =>
     provider === "credential" ? "Email & Password" : provider.charAt(0).toUpperCase() + provider.slice(1),
   )
+  const interactiveCardClass =
+    "rounded-xl border bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[0_14px_32px_-22px_rgba(15,23,42,0.5)]"
 
   return (
     <section className="space-y-6">
@@ -25,23 +27,23 @@ export default async function MyProfilePage() {
           submissions quickly.
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-lg border bg-background p-3">
+          <div className="rounded-lg border bg-background p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40">
             <p className="text-xs text-muted-foreground">Profile Completion</p>
             <p className="mt-1 text-xl font-semibold">{completion}%</p>
           </div>
-          <div className="rounded-lg border bg-background p-3">
+          <div className="rounded-lg border bg-background p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40">
             <p className="text-xs text-muted-foreground">Connected Methods</p>
             <p className="mt-1 text-xl font-semibold">{providerLabels.length || 1}</p>
           </div>
-          <div className="rounded-lg border bg-background p-3">
+          <div className="rounded-lg border bg-background p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40">
             <p className="text-xs text-muted-foreground">Member Since</p>
             <p className="mt-1 text-xl font-semibold">{formatDate(user.createdAt)}</p>
           </div>
         </div>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-12">
-        <div className="rounded-xl border bg-card p-6 xl:col-span-8">
+      <div className="grid gap-5 xl:grid-cols-12 2xl:gap-6">
+        <div className="rounded-xl border bg-card p-6 transition-all duration-200 hover:border-primary/35 xl:col-span-8">
           <MyProfileForm
             initialName={user.name}
             initialEmail={user.email}
@@ -55,8 +57,8 @@ export default async function MyProfilePage() {
           />
         </div>
 
-        <aside className="space-y-3 xl:col-span-4">
-          <div className="rounded-xl border bg-card p-4">
+        <aside className="space-y-3 self-start xl:sticky xl:top-24 xl:col-span-4">
+          <div className={interactiveCardClass}>
             <div className="flex items-center gap-2 text-sm font-semibold">
               <Mail className="h-4 w-4 text-primary" />
               Connected Email
@@ -65,7 +67,7 @@ export default async function MyProfilePage() {
             <p className="mt-1 text-xs text-muted-foreground">Joined {formatDate(user.createdAt)}</p>
           </div>
 
-          <div className="rounded-xl border bg-card p-4">
+          <div className={interactiveCardClass}>
             <div className="flex items-center gap-2 text-sm font-semibold">
               <ShieldCheck className="h-4 w-4 text-primary" />
               Connected Sign-In Methods
@@ -83,7 +85,7 @@ export default async function MyProfilePage() {
             </div>
           </div>
 
-          <div className="rounded-xl border bg-card p-4">
+          <div className={interactiveCardClass}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm font-semibold">
                 <BadgeCheck className="h-4 w-4 text-primary" />
@@ -108,7 +110,7 @@ export default async function MyProfilePage() {
             </ul>
           </div>
 
-          <div className="rounded-xl border bg-card p-4">
+          <div className={interactiveCardClass}>
             <div className="flex items-center gap-2 text-sm font-semibold">
               <Sparkles className="h-4 w-4 text-primary" />
               Profile Snapshot
@@ -138,7 +140,7 @@ export default async function MyProfilePage() {
             </div>
           </div>
 
-          <div className="rounded-xl border bg-card p-4">
+          <div className={interactiveCardClass}>
             <div className="flex items-center gap-2 text-sm font-semibold">
               <MapPin className="h-4 w-4 text-primary" />
               Growth Tips
