@@ -6,6 +6,7 @@ import { IIdea } from "@/types/idea.types"
 import { Quote } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { BeamHoverCard } from "@/components/shared/interactive/BeamHoverCard"
 
 export function TestimonialsSection() {
   const params = { limit: "3", sortBy: "createdAt", sortOrder: "asc" }
@@ -35,30 +36,35 @@ export function TestimonialsSection() {
           const categoryName = idea.category?.name || "General"
 
           return (
-            <Link 
+            <BeamHoverCard 
               key={idea.id} 
-              href={`/ideas/${idea.id}`}
               className={cn(
-                "relative flex flex-col rounded-2xl border bg-card p-6 shadow-sm",
+                "h-full flex flex-col rounded-2xl border bg-card shadow-sm",
                 "transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md"
               )}
+              style={{ height: '100%' }}
             >
-              <Quote className="absolute right-6 top-6 size-12 text-primary/10" />
-              <div className="mb-4">
-                <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wider">
-                  {categoryName}
-                </span>
-              </div>
-              <h3 className="mb-3 text-lg font-bold leading-tight">{idea.title}</h3>
-              <p className="line-clamp-4 text-sm text-muted-foreground flex-1 italic relative z-10">
-                &quot;{idea.problemStatement}&quot;
-              </p>
-              
-              <div className="mt-6 flex flex-col pt-4">
-                <p className="text-sm font-semibold text-foreground/90">{authorName}</p>
-                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-widest mt-0.5">Top Contributor</p>
-              </div>
-            </Link>
+              <Link 
+                href={`/ideas/${idea.id}`}
+                className="relative flex h-full flex-col p-6"
+              >
+                <Quote className="absolute right-6 top-6 size-12 text-primary/10" />
+                <div className="mb-4 relative z-10">
+                  <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wider">
+                    {categoryName}
+                  </span>
+                </div>
+                <h3 className="mb-3 text-lg font-bold leading-tight relative z-10">{idea.title}</h3>
+                <p className="line-clamp-4 text-sm text-muted-foreground flex-1 italic relative z-10">
+                  &quot;{idea.problemStatement}&quot;
+                </p>
+                
+                <div className="mt-6 flex flex-col pt-4 relative z-10">
+                  <p className="text-sm font-semibold text-foreground/90">{authorName}</p>
+                  <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-widest mt-0.5">Top Contributor</p>
+                </div>
+              </Link>
+            </BeamHoverCard>
           )
         })}
       </div>
