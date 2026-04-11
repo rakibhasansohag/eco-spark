@@ -14,6 +14,7 @@ interface UserReviewsSectionProps {
   ideaId: string
   isLoggedIn: boolean
   canReview: boolean
+  userRole?: string
 }
 
 // ─── Star Rating Component ──────────────────────────────────────────────────
@@ -63,11 +64,12 @@ function StarRating({
 }
 
 // ─── Main Section ───────────────────────────────────────────────────────────
-export function UserReviewsSection({ ideaId, isLoggedIn, canReview }: UserReviewsSectionProps) {
+export function UserReviewsSection({ ideaId, isLoggedIn, canReview, userRole }: UserReviewsSectionProps) {
   const qc = useQueryClient()
   const [experience, setExperience] = useState("")
   const [rating, setRating] = useState<number>(0)
   const [effectiveness, setEffectiveness] = useState<number>(0)
+  const isAdmin = userRole === "ADMIN"
 
   const { data } = useQuery({
     queryKey: ["idea-reviews", ideaId],
@@ -81,6 +83,7 @@ export function UserReviewsSection({ ideaId, isLoggedIn, canReview }: UserReview
 
   const addMutation = useMutation({
     mutationFn: async () => {
+      if (isAdmin) return
       if (rating === 0) throw new Error("Please select an overall rating")
       if (effectiveness === 0) throw new Error("Please select an effectiveness rating")
       if (experience.trim().length === 0) throw new Error("Please write your experience")
@@ -138,6 +141,12 @@ export function UserReviewsSection({ ideaId, isLoggedIn, canReview }: UserReview
             {isLoggedIn 
               ? "You must unlock this premium idea to share your experience." 
               : "Log in and unlock this idea to share your experience."}
+          </p>
+        </div>
+      ) : isAdmin ? (
+        <div className="rounded-xl border border-dashed bg-muted/30 px-5 py-6 text-center">
+          <p className="text-sm text-muted-foreground italic font-medium">
+            Administrative accounts are for moderation and cannot post community reviews.
           </p>
         </div>
       ) : isLoggedIn ? (

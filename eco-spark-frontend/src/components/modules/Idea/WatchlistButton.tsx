@@ -9,19 +9,21 @@ import { getWatchlist, toggleWatchlistAction } from "@/services/watchlist.servic
 interface WatchlistButtonProps {
   ideaId: string
   isLoggedIn: boolean
+  userRole?: string
 }
 
-export function WatchlistButton({ ideaId, isLoggedIn }: WatchlistButtonProps) {
+export function WatchlistButton({ ideaId, isLoggedIn, userRole }: WatchlistButtonProps) {
   const qc = useQueryClient()
+  const isAdmin = userRole === "ADMIN"
 
   const { data: watchlists } = useQuery({
     queryKey: ["watchlist", ideaId],
     queryFn: async () => {
-      if (!isLoggedIn) return []
+      if (!isLoggedIn || isAdmin) return []
       const res = await getWatchlist(ideaId)
       return res.data
     },
-    enabled: isLoggedIn,
+    enabled: isLoggedIn && !isAdmin,
   })
 
   const userWatchlistRecord = watchlists && watchlists.length > 0 ? watchlists[0] : null
@@ -29,6 +31,7 @@ export function WatchlistButton({ ideaId, isLoggedIn }: WatchlistButtonProps) {
 
   const toggleMutation = useMutation({
     mutationFn: async () => {
+      if (isAdmin) return
       const res = await toggleWatchlistAction(ideaId, isWatchlisted, userWatchlistRecord?.id)
       if (!res.success) throw new Error(res.message)
       return res
@@ -53,9 +56,14 @@ export function WatchlistButton({ ideaId, isLoggedIn }: WatchlistButtonProps) {
           toast.error("Please log in to save ideas.")
           return
         }
+        if (isAdmin) {
+          toast.error("Admins cannot save ideas to watchlist.")
+          return
+        }
         toggleMutation.mutate()
       }}
-      disabled={toggleMutation.isPending}
+      disabled={toggleMutation.isPending || isAdmin}
+      title={isAdmin ? "Admins cannot save ideas" : ""}
     >
       {isWatchlisted ? <BookmarkCheck className="size-3.5 text-primary" /> : <Bookmark className="size-3.5" />}
       <span>{isWatchlisted ? "Saved" : "Save"}</span>

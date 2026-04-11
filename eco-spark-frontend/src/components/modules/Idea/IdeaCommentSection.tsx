@@ -17,6 +17,7 @@ interface IdeaCommentSectionProps {
   initialComments: IComment[]
   isLoggedIn: boolean
   currentUserId?: string
+  userRole?: string
 }
 
 function CommentItem({
@@ -53,7 +54,7 @@ function CommentItem({
                 </Button>
               }
               title="Delete Comment"
-              description="This will permanently delete your comment."
+              description="This will permanently delete this comment."
               confirmLabel="Delete"
               onConfirm={handleDelete}
             />
@@ -70,10 +71,12 @@ export function IdeaCommentSection({
   initialComments,
   isLoggedIn,
   currentUserId,
+  userRole,
 }: IdeaCommentSectionProps) {
   const [comments, setComments] = useState<IComment[]>(initialComments)
   const [content, setContent] = useState("")
   const qc = useQueryClient()
+  const isAdmin = userRole === "ADMIN"
 
   const addMutation = useMutation({
     mutationFn: () => createComment({ content, ideaId }),
@@ -100,7 +103,20 @@ export function IdeaCommentSection({
         </h2>
       </div>
 
-      {isLoggedIn ? (
+      {!isLoggedIn ? (
+        <p className="text-sm text-muted-foreground">
+          <a href="/login" className="font-medium text-primary hover:underline">
+            Log in
+          </a>{" "}
+          to leave a comment.
+        </p>
+      ) : isAdmin ? (
+        <div className="rounded-xl border border-dashed bg-muted/30 px-5 py-4 text-center">
+          <p className="text-sm text-muted-foreground italic font-medium">
+            Administrative accounts are restricted from community discussions.
+          </p>
+        </div>
+      ) : (
         <div className="flex gap-3">
           <Textarea
             placeholder="Share your thoughts…"
@@ -119,13 +135,6 @@ export function IdeaCommentSection({
             <Send className="size-4" />
           </Button>
         </div>
-      ) : (
-        <p className="text-sm text-muted-foreground">
-          <a href="/login" className="font-medium text-primary hover:underline">
-            Log in
-          </a>{" "}
-          to leave a comment.
-        </p>
       )}
 
       {comments.length > 0 ? (
@@ -134,7 +143,7 @@ export function IdeaCommentSection({
             <CommentItem
               key={comment.id}
               comment={comment}
-              canDelete={isLoggedIn && comment.authorId === currentUserId}
+              canDelete={isAdmin || (isLoggedIn && comment.authorId === currentUserId)}
               onDeleted={handleDelete}
             />
           ))}

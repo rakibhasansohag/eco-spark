@@ -13,9 +13,16 @@ interface IdeaVoteSectionProps {
   ideaId: string
   initialVotes: IVoteCounts | null
   isLoggedIn: boolean
+  userRole?: string
 }
 
-export function IdeaVoteSection({ ideaId, initialVotes, isLoggedIn }: IdeaVoteSectionProps) {
+export function IdeaVoteSection({
+  ideaId,
+  initialVotes,
+  isLoggedIn,
+  userRole,
+}: IdeaVoteSectionProps) {
+  const isAdmin = userRole === "ADMIN"
   const [votes, setVotes] = useState<IVoteCounts>(
     initialVotes ?? { upvotes: 0, downvotes: 0, userVote: null },
   )
@@ -64,6 +71,10 @@ export function IdeaVoteSection({ ideaId, initialVotes, isLoggedIn }: IdeaVoteSe
       toast.error("Please log in to vote")
       return
     }
+    if (isAdmin) {
+      toast.error("Admins cannot vote on ideas.")
+      return
+    }
     if (votes.userVote === type) {
       removeMutation.mutate()
     } else {
@@ -85,7 +96,8 @@ export function IdeaVoteSection({ ideaId, initialVotes, isLoggedIn }: IdeaVoteSe
             votes.userVote === "UPVOTE" && "border-primary bg-primary/10 text-primary",
           )}
           onClick={() => handleVote("UPVOTE")}
-          disabled={isPending}
+          disabled={isPending || isAdmin}
+          title={isAdmin ? "Admins cannot vote on ideas" : ""}
         >
           <ThumbsUp className="size-3.5" />
           <span>{votes.upvotes}</span>
@@ -99,7 +111,8 @@ export function IdeaVoteSection({ ideaId, initialVotes, isLoggedIn }: IdeaVoteSe
               "border-destructive bg-destructive/10 text-destructive",
           )}
           onClick={() => handleVote("DOWNVOTE")}
-          disabled={isPending}
+          disabled={isPending || isAdmin}
+          title={isAdmin ? "Admins cannot vote on ideas" : ""}
         >
           <ThumbsDown className="size-3.5" />
           <span>{votes.downvotes}</span>
@@ -107,6 +120,10 @@ export function IdeaVoteSection({ ideaId, initialVotes, isLoggedIn }: IdeaVoteSe
       </div>
       {!isLoggedIn ? (
         <span className="ml-auto text-xs text-muted-foreground">Log in to vote</span>
+      ) : isAdmin ? (
+        <span className="ml-auto text-xs text-muted-foreground text-amber-600 font-medium">
+          Admins can only see and moderate
+        </span>
       ) : null}
     </div>
   )

@@ -71,7 +71,7 @@ export default async function IdeaDetailsPage({
         <div className="flex items-start justify-between gap-4 mt-3">
           <h1 className="text-2xl font-bold tracking-tight">{idea.title}</h1>
           <div className="flex items-center gap-2">
-            <WatchlistButton ideaId={idea.id} isLoggedIn={isLoggedIn} />
+            <WatchlistButton ideaId={idea.id} isLoggedIn={isLoggedIn} userRole={userRole} />
             <ShareIdeaButton ideaId={idea.id} title={idea.title} />
           </div>
         </div>
@@ -185,16 +185,27 @@ export default async function IdeaDetailsPage({
         </div>
       </article>
 
-      <IdeaVoteSection ideaId={id} initialVotes={voteData} isLoggedIn={isLoggedIn} />
+      <IdeaVoteSection
+        ideaId={id}
+        initialVotes={voteData}
+        isLoggedIn={isLoggedIn}
+        userRole={userRole}
+      />
 
       <IdeaCommentSection
         ideaId={id}
         initialComments={initialComments}
         isLoggedIn={isLoggedIn}
         currentUserId={currentUserId}
+        userRole={userRole}
       />
 
-      <UserReviewsSection ideaId={id} isLoggedIn={isLoggedIn} canReview={!contentLocked} />
+      <UserReviewsSection
+        ideaId={id}
+        isLoggedIn={isLoggedIn}
+        canReview={!contentLocked}
+        userRole={userRole}
+      />
 
       <SimilarIdeasSection ideaId={id} />
     </main>
