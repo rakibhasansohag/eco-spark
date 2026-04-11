@@ -64,6 +64,40 @@ export const IdeaController = {
 		});
 	}),
 
+	triggerAutomation: catchAsync(async (req: Request, res: Response) => {
+		const { envVars } = await import("../../config/env.js");
+		const token = req.headers["x-automation-key"];
+		
+		if (!envVars.AUTOMATION_SECRET || token !== envVars.AUTOMATION_SECRET) {
+			sendResponse(res, {
+				httpStatusCode: StatusCodes.UNAUTHORIZED,
+				success: false,
+				message: 'Invalid automation key',
+			});
+			return;
+		}
+
+		const prisma = (await import("../../lib/prisma.js")).default;
+		const admin = await prisma.user.findFirst({ where: { role: "ADMIN" } });
+		
+		if (!admin) {
+			sendResponse(res, {
+				httpStatusCode: StatusCodes.NOT_FOUND,
+				success: false,
+				message: 'No admin user found for attribution',
+			});
+			return;
+		}
+
+		const result = await IdeaService.autoSeed(admin.id);
+		sendResponse(res, {
+			httpStatusCode: StatusCodes.CREATED,
+			success: true,
+			message: `Triggered: ${result.length} AI ideas seeded successfully`,
+			data: result,
+		});
+	}),
+
 	getMyIdeas: catchAsync(async (req: Request, res: Response) => {
 		const result = await IdeaService.getMyIdeas(
 			req.user!.userId,

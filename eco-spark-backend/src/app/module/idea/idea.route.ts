@@ -12,6 +12,7 @@ const router = Router();
 router.get("/my-ideas", checkAuth(Role.MEMBER), IdeaController.getMyIdeas);
 router.get("/admin-all", checkAuth(Role.ADMIN), IdeaController.getAllForAdmin);
 router.post("/auto-seed", checkAuth(Role.ADMIN), IdeaController.autoSeed);
+router.post("/trigger-automation", IdeaController.triggerAutomation);
 
 // Public routes
 router.get("/", IdeaController.getAll);

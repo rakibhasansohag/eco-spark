@@ -33,4 +33,5 @@ export const envVars = {
   STRIPE_WEBHOOK_SECRET: require("STRIPE_WEBHOOK_SECRET"),
 
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+  AUTOMATION_SECRET: process.env.AUTOMATION_SECRET,
 } as const;
