@@ -260,11 +260,26 @@ export default function MyIdeasManagement({
             ))}
           </SelectContent>
         </Select>
-        <Input
-          placeholder="Filter by location"
-          value={locationInput}
-          onChange={(e) => setLocationInput(e.target.value)}
-        />
+        <div className="relative">
+          <Input
+            placeholder="Filter by location"
+            value={locationInput}
+            onChange={(e) => setLocationInput(e.target.value)}
+            className="pr-9"
+          />
+          {locationInput ? (
+            <button
+              type="button"
+              onClick={() => {
+                setLocationInput("")
+                setFilter("locationScope", "")
+              }}
+              className="absolute top-1/2 right-3 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <X className="size-3.5" />
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2">

@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useRef } from "react"
+import { useCallback, useRef, useState, useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
 
 interface UseServerManagedDataTableSearchArgs {
@@ -12,15 +12,22 @@ export function useServerManagedDataTableSearch({
 }: UseServerManagedDataTableSearchArgs) {
   const router = useRouter()
   const pathname = usePathname()
-  const debounceRef = useRef<number | null>(null)
+  const debounceRef = useRef<NodeJS.Timeout | null>(null)
+  
+  const [localSearchTerm, setLocalSearchTerm] = useState(searchParams.searchTerm ?? "")
 
-  const setSearchTerm = useCallback(
+  // Sync with URL when it changes
+  useEffect(() => {
+    setLocalSearchTerm(searchParams.searchTerm ?? "")
+  }, [searchParams.searchTerm])
+
+  const triggerSearch = useCallback(
     (value: string) => {
       if (debounceRef.current) {
-        window.clearTimeout(debounceRef.current)
+        clearTimeout(debounceRef.current)
       }
 
-      debounceRef.current = window.setTimeout(() => {
+      debounceRef.current = setTimeout(() => {
         const next = new URLSearchParams(searchParams)
         if (value.trim()) {
           next.set("searchTerm", value.trim())
@@ -29,14 +36,24 @@ export function useServerManagedDataTableSearch({
         }
         next.set("page", "1")
         router.replace(`${pathname}?${next.toString()}`)
-        router.refresh()
-      }, 300)
+      }, 500)
     },
     [pathname, router, searchParams]
   )
 
+  const handleSearchChange = (value: string) => {
+    setLocalSearchTerm(value)
+    triggerSearch(value)
+  }
+
+  const clearSearch = () => {
+    setLocalSearchTerm("")
+    triggerSearch("")
+  }
+
   return {
-    searchTerm: searchParams.searchTerm ?? "",
-    setSearchTerm,
+    searchTerm: localSearchTerm,
+    setSearchTerm: handleSearchChange,
+    clearSearch
   }
 }

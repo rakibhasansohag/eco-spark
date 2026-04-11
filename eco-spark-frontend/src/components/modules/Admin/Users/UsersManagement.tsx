@@ -36,8 +36,13 @@ function UserActionsCell({ user }: { user: IUser }) {
     <div className="flex items-center gap-2">
       <ConfirmDialog
         trigger={
-          <Button variant="outline" size="sm">
-            {user.role === "ADMIN" ? "Make Member" : "Make Admin"}
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={user.role === "ADMIN"}
+            title={user.role === "ADMIN" ? "Admins cannot be demoted to members" : ""}
+          >
+            {user.role === "ADMIN" ? "Admin" : "Make Admin"}
           </Button>
         }
         title={`Change Role to ${user.role === "ADMIN" ? "Member" : "Admin"}`}

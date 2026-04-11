@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { ColumnDef } from "@tanstack/react-table"
 import { toast } from "sonner"
-import { CheckCircle, Lightbulb, XCircle, Trash2 } from "lucide-react"
+import { CheckCircle, Lightbulb, XCircle, Trash2, X } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -319,11 +319,26 @@ export default function AdminIdeasManagement({
             ))}
           </SelectContent>
         </Select>
-        <Input
-          placeholder="Filter by location"
-          value={locationInput}
-          onChange={(e) => setLocationInput(e.target.value)}
-        />
+        <div className="relative">
+          <Input
+            placeholder="Filter by location"
+            value={locationInput}
+            onChange={(e) => setLocationInput(e.target.value)}
+            className="pr-9"
+          />
+          {locationInput ? (
+            <button
+              type="button"
+              onClick={() => {
+                setLocationInput("")
+                setFilter("locationScope", "")
+              }}
+              className="absolute top-1/2 right-3 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <X className="size-3.5" />
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2">

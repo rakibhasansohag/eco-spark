@@ -87,6 +87,12 @@ export const UserService = {
   updateByAdmin: async (id: string, payload: { role?: string; status?: string }) => {
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) throw new AppError(StatusCodes.NOT_FOUND, "User not found");
+
+    // RULE: Cannot demote an ADMIN to MEMBER
+    if (user.role === Role.ADMIN && payload.role === Role.MEMBER) {
+      throw new AppError(StatusCodes.FORBIDDEN, "Administrative protection: Admins cannot be demoted to members.");
+    }
+
     return prisma.user.update({
       where: { id },
       data: {
