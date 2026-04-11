@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useRef, useState, useEffect } from "react"
+import { useCallback, useRef, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 
 interface UseServerManagedDataTableSearchArgs {
@@ -15,11 +15,12 @@ export function useServerManagedDataTableSearch({
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
   
   const [localSearchTerm, setLocalSearchTerm] = useState(searchParams.searchTerm ?? "")
+  const [prevSearchTerm, setPrevSearchTerm] = useState(searchParams.searchTerm ?? "")
 
-  // Sync with URL when it changes
-  useEffect(() => {
+  if (searchParams.searchTerm !== prevSearchTerm) {
+    setPrevSearchTerm(searchParams.searchTerm ?? "")
     setLocalSearchTerm(searchParams.searchTerm ?? "")
-  }, [searchParams.searchTerm])
+  }
 
   const triggerSearch = useCallback(
     (value: string) => {

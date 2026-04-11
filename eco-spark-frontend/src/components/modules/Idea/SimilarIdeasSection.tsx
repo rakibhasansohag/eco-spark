@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { getSimilarIdeas } from "@/services/idea.services"
 import { IdeaCard } from "@/components/shared/card/IdeaCard"
+import { IIdea } from "@/types/idea.types"
 
 export function SimilarIdeasSection({ ideaId }: { ideaId: string }) {
   const { data: similarIdeas, isLoading } = useQuery({
@@ -29,7 +30,7 @@ export function SimilarIdeasSection({ ideaId }: { ideaId: string }) {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
-          {similarIdeas?.map((idea: any) => (
+          {similarIdeas?.map((idea: IIdea) => (
             <IdeaCard key={idea.id} idea={idea} href={`/ideas/${idea.id}`} />
           ))}
         </div>

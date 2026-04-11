@@ -33,10 +33,11 @@ export default async function IdeaDetailsPage({
     const [res, token] = await Promise.all([getIdeaById(id), getAccessToken()])
     ideaResult = res;
     accessToken = token;
-  } catch (error: any) {
-    console.error("IdeaDetailsPage: Error fetching initial data", error?.message || error);
+  } catch (error) {
+    const err = error as { message?: string; response?: { status?: number } };
+    console.error("IdeaDetailsPage: Error fetching initial data", err?.message || error);
     // If it's a 404 from axios, show notFound
-    if (error?.response?.status === 404) {
+    if (err?.response?.status === 404) {
       notFound();
     }
     // For other errors, re-throw to be caught by error.tsx

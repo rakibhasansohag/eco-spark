@@ -7,7 +7,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { getNotificationsAction, markNotificationAsReadAction, INotification } from "@/services/notification.services"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Link from "next/link"
-import { formatDate } from "@/lib/formatUtils"
 import { cn } from "@/lib/utils"
 
 export function NotificationBell() {

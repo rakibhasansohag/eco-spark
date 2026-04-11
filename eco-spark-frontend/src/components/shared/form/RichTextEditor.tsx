@@ -2,6 +2,7 @@
 
 import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
+import Placeholder from "@tiptap/extension-placeholder"
 import { Bold, Italic, List, ListOrdered, Strikethrough } from "lucide-react"
 import { Toggle } from "@/components/ui/toggle"
 
@@ -14,7 +15,12 @@ interface RichTextEditorProps {
 
 export function RichTextEditor({ value, onChange, onBlur, placeholder }: RichTextEditorProps) {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+      Placeholder.configure({
+        placeholder: placeholder ?? "Start typing...",
+      }),
+    ],
     content: value,
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
@@ -26,7 +32,7 @@ export function RichTextEditor({ value, onChange, onBlur, placeholder }: RichTex
     editorProps: {
       attributes: {
         class:
-          "min-h-[150px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 prose prose-sm dark:prose-invert max-w-none",
+          "min-h-[150px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 prose prose-sm dark:prose-invert max-w-none",
       },
     },
   })
