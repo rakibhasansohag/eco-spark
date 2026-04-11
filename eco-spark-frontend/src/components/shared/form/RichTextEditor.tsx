@@ -16,6 +16,7 @@ export function RichTextEditor({ value, onChange, onBlur, placeholder }: RichTex
   const editor = useEditor({
     extensions: [StarterKit],
     content: value,
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML())
     },
