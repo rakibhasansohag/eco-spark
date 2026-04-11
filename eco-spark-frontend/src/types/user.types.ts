@@ -9,6 +9,7 @@ export interface IUser {
   location?: string | null;
   website?: string | null;
   phone?: string | null;
+  reputation: number;
   role: "ADMIN" | "MEMBER";
   status: "ACTIVE" | "INACTIVE";
   canChangePassword?: boolean;

@@ -181,6 +181,24 @@ export const IdeaService = {
     return { ...idea, rejectionFeedback, isLocked: false };
   },
 
+  getSimilar: async (id: string) => {
+    const original = await prisma.idea.findUnique({ where: { id } });
+    if (!original) throw new AppError(StatusCodes.NOT_FOUND, "Idea not found");
+
+    const similar = await prisma.idea.findMany({
+      where: {
+        id: { not: original.id },
+        categoryId: original.categoryId,
+        status: IdeaStatus.APPROVED
+      },
+      include: ideaInclude,
+      take: 3,
+      orderBy: { createdAt: "desc" }
+    });
+
+    return similar.map(idea => ({ ...idea, isLocked: idea.isPaid }));
+  },
+
   update: async (
     id: string,
     authorId: string,
@@ -248,10 +266,26 @@ export const IdeaService = {
     if (idea.status !== IdeaStatus.UNDER_REVIEW) {
       throw new AppError(StatusCodes.BAD_REQUEST, "Only UNDER_REVIEW ideas can be approved");
     }
-    return prisma.idea.update({
+    const updated = await prisma.idea.update({
       where: { id },
       data: { status: IdeaStatus.APPROVED, rejectionFeedback: null },
     });
+
+    await prisma.user.update({
+      where: { id: idea.authorId },
+      data: { reputation: { increment: 10 } }
+    });
+
+    await prisma.notification.create({
+      data: {
+        userId: idea.authorId,
+        title: "Idea Approved!",
+        message: `Your idea "${idea.title}" has been approved. You earned +10 Reputation!`,
+        link: `/ideas/${idea.id}`
+      }
+    });
+
+    return updated;
   },
 
   reject: async (id: string, payload: IRejectIdea) => {

@@ -14,6 +14,11 @@ export const getIdeaById = async (id: string): Promise<ApiResponse<IIdea>> => {
   return res.data;
 };
 
+export const getSimilarIdeas = async (id: string): Promise<ApiResponse<IIdea[]>> => {
+  const res = await httpClient.get<ApiResponse<IIdea[]>>(`/ideas/${id}/similar`);
+  return res.data;
+};
+
 export const getMyIdeas = async (params?: Record<string, string>): Promise<ApiResponse<IIdea[]>> => {
   const res = await httpClient.get<ApiResponse<IIdea[]>>("/ideas/my-ideas", { params });
   return res.data;

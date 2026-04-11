@@ -54,6 +54,7 @@ export default async function MyProfilePage() {
             initialLocation={user.location ?? ""}
             initialWebsite={user.website ?? ""}
             initialPhone={user.phone ?? ""}
+            initialReputation={user.reputation ?? 0}
           />
         </div>
 

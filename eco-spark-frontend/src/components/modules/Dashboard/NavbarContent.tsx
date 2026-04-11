@@ -14,6 +14,7 @@ import {
 import { UserMenu } from "./UserMenu"
 import { SidebarContent } from "./SidebarContent"
 import { ThemeToggle } from "@/components/shared/ThemeToggle"
+import { NotificationBell } from "./NotificationBell"
 
 interface NavbarContentProps {
   name: string
@@ -59,6 +60,7 @@ export function NavbarContent({ name, role, canChangePassword }: NavbarContentPr
 
       {/* Right slot: theme toggle + user menu */}
       <div className="ml-auto flex items-center gap-1">
+        <NotificationBell />
         <ThemeToggle />
         <UserMenu name={name} role={role} canChangePassword={canChangePassword} />
       </div>

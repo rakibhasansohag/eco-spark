@@ -39,7 +39,7 @@ export const CommentService = {
       }
     }
 
-    return prisma.comment.create({
+    const newComment = await prisma.comment.create({
       data: {
         content: payload.content,
         ideaId: payload.ideaId,
@@ -48,6 +48,24 @@ export const CommentService = {
       },
       include: { author: { select: { id: true, name: true, email: true, image: true } } },
     });
+
+    // Determine notification recipient
+    const recipientId = payload.parentId 
+      ? (await prisma.comment.findUnique({ where: { id: payload.parentId } }))?.authorId
+      : idea.authorId;
+
+    if (recipientId && recipientId !== authorId) {
+      await prisma.notification.create({
+        data: {
+          userId: recipientId,
+          title: payload.parentId ? "New Reply to Your Comment" : "New Comment on Your Idea",
+          message: `${newComment.author.name} replied: "${payload.content.substring(0, 50)}..."`,
+          link: `/ideas/${idea.id}`
+        }
+      });
+    }
+
+    return newComment;
   },
 
   getAll: async (query: IQueryParams) => {

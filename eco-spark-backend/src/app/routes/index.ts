@@ -9,6 +9,7 @@ import { PaymentRoutes } from "../module/payment/payment.route.js";
 import { IdeaAccessRoutes } from "../module/ideaAccess/ideaAccess.route.js";
 import { NewsletterSubscriptionRoutes } from "../module/newsletterSubscription/newsletterSubscription.route.js";
 import { DashboardRoutes } from "../module/dashboard/dashboard.route.js";
+import { NotificationRoutes } from "../module/notification/notification.route.js";
 
 const router = Router();
 
@@ -27,5 +28,6 @@ router.use("/newsletter-subscriptions", NewsletterSubscriptionRoutes);
 router.use("/dashboard", DashboardRoutes);
 router.use("/watchlists", WatchlistRoutes);
 router.use("/reviews", ReviewRoutes);
+router.use("/notifications", NotificationRoutes);
 
 export default router;

@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select"
 import { AppField } from "@/components/shared/form/AppField"
 import { AppTextarea } from "@/components/shared/form/AppTextarea"
+import { RichTextEditor } from "@/components/shared/form/RichTextEditor"
 import { AppFileInput } from "@/components/shared/form/AppFileInput"
 import { AppSubmitButton } from "@/components/shared/form/AppSubmitButton"
 import { normalizeErrors } from "@/lib/formUtils"
@@ -563,22 +564,23 @@ export function CreateIdeaForm() {
               ...(serverErrors.description ?? []),
             ]
             return (
-          <AppTextarea
-            id={field.name}
-            label="Full Description"
-            value={field.state.value}
-            onChange={(value) => {
-              clearFieldError("description")
-              setFormError(null)
-              setCoreSnapshot((prev) => ({ ...prev, description: value }))
-              field.handleChange(value)
-            }}
-            onBlur={field.handleBlur}
-            touched={field.state.meta.isTouched || (serverErrors.description?.length ?? 0) > 0}
-            errors={mergedErrors}
-            placeholder="Detailed information, implementation steps, expected impact…"
-            rows={5}
-          />
+          <div className="space-y-2">
+            <Label htmlFor={field.name}>Full Description</Label>
+            <RichTextEditor
+              value={field.state.value}
+              onChange={(value) => {
+                clearFieldError("description")
+                setFormError(null)
+                setCoreSnapshot((prev) => ({ ...prev, description: value }))
+                field.handleChange(value)
+              }}
+              onBlur={field.handleBlur}
+              placeholder="Detailed information, implementation steps, expected impact…"
+            />
+            {field.state.meta.isTouched || (serverErrors.description?.length ?? 0) > 0 ? (
+              <p className="text-sm text-destructive">{mergedErrors[0]}</p>
+            ) : null}
+          </div>
             )
           })()
         )}

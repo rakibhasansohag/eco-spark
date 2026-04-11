@@ -11,11 +11,34 @@ export const VoteService = {
       throw new AppError(StatusCodes.NOT_FOUND, "Idea not found");
     }
 
+    const existingVote = await prisma.vote.findUnique({
+      where: { userId_ideaId: { userId, ideaId: payload.ideaId } }
+    });
+
     const vote = await prisma.vote.upsert({
       where: { userId_ideaId: { userId, ideaId: payload.ideaId } },
       update: { type: payload.type },
       create: { userId, ideaId: payload.ideaId, type: payload.type },
     });
+
+    // If it's a new upvote or switched from downvote to upvote
+    if (payload.type === VoteType.UPVOTE && (!existingVote || existingVote.type !== VoteType.UPVOTE)) {
+      await prisma.user.update({
+        where: { id: idea.authorId },
+        data: { reputation: { increment: 1 } }
+      });
+
+      if (userId !== idea.authorId) {
+        await prisma.notification.create({
+          data: {
+            userId: idea.authorId,
+            title: "New Upvote!",
+            message: `Someone upvoted your idea "${idea.title}". (+1 Rep)`,
+            link: `/ideas/${idea.id}`
+          }
+        });
+      }
+    }
 
     return vote;
   },

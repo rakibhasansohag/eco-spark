@@ -21,6 +21,7 @@ const publicUserSelect = {
   phone: true,
   role: true,
   status: true,
+  reputation: true,
   createdAt: true,
   updatedAt: true,
 } as const;

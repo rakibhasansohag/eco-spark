@@ -15,6 +15,7 @@ router.post("/auto-seed", checkAuth(Role.ADMIN), IdeaController.autoSeed);
 
 // Public routes
 router.get("/", IdeaController.getAll);
+router.get("/:id/similar", IdeaController.getSimilar);
 router.get("/:id", IdeaController.getById);
 
 // Member mutations

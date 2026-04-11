@@ -10,6 +10,7 @@ import { IdeaVoteSection } from "@/components/modules/Idea/IdeaVoteSection"
 import { IdeaCommentSection } from "@/components/modules/Idea/IdeaCommentSection"
 import { IdeaBuyButton } from "@/components/modules/Idea/IdeaBuyButton"
 import { PaidIdeaGate } from "@/components/modules/Idea/PaidIdeaGate"
+import { SimilarIdeasSection } from "@/components/modules/Idea/SimilarIdeasSection"
 import { WatchlistButton } from "@/components/modules/Idea/WatchlistButton"
 import { ShareIdeaButton } from "@/components/modules/Idea/ShareIdeaButton"
 import { UserReviewsSection } from "@/components/modules/Idea/UserReviewsSection"
@@ -101,13 +102,13 @@ export default async function IdeaDetailsPage({
               {idea.proposedSolution ? (
                 <div>
                   <h2 className="text-base font-semibold">Proposed Solution</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">{idea.proposedSolution}</p>
+                  <div className="mt-1 text-sm text-muted-foreground prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: idea.proposedSolution }} />
                 </div>
               ) : null}
               {idea.description ? (
                 <div>
                   <h2 className="text-base font-semibold">Description</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">{idea.description}</p>
+                  <div className="mt-1 text-sm text-muted-foreground prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: idea.description }} />
                 </div>
               ) : null}
             </>
@@ -194,6 +195,8 @@ export default async function IdeaDetailsPage({
       />
 
       <UserReviewsSection ideaId={id} isLoggedIn={isLoggedIn} canReview={!contentLocked} />
+
+      <SimilarIdeasSection ideaId={id} />
     </main>
   )
 }

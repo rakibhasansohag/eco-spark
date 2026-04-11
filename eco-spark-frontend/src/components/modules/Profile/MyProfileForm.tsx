@@ -12,6 +12,7 @@ import { updateProfileAction } from "@/app/(dashboardLayout)/(commonProtectedLay
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { UserBadge } from "@/components/shared/UserBadge"
 
 interface MyProfileFormProps {
   initialName: string
@@ -23,6 +24,7 @@ interface MyProfileFormProps {
   initialLocation?: string
   initialWebsite?: string
   initialPhone?: string
+  initialReputation: number
 }
 
 export function MyProfileForm({
@@ -35,6 +37,7 @@ export function MyProfileForm({
   initialLocation = "",
   initialWebsite = "",
   initialPhone = "",
+  initialReputation = 0,
 }: MyProfileFormProps) {
   const mutation = useMutation({ mutationFn: updateProfileAction })
   const initials = useMemo(
@@ -108,6 +111,9 @@ export function MyProfileForm({
                 <p className="text-xs text-muted-foreground">
                   PNG, JPG, WEBP up to 2MB
                 </p>
+                <div className="pt-1">
+                  <UserBadge reputation={initialReputation} />
+                </div>
               </div>
             </div>
           </div>
