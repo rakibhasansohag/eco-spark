@@ -40,13 +40,17 @@ export function AdminStatusBarChart({ title, data }: AdminStatusBarChartProps) {
               tick={{ fontSize: 12, fill: "var(--color-muted-foreground)" }}
             />
             <Tooltip
+              cursor={{ fill: "var(--color-muted)", opacity: 0.15 }}
               formatter={(value) => [Number(value).toLocaleString(), "Count"]}
               contentStyle={{
                 borderRadius: 12,
                 border: "1px solid var(--color-border)",
                 background: "var(--color-card)",
-                color: "var(--color-card-foreground)",
+                color: "var(--color-foreground)",
+                boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
               }}
+              itemStyle={{ color: "var(--color-foreground)", fontSize: 12 }}
+              labelStyle={{ color: "var(--color-muted-foreground)", fontWeight: 600, marginBottom: 4 }}
             />
             <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={34}>
               {data.map((item, index) => (

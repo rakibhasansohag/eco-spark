@@ -1,5 +1,6 @@
 import { Router } from "express";
 import checkAuth from "../../middleware/checkAuth.js";
+import { extractUser } from "../../middleware/extractUser.js";
 import validateRequest from "../../middleware/validateRequest.js";
 import { IdeaController } from "./idea.controller.js";
 import { createIdeaZodSchema, updateIdeaZodSchema, rejectIdeaZodSchema } from "./idea.validation.js";
@@ -14,10 +15,10 @@ router.get("/admin-all", checkAuth(Role.ADMIN), IdeaController.getAllForAdmin);
 router.post("/auto-seed", checkAuth(Role.ADMIN), IdeaController.autoSeed);
 router.post("/trigger-automation", IdeaController.triggerAutomation);
 
-// Public routes
-router.get("/", IdeaController.getAll);
-router.get("/:id/similar", IdeaController.getSimilar);
-router.get("/:id", IdeaController.getById);
+// Public routes (using extractUser to optionally identify logged in users for access checks)
+router.get("/", extractUser, IdeaController.getAll);
+router.get("/:id/similar", extractUser, IdeaController.getSimilar);
+router.get("/:id", extractUser, IdeaController.getById);
 
 // Member mutations
 router.post(

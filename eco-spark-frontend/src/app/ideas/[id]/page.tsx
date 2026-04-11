@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation"
 import { getIdeaById } from "@/services/idea.services"
 import { getVoteCounts } from "@/services/vote.services"
 import { getCommentList } from "@/services/comment.services"
@@ -8,7 +9,6 @@ import { Badge } from "@/components/ui/badge"
 import { BackLink } from "@/components/shared/BackLink"
 import { IdeaVoteSection } from "@/components/modules/Idea/IdeaVoteSection"
 import { IdeaCommentSection } from "@/components/modules/Idea/IdeaCommentSection"
-import { IdeaBuyButton } from "@/components/modules/Idea/IdeaBuyButton"
 import { PaidIdeaGate } from "@/components/modules/Idea/PaidIdeaGate"
 import { SimilarIdeasSection } from "@/components/modules/Idea/SimilarIdeasSection"
 import { WatchlistButton } from "@/components/modules/Idea/WatchlistButton"
@@ -26,9 +26,28 @@ export default async function IdeaDetailsPage({
 }) {
   const { id } = await params
 
-  const [ideaResult, accessToken] = await Promise.all([getIdeaById(id), getAccessToken()])
+  let ideaResult;
+  let accessToken;
 
-  const idea = ideaResult.data
+  try {
+    const [res, token] = await Promise.all([getIdeaById(id), getAccessToken()])
+    ideaResult = res;
+    accessToken = token;
+  } catch (error: any) {
+    console.error("IdeaDetailsPage: Error fetching initial data", error?.message || error);
+    // If it's a 404 from axios, show notFound
+    if (error?.response?.status === 404) {
+      notFound();
+    }
+    // For other errors, re-throw to be caught by error.tsx
+    throw error;
+  }
+
+  const idea = ideaResult?.data
+  if (!idea) {
+    notFound();
+  }
+
   const decoded = decodeAccessToken(accessToken)
   const isLoggedIn = !!decoded
   const currentUserId = decoded?.userId
@@ -47,8 +66,12 @@ export default async function IdeaDetailsPage({
   // Check paid access
   let hasAccess = false
   if (idea.isPaid && isLoggedIn) {
-    const accessResult = await checkIdeaAccess(id).catch(() => ({ data: { hasAccess: false } }))
-    hasAccess = accessResult.data.hasAccess
+    if (userRole === "ADMIN") {
+      hasAccess = true
+    } else {
+      const accessResult = await checkIdeaAccess(id).catch(() => ({ data: { hasAccess: false } }))
+      hasAccess = accessResult.data.hasAccess
+    }
   }
 
   const contentLocked = idea.isPaid && !hasAccess

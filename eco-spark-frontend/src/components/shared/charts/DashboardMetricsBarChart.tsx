@@ -63,13 +63,17 @@ export function DashboardMetricsBarChart({ title, data }: DashboardMetricsBarCha
               tickLine={false}
             />
             <Tooltip
+              cursor={{ fill: "hsl(var(--muted))", opacity: 0.2 }}
               formatter={(value) => [Number(value).toLocaleString(), "Value"]}
               contentStyle={{
                 borderRadius: 12,
                 border: "1px solid hsl(var(--border))",
                 background: "hsl(var(--card))",
-                color: "hsl(var(--card-foreground))",
+                color: "hsl(var(--foreground))",
+                boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
               }}
+              itemStyle={{ color: "hsl(var(--foreground))", fontSize: 12 }}
+              labelStyle={{ color: "hsl(var(--muted-foreground))", fontWeight: 600, marginBottom: 4 }}
             />
             <Bar
               dataKey="value"
