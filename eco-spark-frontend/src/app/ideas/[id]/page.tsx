@@ -54,7 +54,7 @@ export default async function IdeaDetailsPage({
   const contentLocked = idea.isPaid && !hasAccess
 
   return (
-    <main className="container mx-auto px-4 py-10 md:px-6">
+    <main className="container mx-auto max-w-7xl px-4 py-10 md:px-6">
       <BackLink href="/ideas" label="All Ideas" />
 
       <article className="mt-4 rounded-lg border bg-card p-6">
