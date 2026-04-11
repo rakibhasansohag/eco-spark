@@ -1,5 +1,5 @@
-import { FormSkeleton } from "@/components/shared/skeleton/FormSkeleton"
+import { ProfileSkeleton } from "@/components/shared/skeleton/ProfileSkeleton"
 
 export default function MyProfileLoading() {
-  return <FormSkeleton />
+  return <ProfileSkeleton />
 }

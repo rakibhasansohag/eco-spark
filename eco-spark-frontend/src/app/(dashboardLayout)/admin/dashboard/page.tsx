@@ -88,10 +88,10 @@ export default async function AdminDashboardPage() {
       ) : null}
       <FadeInSection delay={0.04}>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <StatsCard title="Total Members" value={stats.totalMembers} icon={Users} />
-          <StatsCard title="Total Ideas" value={stats.totalIdeas} icon={Lightbulb} />
-          <StatsCard title="Approval Rate" value={`${approvalRate}%`} icon={CheckCircle2} />
-          <StatsCard title="Review Queue" value={reviewQueue} icon={Clock3} />
+          <StatsCard title="Total Members" value={stats.totalMembers} icon={<Users className="size-5" />} />
+          <StatsCard title="Total Ideas" value={stats.totalIdeas} icon={<Lightbulb className="size-5" />} />
+          <StatsCard title="Approval Rate" value={`${approvalRate}%`} icon={<CheckCircle2 className="size-5" />} />
+          <StatsCard title="Review Queue" value={reviewQueue} icon={<Clock3 className="size-5" />} />
         </div>
       </FadeInSection>
       <FadeInSection delay={0.08}>

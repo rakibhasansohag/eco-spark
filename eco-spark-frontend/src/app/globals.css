@@ -175,5 +175,23 @@
   .beam-hover:hover::before {
     transform: translateX(150%) scale(1);
   }
+
+  @keyframes beam-skeleton {
+    0% {
+      transform: translateX(-100%) rotate(20deg);
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      transform: translateX(250%) rotate(20deg);
+      opacity: 0;
+    }
+  }
+
+  .animate-beam-skeleton {
+    animation: beam-skeleton 2s infinite linear;
+  }
 }
 

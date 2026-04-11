@@ -357,6 +357,11 @@ Do not wrap the array in markdown code blocks like \`\`\`json, return just the a
     const createdIdeas = [];
     for (const idea of generatedIdeas) {
       const cat = categories.find(c => c.name.toLowerCase() === idea.category.toLowerCase()) || categories[0];
+      
+      // Randomly decide if paid or free (33% chance of paid)
+      const isPaid = Math.random() < 0.33;
+      const price = isPaid ? new Prisma.Decimal(Math.floor(Math.random() * 41) + 10) : null; // $10 - $50
+
       const newIdea = await prisma.idea.create({
         data: {
           title: idea.title,
@@ -366,7 +371,8 @@ Do not wrap the array in markdown code blocks like \`\`\`json, return just the a
           authorId: adminUserId,
           categoryId: cat.id,
           status: IdeaStatus.APPROVED,
-          isPaid: false
+          isPaid,
+          price
         }
       });
       createdIdeas.push(newIdea);

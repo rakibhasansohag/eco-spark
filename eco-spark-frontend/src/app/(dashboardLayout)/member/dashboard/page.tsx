@@ -90,10 +90,10 @@ export default async function MemberDashboardPage() {
       ) : null}
       <FadeInSection delay={0.04}>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <StatsCard title="My Total Ideas" value={stats.totalIdeas} icon={Lightbulb} />
-          <StatsCard title="Approval Rate" value={`${approvalRate}%`} icon={CheckCircle2} />
-          <StatsCard title="In Review" value={inReviewCount} icon={Clock3} />
-          <StatsCard title="Engagement" value={totalEngagement} icon={Activity} />
+          <StatsCard title="My Total Ideas" value={stats.totalIdeas} icon={<Lightbulb className="size-5" />} />
+          <StatsCard title="Approval Rate" value={`${approvalRate}%`} icon={<CheckCircle2 className="size-5" />} />
+          <StatsCard title="In Review" value={inReviewCount} icon={<Clock3 className="size-5" />} />
+          <StatsCard title="Engagement" value={totalEngagement} icon={<Activity className="size-5" />} />
         </div>
       </FadeInSection>
       <FadeInSection delay={0.08}>

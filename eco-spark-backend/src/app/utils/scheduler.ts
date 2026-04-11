@@ -1,17 +1,18 @@
+import cron from "node-cron";
 import { IdeaService } from "../module/idea/idea.service.js";
 import prisma from "../lib/prisma.js";
 
 /**
- * Starts a background interval to automatically generate AI ideas
- * every 24 hours. It uses the first available admin user as the author.
+ * Starts a background cron job to automatically generate AI ideas
+ * at 12:00 AM every day. It uses the first available admin user as the author.
  */
 export const startIdeaAutomationScheduler = async () => {
-  console.info("Scheduler: Initializing AI Idea Automation (24h interval)...");
+  console.info("Scheduler: Initializing AI Idea Automation (12:00 AM Cron)...");
 
   // Define the task
   const runAutomation = async () => {
     try {
-      console.info("Scheduler: Running monthly/daily AI idea generation batch...");
+      console.info("Scheduler: Running daily AI idea generation batch (Midnight task)...");
       const admin = await prisma.user.findFirst({ where: { role: "ADMIN" } });
       
       if (admin) {
@@ -25,11 +26,9 @@ export const startIdeaAutomationScheduler = async () => {
     }
   };
 
-  // Run immediately on startup (for demo/dev purposes) if needed, 
-  // or just set the interval. Let's just set the interval.
-  const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+  // Schedule to run at 12:00 AM (midnight) every day
+  // Minute 0, Hour 0, Day *, Month *, DayOfWeek *
+  cron.schedule("0 0 * * *", runAutomation);
   
-  setInterval(runAutomation, TWENTY_FOUR_HOURS);
-  
-  console.info("Scheduler: AI Idea Automation active.");
+  console.info("Scheduler: AI Idea Automation active (Cron set to 00:00).");
 };
