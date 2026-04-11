@@ -14,12 +14,13 @@ export function useServerManagedDataTableSearch({
   const pathname = usePathname()
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
   
-  const [localSearchTerm, setLocalSearchTerm] = useState(searchParams.searchTerm ?? "")
-  const [prevSearchTerm, setPrevSearchTerm] = useState(searchParams.searchTerm ?? "")
+  const currentPropTerm = searchParams.searchTerm ?? ""
+  const [localSearchTerm, setLocalSearchTerm] = useState(currentPropTerm)
+  const [prevSearchTerm, setPrevSearchTerm] = useState(currentPropTerm)
 
-  if (searchParams.searchTerm !== prevSearchTerm) {
-    setPrevSearchTerm(searchParams.searchTerm ?? "")
-    setLocalSearchTerm(searchParams.searchTerm ?? "")
+  if (currentPropTerm !== prevSearchTerm) {
+    setPrevSearchTerm(currentPropTerm)
+    setLocalSearchTerm(currentPropTerm)
   }
 
   const triggerSearch = useCallback(
